@@ -1,0 +1,18 @@
+{
+  "gpu_preflight": [
+    {
+      "timestamp": "2026/09/21 21:00:01.137",
+      "uuid": "GPU-2dc4b50c-07a5-26d6-f5ce-54ef728d56b2",
+      "utilization_pct": 0,
+      "memory_used_mib": 0,
+      "sm_clock_mhz": 2032
+    },
+    {
+      "timestamp": "2026/09/21 21:00:02.262",
+      "uuid": "GPU-2dc4b50c-07a5-26d6-f5ce-54ef728d56b2",
+      "utilization_pct": 0,
+      "memory_used_mib": 0,
+      "sm_clock_mhz": 2032
+    }
+  ]
+}

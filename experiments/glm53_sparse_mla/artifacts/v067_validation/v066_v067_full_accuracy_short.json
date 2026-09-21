@@ -1,0 +1,46 @@
+{
+  "purpose": "accuracy only; no latency claim",
+  "args": {
+    "kernel_versions": [
+      "v066",
+      "v067"
+    ],
+    "include_trtllm": false,
+    "local_tokens": 1024,
+    "chunk": 0,
+    "seed": 5678,
+    "batch_rows": 256,
+    "output_json": "artifacts/v066_v067_full_accuracy_short.json"
+  },
+  "benchmark_sha256": "d843320fb5147a807135282a1b87bb4c247cdd7a6a16b9107d546c48c8a8fb66",
+  "atol": 0.01,
+  "rtol": 0.05,
+  "cases": {
+    "v066": {
+      "kernel_sha256": "3fdff6a52010734d274e557217a307b5f953bec7453849d0dbe3e773615df1be",
+      "finite": true,
+      "mismatches": 0,
+      "max_abs": 0.007934808731079102,
+      "squared_error_sum": 1.4839477196914865,
+      "examples": [],
+      "checked_rows": 1024,
+      "checked_elements": 33554432,
+      "rmse": 0.00021029761850465875,
+      "relative_rmse": 0.001657997534213763,
+      "pass": true
+    },
+    "v067": {
+      "kernel_sha256": "a4a8879a8ca7fdc12eb1880e0cb10bff72fecf1895246f59a3feafd81e7c7fff",
+      "finite": true,
+      "mismatches": 0,
+      "max_abs": 0.008034229278564453,
+      "squared_error_sum": 1.5210060684289917,
+      "examples": [],
+      "checked_rows": 1024,
+      "checked_elements": 33554432,
+      "rmse": 0.00021290728781552258,
+      "relative_rmse": 0.0016785723049282,
+      "pass": true
+    }
+  }
+}

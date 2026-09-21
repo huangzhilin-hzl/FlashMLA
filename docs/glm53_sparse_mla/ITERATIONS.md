@@ -1933,3 +1933,123 @@ of three runs. Qualified b512/chunk0 device memcheck with --report-api-errors
 no reports zero errors and passes its two sampled reference rows. The README
 now points residual performance runs tov065, retainingv053 as the independently
 audited full-reference baseline andv054 as the fast baseline-precision path.
+
+## Iteration 067 — wider bounded anchor window
+
+Based onv066, use probability scale16 and a4.5-log2 anchor window. The maximum
+high-P input remains16*2^4.5≈362.04, so overflow headroom is unchanged. This
+may avoid additional output corrections, at the cost of coarser FP8 subnormal
+resolution for the high/residual terms. This is a distinct speed/accuracy
+experiment, not an assumed improvement. No tolerance or reference changes.
+Independent full-reference and additional-input checks are required before
+any accuracy claim or promotion. Pending.
+
+### Iteration 066 initial performance and independent full audit
+
+Smoke/full-target8-row checks pass; warm events2160.61us versusTRT1691.81us
+improve about2.9% overv065. NCU:102 registers,203064 shared bytes,
+occupancy23.327%,tensor35.395%,eligible0.524663,long-scoreboard6.604001,
+zero local sectors,shared conflicts3599362/2882458,diagnostic3.670752ms.
+
+An independent full8192-row/seed1234 FP32-reference audit passes every one
+of268435456 output elements with the unchanged tolerance. Max_abs0.005918741,
+relative_RMSE0.001709720; all finite, zero mismatches. The lower probability
+scale slightly increases relative error fromv053's0.001693324 while preserving
+this full-input pass. Other seeds/short/masked inputs and stable timing pending.
+
+## Iteration 068 — N256 with two compute groups and a larger role budget
+
+Revisit the rejectedv059 single-stage N256 idea onv066's residual path. Use
+two compute groups, each processing64 scores per thread, plus eight producer
+warps. Compute requests208 registers and producers32 (61440 total), subject
+to inspection of the actual compiled pool. This targetsv059's heavy local
+traffic by allowing larger per-thread compute fragments; it changes multiple
+resource choices and is not an isolated measurement of tile size alone.
+
+A single256-key KV stage and two16KiB probability buffers fit shared memory.
+Each query has eight iterations. QK usesN256; PV uses eightK32 steps. Four
+collector buffers cover one K-group of128 keys at a time, scheduling its
+high/residual pair before reusing collectors for the next K-group. Each output
+now interleaves high/residual terms across these K-groups, so FP32 accumulation
+order changes and an independent accuracy audit is necessary.
+
+Score coordinate audit, offline registers/spills, bounded smoke and profiling
+precede any promotion. The producer loses double-buffer prefetch; reduced
+synchronization may or may not offset that cost. Pending.
+
+### Iteration 067 initial performance and two full-reference seeds
+
+Smoke and8-row target checks pass. Warm events2048.38us versusTRT1693.86us,
+about5.2% belowv066. NCU:102 registers,203064 shared bytes,occupancy23.314%,
+tensor37.469%,eligible0.539711,long-scoreboard6.569879,zero local sectors,
+shared conflicts3586383/2894575,diagnostic3.468544ms.
+
+All268435456 elements independently pass for both seed1234 and seed5678.
+Seed1234:max_abs0.005918741,relative_RMSE0.001735970; seed5678:max_abs
+0.005017400,relative_RMSE0.001735982. The same seed5678 audit independently
+passesv066 with max_abs0.004050493,relative_RMSE0.001709954. These numerical
+comparisons show a small accuracy tradeoff, with both still passing the
+original tolerance. Stable timing and additional edge checks pending.
+
+## Iteration 069 — scale4 with a6.5-log2 bounded anchor
+
+Based onv067, lower high/residual probability scale to4 and widen the anchor
+window to6.5 log2 units, retaining the same maximum input≈362.04. This tests
+additional correction avoidance against increased subnormal rounding error.
+Independent reference audits, including additional seeds, remain mandatory;
+passingv067 does not validate this candidate. No tolerance changes. Pending.
+
+### Iteration 067 stable timing and edge validation
+
+512-row Graph checks pass: warm2134.14us versusTRT1869.14us, cold2107.38us
+versusTRT1926.99us. These sustained timings are slower than the short2048us
+event result and must not be conflated. Both regimes improve overv065.
+
+The full1024-row/chunk0/seed5678 audit passes all33554432 elements forv066
+andv067. v066:max_abs0.007934809,relative_RMSE0.001657998;v067:max_abs
+0.008034229,relative_RMSE0.001678572. v067's internal-hole/partial case passes
+the unchanged reference with max_abs0.004001856. Qualified b512/chunk0
+memcheck (--report-api-errors no) reports zero device errors and passes its
+two numerical rows. v067 is the best validated higher-precision path so far.
+
+v068's offline coordinate audit passes. CUBIN REG128,STACK176, with actual
+USETMAXREG32/208 instructions; its61440-register role sum fits the65536
+initial pool. The nonzero stack suggests local traffic may still limit it;
+runtime profiling is required before evaluating the N256 hypothesis.
+
+### Iteration 068 result — N256 rejected again
+
+Smoke/full-target8-row checks pass, but warm2820.26us versusTRT1691.87us
+regresses substantially. NCU:128 registers,219432 shared bytes,occupancy
+23.358%,tensor28.350%,eligible0.313090,long-scoreboard12.293159,local read/
+write sectors28049420/11543824,shared conflicts32813/112796,diagnostic
+4.578528ms. Even the larger compute register budget does not remove local
+traffic; single-stage N256 is not promising in this form. No promotion or
+expanded reference claim for this rejected performance experiment.
+
+## Iteration 070 — single-P speed/accuracy boundary experiment
+
+Based onv054, use the same scale16/window4.5 finite-range anchor rule asv067,
+with a single FP8 probability term. This isolates the speed/accuracy tradeoff
+of reduced output correction without the extra residual PV. It is **not**
+a higher-precision candidate and cannot inheritv067's all-row passes or
+v054's close TRTLLM equivalence. Earlier bounded single-Pv051 had more
+reference failures, so full auditing against both FP32 and TRTLLM is essential.
+
+Keep original tolerances, retain every failure count, and do not promote based
+on the original eight sampled rows alone. The current validated fast and
+higher-precision paths remainv054 andv067. Pending.
+
+### Iteration 069 result — little speed benefit for lower precision
+
+Smoke/full-target8-row checks pass. Warm2043.84us versusTRT1693.66us improves
+only4.5us over v067's short run, insufficient to favor the precision tradeoff.
+NCU:102 registers,203064 shared bytes,occupancy23.319%,tensor37.648%,
+eligible0.540857,long-scoreboard6.562892,zero local sectors,shared conflicts
+3600192/2890032,diagnostic3.454304ms.
+
+Full8192-row audits pass the original combined tolerance for seed1234 and
+seed5678. Their max_abs errors rise to0.011162430/0.010025859 and relative_RMSE
+to0.001953739/0.001952327. A max absolute error over0.01 can still pass the
+unchanged atol+rtol criterion; no threshold was altered. Prefer v067's
+better precision and already completed stable/edge validation.

@@ -29,6 +29,8 @@ for directory in sorted(root.glob("v[0-9][0-9][0-9]")):
     status = "unsafe; rejected" if version in ("v002", "v003") else "prototype"
     if version == "v053":
         status = "all 8192 rows PASS, seed1234"
+    if version in ("v066", "v067", "v069"):
+        status = "all8192 rows PASS, seeds1234/5678"
     if version in ("v054", "v063"):
         status = "same 9 all-row failures as TRT"
     if version == "v065":

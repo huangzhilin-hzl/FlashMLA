@@ -1,0 +1,3 @@
+WS COPY AUDIT PASS: physical datapath = local thread id, column = element index
+WS LOGICAL COVERAGE PASS: every head/key element is covered exactly once
+Output staging is unchanged from v054/v066 two-group mapping
