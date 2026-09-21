@@ -1,0 +1,3 @@
+WS COPY AUDIT PASS: physical datapath = local thread id, column = element index
+WS LOGICAL COVERAGE PASS: every head/key element is covered exactly once
+WS EPILOGUE AUDIT PASS: all output coordinates match physical N256 MMA layout

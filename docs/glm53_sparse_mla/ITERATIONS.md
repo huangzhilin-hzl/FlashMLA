@@ -897,7 +897,7 @@ utilization against prior isolated runs. Preserve the raw evidence. GPU
 benchmarking waits for an available authorized GPU1; no other GPU or process
 is modified.
 
-## Iteration 034 — two compute warpgroups per tile (pending)
+## Iteration 034 — two compute warpgroups per tile
 
 File: `experiments/glm53_sparse_mla/kernel_v034.py`, based on v030.
 Use 384 threads: two 128-thread compute groups and the original 128-thread TMA
@@ -922,7 +922,7 @@ memory size. Numerical and runtime checks remain pending. The GPU preflight
 correctly refused the v034 timing/profiling command while 257665 MiB remained
 allocated on GPU1; its log is preserved with the offline compilation evidence.
 
-## Iteration 035 — TMEM probabilities with matching A/D lane alignment (pending)
+## Iteration 035 — TMEM probabilities with matching A/D lane alignment
 
 File: `experiments/glm53_sparse_mla/kernel_v035.py`, based on v030.
 The preserved TRTLLM SASS contains PV-like MMA groups using a `tmem[...]`
@@ -993,3 +993,165 @@ that improves latency. Preserve original FP32 tolerances and explicitly
 retain the existing short-sequence numerical limitation. Re-run v033 timing
 only if it becomes useful for comparison; its spilled correction path is not
 currently preferred.
+
+### GPU1 availability and iteration 034/035 measured results
+
+GPU1 became idle again at 18:36:07 pod time (two samples: utilization 0%,
+allocated memory 0 MiB); isolated GPU work resumed under the original UUID.
+Both corrected candidates pass b2 smoke and full-target 8-row checks with the
+original tolerances, max_abs 0.006737709 and relative_RMSE 0.014866708.
+
+v034 paired warm events: TRTLLM 1693.82 us versus candidate 2878.69 us,
+approximately 0.5884x. This is about 4% faster than the previous 3.0 ms best.
+NCU: registers 90, shared 194864 bytes, occupancy 17.190%, tensor 35.800%,
+eligible 0.35235, long scoreboard 5.88091, local sectors 0/0, shared conflicts
+5119552/191873, diagnostic 4.947520 ms. Splitting compute work improves
+end-to-end time even with additional cross-group reductions.
+
+v035 paired warm events: TRTLLM 1691.90 us versus candidate 3045.25 us,
+approximately 0.5556x. NCU: registers 126, shared 185648 bytes, occupancy 10.813%,
+tensor 33.832%, eligible 0.23408, long scoreboard 4.63940, local sectors 0/0,
+shared conflicts 5675146/11780, diagnostic 5.223104 ms. Removing shared P saves
+8192 shared bytes but does not improve runtime by itself. Keep this as a
+validated layout/data-path building block rather than the best candidate.
+
+### Iteration 034 expanded Graph and device memory validation
+
+Full b8192/chunk3/seed1234 passes 64 checked rows, max_abs 0.009754896 and
+relative_RMSE 0.014703961. TRTLLM passes with max_abs 0.010130458. The original
+atol=0.01/rtol=0.05 criteria are unchanged and this remains sampled validation.
+20 warmups/100 Graph repeats: warm v034 2879.57 us versus TRTLLM 1878.14 us;
+cold v034 2883.65 us versus TRTLLM 1870.34 us. The stable run confirms an
+approximately 4% improvement over v016, while TRTLLM is still about 1.53x faster.
+
+Compute Sanitizer memcheck on b512/chunk0 (lengths 1..2045), checked rows 0/511,
+passes numerical comparison (max_abs 0.006182492) and reports 0 device memory
+errors. `--report-api-errors no` is explicitly used to bypass the previously
+identified CUDA Python feature-lookup API errors, while preserving device
+memory instrumentation. It is a qualified device-memory pass, not a claim
+that the default sanitizer mode or every possible shape was validated.
+
+## Iteration 036 — combine two compute groups with TMEM probabilities
+
+File: `experiments/glm53_sparse_mla/kernel_v036.py`, based on v035 with v034's
+compute partition. Each of two compute groups handles 64 score columns and
+256 output channels. Packed probabilities use 16 TMEM columns per group and
+are duplicated into matching A/D lane halves. Each output group owns one
+interleaved N256 fragment. Retain explicit tcgen05 fences and the cross-group
+head-max/sum reductions. This tests whether the smaller TMEM store fragments
+and broader compute distribution make the TMEM-P path worthwhile; v035 alone
+was not faster, so composition must be measured. Validation pending.
+
+## Iteration 037 — defer cross-group denominator reduction
+
+File: `experiments/glm53_sparse_mla/kernel_v037.py`, based on v034.
+Both compute groups use the same per-tile running maximum and correction.
+Therefore each can update only its own denominator contribution throughout
+the tile loop; the full denominator is their sum at exit. Remove per-tile
+shared head-sum exchange and its barrier, and perform that reduction once
+before epilogue. Reuse the now-dead head-max storage for the final partial
+sums, saving 512 shared bytes. This preserves the real-arithmetic softmax
+formula but changes FP32 summation order, requiring fresh numerical checks.
+The per-tile maximum exchange and all required TC memory ordering remain.
+Validation pending.
+
+### Iteration 036 result
+
+The two-group compile-time probability-coordinate audit passes; smoke and
+full-target 8-row numerical checks pass with unchanged errors. Paired warm
+medians: TRTLLM 1691.74 us, v036 2926.85 us (approximately 0.5780x), slower than
+v034. NCU reports only 80 registers but local-load/store sectors 8912896 /
+13117008. Lower register count alone is not evidence of a better implementation.
+Shared 186672 bytes, occupancy 17.168%, tensor 35.093%, eligible 0.34443,
+long scoreboard 6.16955, shared conflicts 5365693/115454, diagnostic 5.033600 ms.
+Continue from v034's shared-probability path for the next latency experiments.
+
+## Iteration 038 — one-head Layout-E softmax/correction and weight-stationary MMA
+
+File: `experiments/glm53_sparse_mla/kernel_v038.py`, based on v037, using the
+validated inline .ws MMA helper from v023. Unlike v023's two-head/thread
+Ld16x32bx2 mapping, use Ld32x32b Rep32 on a physical 128-DP × 32-column view.
+Each compute thread then owns one head and 32 keys. The two compute groups
+cover complementary physical column halves; four partial maxima per head
+are merged once per tile. Denominator contributions remain independent until
+the final reduction, as in v037. Correction uses the same one-head mapping;
+epilogue retains v023's coalesced Layout-E copy.
+
+QK uses the SW128 main 512 plus SW64 tail 64 layouts and TMA producer from v030.
+Both QK and PV use hardware weight-stationary MMA. The goal is to expose its
+lower tensor-cycle cost while avoiding the two-head bookkeeping and repeated
+head-sum synchronization that limited v023/v027. TMEM O occupies columns 0..255
+across all datapaths, S 256..319; P remains in shared memory. This changes both
+layout and reduction order and requires fresh numerical/memory validation.
+No performance result is yet claimed.
+
+### Iteration 037 short-run result
+
+Smoke/full 8-row checks PASS. Full-target max_abs remains 0.006737709;
+relative_RMSE is 0.014866682 after the changed denominator summation order.
+Paired warm medians: TRTLLM 1691.78 us, v037 2777.12 us (approximately 0.6092x).
+This improves v034 by approximately 3.5%. NCU: registers 114, shared 194352 bytes,
+occupancy 17.161%, tensor 37.309%, eligible 0.34573, long scoreboard 6.18059,
+local sectors 0/0, shared conflicts 5777572/382800, diagnostic 4.737184 ms.
+Expanded Graph and device-memory validation is in progress.
+
+### Iteration 037 expanded validation
+
+Full b8192/chunk3/seed1234 passes 64 sampled rows, max_abs 0.009754896 and
+relative_RMSE 0.014703972, unchanged tolerances. 20 warmups/100 Graph repeats:
+warm candidate 2777.20 us versus TRTLLM 1879.97 us; cold candidate 2781.15 us
+versus TRTLLM 1874.18 us. This confirms the short-run improvement, with TRTLLM
+still approximately 1.48x faster in the warm Graph run.
+
+The b512/chunk0 device memcheck, using the explicitly qualified
+`--report-api-errors no` setting, reports 0 device memory errors. Checked
+rows 0/511 pass numerical comparison with max_abs 0.006182492. This checks
+partial tiles and the reused shared denominator storage on that input, not
+all possible masks or shapes. v037 is the current best validated candidate.
+
+### Iteration 038 rejection and iteration 039 address correction
+
+v038 offline compilation passes with REG122/STACK0/LOCAL0 and its score
+coordinate audit covers every head/key. However, the first b2 GPU check
+fails: 30151/65536 mismatches, max_abs 0.604953766. No performance/NCU run
+was accepted for this numerically invalid candidate. Inspecting the earlier
+v023 epilogue reveals the cause: each N256 Layout-E tile puts channels
+0..127 and 128..255 into opposite 64-DP halves. A 64-column epilogue slice
+therefore contains non-contiguous channel blocks, not 128 consecutive channels.
+
+v039 changes only that output address: group*256 + tile*64 + (d//64)*128 + d%64.
+Extend audit_ws_layout.py to compare each epilogue physical address with the
+N256 MMA address and verify complete, unique coverage of all 64*512 outputs.
+The score/correction mapping and algorithm remain unchanged. GPU validation
+and profiling are pending. Preserve v038's failure rather than counting it
+as a performance candidate.
+
+### Iteration 039 validation and profiling
+
+The corrected output mapping passes all coordinate audits and b2/full-target
+8-row numerical checks. Paired warm events: candidate 2328.74 us versus TRTLLM
+1691.81 us, approximately 0.7265x. NCU: 118 registers, 194864 shared bytes,
+occupancy 17.071%, tensor active 22.316%, eligible 0.43145, long scoreboard
+4.52277, local sectors 0/0, shared load/store conflicts 4421204/1777016,
+diagnostic 3.962400 ms. Weight-stationary MMA changes tensor-cycle accounting;
+its lower tensor-active percentage versus v037 does not mean lower useful
+throughput. End-to-end latency improves approximately 16%.
+
+Full b8192 Graph validation (20 warmups/100 repeats/64 checked rows) passes
+with max_abs 0.009754896 and relative_RMSE 0.014703953. Warm: 2332.50 us versus
+TRTLLM 1872.05 us; cold: 2338.51 us versus TRTLLM 1912.77 us. The warm gap is
+now approximately 1.25x. b512/chunk0 device memcheck with the explicitly
+qualified --report-api-errors no setting reports zero device errors, and
+rows 0/511 pass with max_abs 0.006182492. v039 becomes the best validated
+candidate; this remains sampled validation within the existing scope.
+
+## Iteration 040 — packed output correction multiplication
+
+Based on v039, change only output correction's scalar FP32 multiplies into
+explicit cute.arch.mul_packed_f32x2 pairs. FlashInfer's sparse blk128
+flash_fwd_sm100.py uses this operation in its correction path. The
+[PTX packed FP32 multiplication specification](https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#floating-point-instructions-mul)
+keeps each element's FP32 rounding; this introduces no approximation threshold.
+The aim is fewer CUDA-core instructions while retaining the same TMEM
+load/store sizes and synchronization. Numerical checks, code-generation
+inspection and performance profiling are pending.

@@ -32,13 +32,13 @@ export CUTE_DSL_ARCH=sm_103a
 
 # Full target, paired comparison, expanded sampled correctness, stable timing.
 /opt/sglang/bin/python bench.py \
-  --kernel-version v016 --block-k 128 \
+  --kernel-version v039 --block-k 128 \
   --backends trtllm cute --scope native --check-rows 64 \
   --warmup-iters 20 --repeat-iters 100 --cache both --timing cuda-graph \
-  --output-json artifacts/v016_full_graph.json
+  --output-json artifacts/v039_full_graph.json
 
 # Short event-based tuning run, followed by one warmed NCU invocation.
-bash run_iteration.sh v016 128
+bash run_iteration.sh v039 128
 ```
 
 `run_iteration.sh` saves raw JSON, logs, NCU details/CSV and an immutable per-run
@@ -55,7 +55,7 @@ python3 experiments/glm53_sparse_mla/summarize.py > docs/glm53_sparse_mla/RESULT
 ## Validation limits
 
 Full-target iterations use the original FP32 reference and unchanged tolerances
-(`atol=0.01`, `rtol=0.05`). The usual tuning check samples 8 rows. v013 and v016 also
+(`atol=0.01`, `rtol=0.05`). The usual tuning check samples 8 rows. v013, v016, v034, v037 and v039 also
 passed 64 sampled rows on the target chunk3, with graph warm/cold measurements.
 That is not exhaustive validation of all rows, shapes or quantization scales.
 
@@ -83,7 +83,6 @@ CUDA_VISIBLE_DEVICES="" CUTE_DSL_ARCH=sm_103a /opt/sglang/bin/python \
 ```
 
 This emits PTX/CUBIN for inspection without allocating or launching GPU work.
-Compilation and static resource reports are not runtime validation. Pending
-v034/v035 additionally make cross-thread TMEM ordering explicit with tcgen05
+Compilation and static resource reports are not runtime validation. v034 and later candidates additionally make cross-thread TMEM ordering explicit with tcgen05
 fences. Earlier measured versions lack those explicit fences; their sampled
 passes do not establish safety for every compiler or execution schedule.

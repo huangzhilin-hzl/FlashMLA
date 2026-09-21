@@ -1,0 +1,23 @@
+{"version": "v035", "device_launch": false, "sha256": "b714f03aad3985d8b4166c84d780f89632f861405a1265ef4fc1fd3f96aafd63"}
+Traceback (most recent call last):
+  File "/tmp/glm53_sparse_mla_dev/compile_offline.py", line 34, in <module>
+    compiled = cute.compile(module.SparseMLA(128), *tensors, make_fake_stream(),
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/glm53_sparse_mla_dev/kernel_v035.py", line 78, in __call__
+    qlayout, klayout, playout, vlayout, qtail_layout, ktail_layout).launch(
+                                                                    ^^^^^^^
+  File "/tmp/glm53_sparse_mla_dev/kernel_v035.py", line 138, in kernel
+    if tid >= 128:
+  File "/tmp/glm53_sparse_mla_dev/kernel_v035.py", line 230, in else_block_19
+    for block in cutlass.range(num_blocks):
+  File "/tmp/glm53_sparse_mla_dev/kernel_v035.py", line 290, in if_region_32
+    if warp == 0:
+  File "/tmp/glm53_sparse_mla_dev/kernel_v035.py", line 291, in then_block_35
+    for ntile in cutlass.range(2, unroll_full=True):
+  File "/tmp/glm53_sparse_mla_dev/kernel_v035.py", line 295, in loop_body_33
+    for k in cutlass.range(cute.size(a_pv, mode=[2]), unroll_full=True):
+  File "/tmp/glm53_sparse_mla_dev/kernel_v035.py", line 296, in loop_body_34
+    cute.gemm(pv, to[None, None, ntile], a_pv[None, None, k],
+  File "/opt/sglang/lib/python3.12/site-packages/nvidia_cutlass_dsl/dsl_packages/cutlass/cute/algorithm.py", line 146, in gemm
+    raise ValueError("`a` and `b` must have the same rank")
+ValueError: `a` and `b` must have the same rank
