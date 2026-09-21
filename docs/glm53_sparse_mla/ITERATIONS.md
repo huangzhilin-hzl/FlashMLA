@@ -404,3 +404,31 @@ the denominators once after the final PV and a synchronization. This saves
 256 bytes/CTA and removes unnecessary per-tile denominator stores. The goal
 is to restore two resident CTAs without changing the double-buffered pipeline.
 Full target correctness, NCU and partial-tile checks are pending.
+
+### Iteration 013 result
+
+Full b8192 8-row correctness PASS. Paired medians: TRTLLM 1691.78 us, v013
+4482.37 us; ratio 0.37743x. NCU confirms two-CTA residency: occupancy 12.405%,
+shared memory 115468 bytes, 126 registers/thread, no local sectors. Tensor
+active 36.693%, eligible warps 0.37793, long scoreboard 2.08951. Shared-load/
+store conflicts 5668630 / 160100; diagnostic duration 7.34963 ms. The 256-byte
+saving restores concurrency; the overlapping-load pipeline now improves on
+v010 by 1.18x. Still 2.65x slower than the paired TRTLLM baseline.
+
+Extended validation: memcheck at b1024/chunk0/seed5678 reports zero memory
+errors, but the unchanged numerical tolerance fails on 6 of 524288 checked
+elements (16 rows; maximum offending absolute error 0.0154580). This is a
+**failed numerical check**, not an accepted validation. Compare TRTLLM on the
+same inputs and inspect FP8 probability quantization before claiming broader
+shape/seed coverage. The target b8192/chunk3 is being rechecked with 64 rows.
+No tolerance has been relaxed.
+
+## Iteration 014 — dedicated loader warpgroup
+
+File: `experiments/glm53_sparse_mla/kernel_v014.py`, based on v013.
+Use a 256-thread CTA: four warps load Q/KV and four execute QK/softmax/PV.
+Two full/empty mbarrier pairs protect the two KV stages; producer and consumer
+use separate 128-thread named barriers. Producers can prepare the next stage
+while compute warps continue, without requiring the same warps to issue loads.
+Retain alpha/denominator aliasing to stay within the two-CTA shared-memory limit.
+Numerical behavior is unchanged by construction but still requires validation.
