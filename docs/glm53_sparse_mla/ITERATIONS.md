@@ -345,3 +345,16 @@ File: `experiments/glm53_sparse_mla/kernel_v011.py`, based on corrected v009.
 Apply the same zero-fill change to the full-output CTA design, to reassess the
 QK-duplication versus concurrency tradeoff after register pressure is reduced.
 Validation pending for v010/v011.
+
+### Iteration 010 result — zero-fill liveness hypothesis confirmed
+
+Full b8192 8-row correctness PASS, same error as v008. Paired warm event medians:
+TRTLLM 1691.87 us, v010 5277.73 us; ratio 0.32057x. This is 1.34x faster than
+v008. Registers fall from 255 to 128/thread and local load/store sectors both
+fall to zero. The zero-fill path's address liveness was a major spill cause,
+even though the selected chunk has valid indices throughout.
+
+NCU: 78.604 KB shared memory; occupancy 12.413%; tensor active 32.250%; eligible
+warps/scheduler 0.28713; long scoreboard 3.23416. Shared-load/store conflicts
+26863016 / 6124491. Diagnostic duration 8.35981 ms. With spilling removed,
+serialized loads/computation and duplicate QK remain major optimization targets.
