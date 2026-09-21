@@ -123,3 +123,30 @@ keep sparse indices unchanged; reserve 256 TMEM columns instead of 512 and move
 PV scratch to column 64, allowing two CTAs/SM if other resources permit.
 The vector pointers explicitly assert true 16-byte alignment (576-byte rows and
 16-byte column offsets). Correctness and performance are pending.
+
+### Iteration 002 result
+
+Full target 8-row correctness PASS with identical errors to v001. Paired warm
+event medians: TRTLLM 1692.96 us, v002 26413.31 us; TRT/candidate=0.064095x.
+A 10.18x improvement over v001, still 15.60x slower than the paired baseline.
+
+NCU: 255 registers/thread; shared memory 111.372 KB; achieved occupancy 6.252%;
+eligible warps/scheduler 0.2152; tensor-pipe active 6.0297%; long-scoreboard
+0.5928 cycles/issued instruction. Additional hardware counters measured
+194510848 local-load sectors and 164084856 local-store sectors, plus 805534747
+shared-load and 402922617 shared-store bank conflicts. These counters establish
+that local-memory traffic and shared-memory conflicts are substantial, beyond
+just the original scalar global gathers. NCU duration 44.9167 ms is diagnostic.
+The smaller TMEM reservation did not increase measured occupancy; the allocation
+permit lifetime must also be examined.
+
+## Iteration 003 — reuse K shared memory as V
+
+File: `experiments/glm53_sparse_mla/kernel_v003.py`.
+Why: v002 NCU measured approximately 1.21 billion shared-memory bank conflicts.
+The scalar FP8 V transpose is an unnecessary candidate source of these conflicts.
+Reference inspection of FlashInfer `monolithic/mla_decode_fp8.py:522` shows
+FP8 PV can use an MN-major V operand on Blackwell. Replace the K-major PV operand
+and explicit transpose buffer with an MN-major view of the already gathered K
+buffer, slicing the correct 256 output channels. No arithmetic precision change.
+Validation pending; remaining local-memory pressure is the next target.
