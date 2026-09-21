@@ -32,13 +32,13 @@ export CUTE_DSL_ARCH=sm_103a
 
 # Fast single-P path with closely matching TRTLLM precision; see all-row limits below.
 /opt/sglang/bin/python bench.py \
-  --kernel-version v097 --block-k 128 \
+  --kernel-version v108 --block-k 128 \
   --backends trtllm cute --scope native --check-rows 512 \
   --warmup-iters 20 --repeat-iters 100 --cache both --timing cuda-graph \
-  --output-json artifacts/v097_accuracy512_graph.json
+  --output-json artifacts/v108_accuracy512_graph.json
 
 # Short event-based tuning run, followed by one warmed NCU invocation.
-bash run_iteration.sh v097 128
+bash run_iteration.sh v108 128
 ```
 
 `run_iteration.sh` saves raw JSON, logs, NCU details/CSV and an immutable per-run
@@ -65,13 +65,47 @@ The full 8192-row/seed1234 audit checks all 268,435,456 output elements:
 | v091, bitmaps plus early stage release | Same as v090 via full bitwise checks on both seeds | Earlier fast path |
 | v094, four producer warps | Same as v091 via full bitwise checks on both seeds | Earlier fast path |
 | v096, pre-wait index fetching | Same as v091 via full bitwise checks on both seeds | Earlier fast path |
-| v097, pre-wait index fetching with four producer warps | Same as v096 via full bitwise checks on both seeds | Current fast path |
+| v097, pre-wait index fetching with four producer warps | Same as v096 via full bitwise checks on both seeds | Earlier fast path |
+| v105, dedicated MMA issuer | Same as v097 via full bitwise checks on both seeds | Earlier fast path |
+| v108, per-thread P readiness | Same as v105 via full bitwise checks on both seeds | Current fast path |
 | v049, P scale256 | 11 | Earlier timing reference |
 | v053, residual FP8 | 0 | Original higher-precision path |
 | v065, residual FP8 with V collector reuse | 0 via full bitwise equivalence to v053 | Exact-equivalence optimization |
 | v067, residual FP8 with bounded scaling anchor | 0 on two independent full-reference seeds | Earlier validated higher-precision path |
 | v075, probability scale folded into exp2 | 0 on two independent full-reference seeds | Earlier higher-precision path |
-| v098, pre-wait index fetching | Full bitwise equality to v075 on both seeds, short case and masks | Current higher-precision path |
+| v098, pre-wait index fetching | Full bitwise equality to v075 on both seeds, short case and masks | Earlier higher-precision path |
+| v106, dedicated MMA issuer | Full bitwise equality to v098 on both seeds, short case and masks | Current higher-precision path |
+
+The current fast path v108 matches v105 bitwise on both full 8192-row seeds,
+all 1024 short-case rows and the masked input; qualified b2 synccheck/b512
+memcheck report zero errors. Its 20/100 eager warm/cold medians are
+1753.09/1766.93 µs versus TRT 1876.54/1915.55 µs, and Graph medians are
+1716.29/1734.90 µs versus 1872.02/1933.12 µs. Four rotated orders measure warm
+1712.40–1720.51 µs versus v105 1722.46–1730.75 µs and TRT
+1867.87–1879.95 µs. Warm improves in every ordering; cold ranges overlap v105
+and one ordering is slightly slower. Every compute thread releases its own
+P/correction writes to the readiness barrier. All baseline FP8 precision limits
+remain. Short tuning is 1680.42 versus TRT 1689.89 µs; the small margin alone
+does not establish a robust short-run advantage.
+
+Earlier fast path v105 matches v097 bitwise on both full 8192-row seeds,
+all 1024 short-case rows and the masked input. Qualified b2 synccheck and b512
+memcheck report zero errors. Its 20/100 eager warm/cold medians are
+1740.94/1768.85 µs versus TRT 1876.64/1913.94 µs; Graph medians are
+1762.86/1742.77 µs versus TRT 1867.81/1916.77 µs. Three rotated orders give
+warm 1726.42–1730.53 µs versus v097 1757.30–1760.72 µs and TRT
+1851.44–1880.13 µs. A separate MMA warp issues current PV before next QK,
+with independent completion and P-readiness barriers. The original FP8
+accuracy limits below still apply. Short five-event timing is near parity with
+TRT (1693.86 versus 1691.84 µs), not a demonstrated short-run win.
+
+The current higher-precision v106 path matches v098 bitwise on both full seeds,
+all short-case rows and the masked input; qualified b2 synccheck/b512 memcheck
+report zero errors. Its 20/100 eager warm/cold medians are 1977.41/1981.01 µs
+versus TRT 1874.05/1918.05 µs; Graph medians are 1998.90/1972.21 µs versus
+1867.82/1916.93 µs. Rotated warm medians are 1962.75–1964.16 µs versus v098
+2005.17–2007.23 µs and TRT 1867.87–1881.60 µs. It improves the higher-precision
+path in every recorded ordering, while remaining slower than TRT.
 
 The higher-precision v098 path matches v075 bitwise on both full seeds, all
 short-case rows and the masked input, with qualified b512 memcheck reporting
@@ -97,7 +131,7 @@ TRT 1886.18/1916.88 µs; Graph medians are 1806.54/1796.08 µs versus
 TRT 1869.81–1878.22 µs, improving on v094 in every ordering. It moves the
 read-only global index fetch before stage-reuse waiting while keeping shared
 publication after that wait. This preserves the documented FP8 precision limits;
-it does not establish an all-row FP32-reference pass. v098 is the current validated
+it does not establish an all-row FP32-reference pass. v106 is the current validated
 higher-precision option.
 
 v094 retains v091 output bits on both full8192-row seeds, the1024-row short
@@ -114,7 +148,7 @@ Eager-event warm/cold medians are1852.51/1851.06 µs versusTRT1886.94/1917.02 µ
 Graph medians1847.62/1832.43 µs versusTRT1863.94/1926.14 µs. Three rotated
 orders give warm v0911822.98–1824.83 µs versusTRT1869.98–1879.65 µs; it also
 improves on v090 in every ordering. These are the same baseline-precision
-outputs, including the failures documented below. v098 is the current higher-precision option on its audited inputs.
+outputs, including the failures documented below. v106 is the current higher-precision option on its audited inputs.
 
 v090 matches v086 bitwise on all8192 rows of both seeds and all1024 rows of
 the short case, in three repeats each. The mask case also matches v086 bitwise,
@@ -166,7 +200,7 @@ To reproduce the full shared-reference audit (accuracy only):
 
 ```bash
 /opt/sglang/bin/python validate_full_accuracy.py \
-  --kernel-versions v097 v098 --include-trtllm \
+  --kernel-versions v108 v106 --include-trtllm \
   --output-json artifacts/full_accuracy_seed1234.json
 ```
 

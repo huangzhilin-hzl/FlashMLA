@@ -3202,3 +3202,211 @@ TRT1691.68 us is slightly slower thanv0971749.06 us. NCU base/stable:120
 registers,194904 shared bytes, occupancy17.777%, tensor29.356%, eligible0.362432,
 long-scoreboard5.545522, zero local sectors, aggregate shared conflicts
 3563570/676605, diagnostic3.013952 ms. No promotion or expanded timing claim.
+
+### Iteration 105 initial result — dedicated issuing improves short timing
+
+Offline REG85/STACK0. Bounded smoke, b2 qualified synccheck and b512 qualified
+memcheck pass. Full8192 seed1234 outputs match v097 in three repeats, and the
+masked output bits match. Warm1693.86 us versusTRT1691.84 us is near parity in
+the short tuning regime and improves fromv0971749.06 us. NCU base/stable:
+85 registers,194920 shared bytes, occupancy19.223%, tensor30.530%, eligible
+0.391934, long-scoreboard5.931732, zero local sectors, aggregate shared
+conflicts6238821/1956021, diagnostic2.896512 ms. Long-run and additional
+full-seed/short equivalence checks are pending before promotion.
+
+## Iteration 106 — dedicated issuing for residual FP8
+
+Apply v105's416-thread producer/compute/MMA roles and three-barrier handshake
+to v100's higher-precision math. Keep both FP8 probability terms, bounded
+softmax anchor, per-score masks and the original post-PV256-thread barrier.
+The dedicated issuer fills/lastuses all four B collectors for each N tile in
+the same high-then-residual order, then queues next QK only after all current
+PV instructions and their completion commit have been issued. Preserve direct
+full-stage acquisition for shared index visibility and all TMEM fences.
+The comparison baseline is validated higher-precision v098; v100's four-producer
+mapping already matches v098 bitwise on the audited first seed/masked input.
+Offline, bounded smoke/synchronization/memory and full equivalence are pending.
+
+### Iteration 105 promotion — independent issue gains survive long runs
+
+All8192 seed1234/5678 and all1024 short-case outputs match v097 bitwise in
+three repeats each; masked equality, qualified b2 synccheck and b512 memcheck
+also pass. Eager20/100 warm/cold medians1740.94/1768.85 us versusTRT1876.64/
+1913.94 us; Graph1762.86/1742.77 us versusTRT1867.81/1916.77 us. Rotating
+warm medians v1051728.06/1730.53/1726.42 us, v0971759.30/1757.30/1760.72 us,
+TRT1851.44/1876.14/1880.13 us. Cold v1051714.19/1722.29/1712.43 us, v097
+1761.70/1759.20/1761.26 us, TRT1859.60/1863.86/1865.79 us. The improvement
+holds in every ordering. Promote v105 as the current fast path, retaining all
+baseline FP8 accuracy limits. Short tuning is near TRT parity, not a proven win.
+
+v106 compiles REG100/STACK0. Its bounded synchronization/memory, masked and
+full-target equivalence checks precede paired timing on GPU1.
+
+### Iteration 106 initial result — dedicated issuing helps residual FP8
+
+Smoke/eight-row checks, qualified b2 synccheck/b512 memcheck, full8192 seed1234
+bitwise equivalence to v098 in three repeats, and masked equality/FP32 tolerance
+pass. Warm1851.68 us versusTRT1689.70 us improves fromv0981924.90 us. NCU
+base/stable:100 registers,203080 shared bytes, occupancy19.263%, tensor41.229%,
+eligible0.464376, long-scoreboard6.003787, zero local sectors, aggregate shared
+conflicts6353209/1624138, diagnostic3.165440 ms. Extended evidence is pending.
+
+### v105 source profile at unlocked clocks
+
+Clock-control none / pipeline-boost-state dynamic:614231600 executed instructions,
+28663808 shared wavefronts equal to ideal, zero excessive. Long-scoreboard
+samples total64620, led by producer stage-reuse16884, compute PV completion
+16869 and compute QK completion13859. The counts reflect both the extra resident
+issue warp and different overlap; do not interpret differences as runtime
+fractions. Further reduce the P-readiness handoff only with an explicit release
+from every participating compute warp or thread.
+
+## Iteration 107 — eight warp release arrivals for P readiness
+
+Based on v105. Replace the pre-PV256-thread named barrier and tid0's single
+P-ready arrival with a full-mask warp sync, retained before/after TMEM thread
+fences, shared async-view fence, and one release arrival per compute warp.
+Initialize P-ready with expected count8. Each warp's elected lane releases after
+all32 lanes finish score reads, P writes and correction; the issuer waits for
+all8 releases before any PV or next QK. Every compute warp still waits PV before
+stage reuse and next P stores. Offline and bounded synchronization/memory/full
+bitwise checks are pending.
+
+## Iteration 108 — every compute thread releases P readiness
+
+Based on v105. Initialize P-ready count256 and have every compute thread arrive
+after its before-thread-sync TMEM fence and shared async-view fence. Remove
+only the preceding named barrier and its after-thread-sync fence; the issuer
+retains its acquire wait and after-thread-sync fence before MMA. Each thread
+releases its own writes, so no representative lane needs a warp rendezvous.
+This tests256 arrivals against v107's8 arrivals plus warp synchronization.
+All later PV waits/fences remain. Offline and bounded validation pending.
+
+PTX mbarrier.arrive defaults to release semantics at CTA scope, and mbarrier
+wait defaults to acquire. The installed sync_warp lowers to bar.warp.sync:
+https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#parallel-synchronization-and-communication-instructions-mbarrier-arrive
+These ordering guarantees motivate the protocols; runtime tests do not replace
+the required memory-order reasoning.
+
+## Iteration 109 — control for the next-QK overlap hypothesis
+
+Based on v105. Add a PV-completion wait and after-thread-sync fence in the
+separate MMA issuer before it loops to next QK. Keep all roles, arithmetic,
+P-readiness protocol and compute waits unchanged. This removes the intended
+PV/next-QK issue overlap while keeping most structural/compiler changes from
+dedicated issuing. A timing comparison helps separate overlap from those other
+changes; an extra wait also has its own instruction cost, so the control is not
+a cycle-exact decomposition. Offline, bounded smoke/equivalence and timing pending.
+
+### Iteration 106 promotion — validated higher-precision improvement
+
+All8192 seed1234/5678 output bits and all1024 short-case bits match v098 in
+three repeats each, along with masked equality/FP32 tolerance and qualified
+synccheck/memcheck passes. Eager20/100 medians1977.41/1981.01 us warm/cold
+versusTRT1874.05/1918.05 us; Graph1998.90/1972.21 us versusTRT1867.82/1916.93 us.
+Rotating warm v1061964.16/1964.16/1962.75 us versusv0982005.17/2007.23/2005.38 us
+andTRT1867.87/1880.19/1881.60 us. Cold v1061957.58/1958.02/1955.70 us versus
+v0982009.36/2008.46/2009.22 us andTRT1857.44/1857.46/1857.36 us. Promote v106
+as the current higher-precision option; it remains slower thanTRT in all these
+regimes while preserving the audited full-reference passes.
+
+### Iteration 107 initial result — warp readiness saves a little latency
+
+Offline REG85/STACK0. Smoke/eight-row checks, qualified b2 synccheck/b512
+memcheck, full8192 seed1234 bitwise equality to v105 in three repeats and masked
+equality pass. Warm1685.60 us versusTRT1691.90 us is about8 us belowv105.
+NCU base/stable:85 registers,194920 shared bytes, occupancy19.237%, tensor
+30.744%, eligible0.394402, long-scoreboard5.935145, zero local sectors,
+aggregate shared conflicts6412906/1965066, diagnostic2.886592 ms. The small
+short-run advantage is not yet a sustained-win claim. Expanded checks pending.
+
+### Iteration 108 initial result — direct thread releases slightly improve timing
+
+Offline REG85/STACK0. Smoke/eight-row checks, full8192 seed1234 bitwise equality
+to v105 in three repeats, masked equality, qualified b2 synccheck and b512
+memcheck pass. Warm1680.42 us versusTRT1689.89 us improves about13 us fromv105.
+NCU base/stable:85 registers,194920 shared bytes, occupancy19.216%, tensor
+30.749%, eligible0.394105, long-scoreboard5.970144, zero local sectors,
+aggregate shared conflicts6388573/1998408, diagnostic2.877120 ms. Four-order
+comparison and additional full-seed/short/extended checks are pending.
+
+## Iteration 110 — early stage release for the dedicated residual path
+
+Based on v106. Remove its post-PV256-thread named barrier and the redundant
+following after-thread-sync fence, retaining each warp's PV wait, its
+immediate after-thread-sync fence and the before-thread-sync fence before
+tid0 releases the KV stage. P-ready already follows all index/score/P reads;
+PV completion drains the asynchronous KV reads. The next QK uses the alternate
+stage. This is the previously validated fast-path release protocol applied
+alone to higher-precision v106. Bounded synchronization/memory and full
+bitwise validation are pending before timing.
+
+## Iteration 111 — direct per-thread readiness for both FP8 probability terms
+
+Based on v106. Apply v108's count256 P-ready barrier, with every compute thread
+releasing its writes after the before-thread-sync TMEM and shared async-view
+fences. Both high/residual P stores and correction precede these releases.
+Keep v106's post-PV256-thread barrier and all other behavior unchanged, so this
+isolates readiness publication from v110's early release. Offline and bounded
+synchronization/memory/full equivalence are pending.
+
+### Iteration 109 control result — delaying next QK loses the gain
+
+Offline REG85/STACK0. Bounded smoke/eight-row checks and full8192 seed1234
+bitwise equality to v105 in three repeats pass. Warm1796.42 us versusTRT
+1691.52 us is substantially slower thanv1051693.86 us. NCU base/stable:
+85 registers,194920 shared bytes, occupancy19.236%, tensor28.700%, eligible
+0.374448, long-scoreboard6.585509, zero local sectors, aggregate shared
+conflicts4508767/856939, diagnostic3.081088 ms. This supports the value of
+issuing next QK before waiting for current PV. The control also adds a wait,
+so it does not isolate the saved cycles exactly. No promotion, expanded
+accuracy or sanitizer claim for this control-only version.
+
+## Iteration 112 — balanced per-thread probability sum
+
+Based on v108. Replace the32-value probability ADD reduction with a five-level
+balanced tree using the same pair order tested earlier on v084. Keep exp2,
+FP8 conversion, P-ready and MMA behavior unchanged. The hypothesis is reduced
+serial denominator dependencies in the dedicated issue pipeline. Summation
+rounding changes, so full bitwise equivalence is not assumed; a promising
+latency result requires independent full-reference audits at unchanged
+atol0.01/rtol0.05 and comparison to TRT's documented FP8 limits. Offline and
+bounded runtime checks are pending.
+
+### Iteration 108 promotion — stable warm gain, mixed small cold differences
+
+All8192 seed1234/5678 and all1024 short-case outputs match v105 bitwise in
+three repeats each, retaining the known FP8 accuracy limits. Masked equality,
+qualified b2 synccheck and b512 memcheck pass. Eager20/100 medians1753.09/
+1766.93 us warm/cold versusTRT1876.54/1915.55 us; Graph1716.29/1734.90 us versus
+TRT1872.02/1933.12 us. Separate-run eager medians do not consistently improve
+on v105, so use the same-process rotation to assess the small incremental gain.
+
+Four-order warm medians (us): v1081714.02/1720.51/1712.40/1716.26;
+v1071718.40/1724.56/1718.40/1718.38;
+v1051722.46/1723.71/1730.64/1730.75;
+TRT1867.87/1875.50/1879.95/1876.14. v108 improves on both predecessors in each
+warm ordering. Cold v1081708.18/1717.34/1719.26/1708.00 versusv1051726.64/
+1714.32/1726.48/1728.46 andv1071715.30/1714.13/1715.63/1722.27 is mixed;
+TRT1867.86/1860.69/1859.50/1865.79 remains slower in all four cold orders.
+Promote v108 for its repeated warm gain and retained accuracy; do not claim
+uniform cold improvement over v105/v107. No further v107 full-seed expansion
+is needed while v108 is preferred.
+
+### Iteration 110 initial result — small residual-path stage-release gain
+
+Smoke/eight-row checks, qualified b2 synccheck/b512 memcheck, full8192 seed1234
+bitwise equality to v106 in three repeats and masked equality/FP32 pass hold.
+Warm1847.49 us versusTRT1692.26 us is about4 us belowv106. NCU base/stable:
+100 registers,203080 shared bytes, occupancy19.248%, tensor41.198%, eligible
+0.463342, long-scoreboard6.043707, zero local sectors, aggregate shared
+conflicts7258109/1424805, diagnostic3.154688 ms. Sustained gain pending.
+
+### Iteration 111 initial result — per-thread readiness nearly ties
+
+The same smoke/eight-row, qualified synccheck/memcheck, full8192 seed1234 bitwise
+and masked equality/FP32 checks pass against v106. Warm1850.37 us versusTRT
+1693.79 us is only about1 us belowv106. NCU base/stable:100 registers,203080
+shared bytes, occupancy19.253%, tensor41.142%, eligible0.463759, long-scoreboard
+6.000689, zero local sectors, aggregate shared conflicts6360400/1427677,
+diagnostic3.162816 ms. No promotion until same-process timing establishes gain.
