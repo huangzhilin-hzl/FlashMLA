@@ -29,4 +29,19 @@ for directory in sorted(root.glob("v[0-9][0-9][0-9]")):
     status = "unsafe; rejected" if version in ("v002", "v003") else "prototype"
     print(f"| {version} | {candidate['median_us']:.2f} | {baseline['median_us']:.2f} | {candidate['speedup_vs_trtllm']:.4f}x | {metrics['launch__registers_per_thread']} | {traffic} | {tensor:.2f}% | {status} |")
 print("\nRaw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. No iteration has yet matched TRTLLM.\n")
+graph_paths = sorted(root.glob("v[0-9][0-9][0-9]_validation/*_full_graph.json"))
+if graph_paths:
+    print("## CUDA Graph validation runs\n")
+    print("These are separate warm/cold runs with 20 warmups, 100 repeats and 64 checked rows.\n")
+    print("| Version | Cache | Candidate µs | Paired TRT µs | TRT/candidate |")
+    print("|---|---|---:|---:|---:|")
+    for path in graph_paths:
+        result = json.loads(path.read_text())
+        version = path.name.split("_", 1)[0]
+        for candidate in result["benchmarks"]:
+            if not candidate["case"].startswith("cute-"):
+                continue
+            baseline = next(x for x in result["benchmarks"] if x["case"] == "trtllm/native" and x["cache"] == candidate["cache"])
+            print(f"| {version} | {candidate['cache']} | {candidate['median_us']:.2f} | {baseline['median_us']:.2f} | {candidate['speedup_vs_trtllm']:.4f}x |")
+    print()
 print("See [ITERATIONS.md](ITERATIONS.md) for changes, failed hypotheses, correctness limits and source references.")

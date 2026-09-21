@@ -1,0 +1,900 @@
+========= COMPUTE-SANITIZER
+========= Program hit CUDA_ERROR_INVALID_VALUE (error 1) due to "invalid argument" on CUDA API call to cuGetProcAddress_v2.
+=========     Saved host backtrace up to driver entry point at error
+=========         Host Frame:  [0xd4a2] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x55cc5] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x12825] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x3ed4ef] in driver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame: PyObject_Vectorcall [0x149834] in python
+=========         Host Frame: _PyEval_EvalFrameDefault [0x1d7428] in python
+=========         Host Frame: PyEval_EvalCode [0x1d594a] in python
+=========         Host Frame:  [0x208b11] in python
+=========         Host Frame:  [0x2b54b2] in python
+=========         Host Frame: _PyRun_SimpleFileObject [0x2b5219] in python
+=========         Host Frame: _PyRun_AnyFileObject [0x2b504e] in python
+=========         Host Frame: Py_RunMain [0x2bd0b4] in python
+=========         Host Frame: Py_BytesMain [0x2bcb9c] in python
+=========         Host Frame: __libc_start_call_main in libc_start_call_main.h:58 [0x2a1c9] in libc.so.6
+=========         Host Frame: __libc_start_main in libc-start.c:360 [0x2a28a] in libc.so.6
+=========         Host Frame: _start [0x258344] in python
+=========         Host Frame: make_kv_map in kernel_v028.py:35
+=========         Host Frame: make_runner in kernel_v028.py:335
+=========         Host Frame: make_cases in bench.py:39
+=========         Host Frame: main in benchmark_source.py:549
+========= 
+========= Program hit CUDA_ERROR_INVALID_VALUE (error 1) due to "invalid argument" on CUDA API call to cuGetProcAddress_v2.
+=========     Saved host backtrace up to driver entry point at error
+=========         Host Frame:  [0xd4c8] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x55cc5] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x12825] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x3ed4ef] in driver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame: PyObject_Vectorcall [0x149834] in python
+=========         Host Frame: _PyEval_EvalFrameDefault [0x1d7428] in python
+=========         Host Frame: PyEval_EvalCode [0x1d594a] in python
+=========         Host Frame:  [0x208b11] in python
+=========         Host Frame:  [0x2b54b2] in python
+=========         Host Frame: _PyRun_SimpleFileObject [0x2b5219] in python
+=========         Host Frame: _PyRun_AnyFileObject [0x2b504e] in python
+=========         Host Frame: Py_RunMain [0x2bd0b4] in python
+=========         Host Frame: Py_BytesMain [0x2bcb9c] in python
+=========         Host Frame: __libc_start_call_main in libc_start_call_main.h:58 [0x2a1c9] in libc.so.6
+=========         Host Frame: __libc_start_main in libc-start.c:360 [0x2a28a] in libc.so.6
+=========         Host Frame: _start [0x258344] in python
+=========         Host Frame: make_kv_map in kernel_v028.py:35
+=========         Host Frame: make_runner in kernel_v028.py:335
+=========         Host Frame: make_cases in bench.py:39
+=========         Host Frame: main in benchmark_source.py:549
+========= 
+========= Program hit CUDA_ERROR_INVALID_VALUE (error 1) due to "invalid argument" on CUDA API call to cuGetProcAddress_v2.
+=========     Saved host backtrace up to driver entry point at error
+=========         Host Frame:  [0xd80c] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x55cc5] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x12825] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x3ed4ef] in driver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame: PyObject_Vectorcall [0x149834] in python
+=========         Host Frame: _PyEval_EvalFrameDefault [0x1d7428] in python
+=========         Host Frame: PyEval_EvalCode [0x1d594a] in python
+=========         Host Frame:  [0x208b11] in python
+=========         Host Frame:  [0x2b54b2] in python
+=========         Host Frame: _PyRun_SimpleFileObject [0x2b5219] in python
+=========         Host Frame: _PyRun_AnyFileObject [0x2b504e] in python
+=========         Host Frame: Py_RunMain [0x2bd0b4] in python
+=========         Host Frame: Py_BytesMain [0x2bcb9c] in python
+=========         Host Frame: __libc_start_call_main in libc_start_call_main.h:58 [0x2a1c9] in libc.so.6
+=========         Host Frame: __libc_start_main in libc-start.c:360 [0x2a28a] in libc.so.6
+=========         Host Frame: _start [0x258344] in python
+=========         Host Frame: make_kv_map in kernel_v028.py:35
+=========         Host Frame: make_runner in kernel_v028.py:335
+=========         Host Frame: make_cases in bench.py:39
+=========         Host Frame: main in benchmark_source.py:549
+========= 
+========= Program hit CUDA_ERROR_INVALID_VALUE (error 1) due to "invalid argument" on CUDA API call to cuGetProcAddress_v2.
+=========     Saved host backtrace up to driver entry point at error
+=========         Host Frame:  [0xd832] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x55cc5] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x12825] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x3ed4ef] in driver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame: PyObject_Vectorcall [0x149834] in python
+=========         Host Frame: _PyEval_EvalFrameDefault [0x1d7428] in python
+=========         Host Frame: PyEval_EvalCode [0x1d594a] in python
+=========         Host Frame:  [0x208b11] in python
+=========         Host Frame:  [0x2b54b2] in python
+=========         Host Frame: _PyRun_SimpleFileObject [0x2b5219] in python
+=========         Host Frame: _PyRun_AnyFileObject [0x2b504e] in python
+=========         Host Frame: Py_RunMain [0x2bd0b4] in python
+=========         Host Frame: Py_BytesMain [0x2bcb9c] in python
+=========         Host Frame: __libc_start_call_main in libc_start_call_main.h:58 [0x2a1c9] in libc.so.6
+=========         Host Frame: __libc_start_main in libc-start.c:360 [0x2a28a] in libc.so.6
+=========         Host Frame: _start [0x258344] in python
+=========         Host Frame: make_kv_map in kernel_v028.py:35
+=========         Host Frame: make_runner in kernel_v028.py:335
+=========         Host Frame: make_cases in bench.py:39
+=========         Host Frame: main in benchmark_source.py:549
+========= 
+========= Program hit CUDA_ERROR_INVALID_VALUE (error 1) due to "invalid argument" on CUDA API call to cuGetProcAddress_v2.
+=========     Saved host backtrace up to driver entry point at error
+=========         Host Frame:  [0xd9ad] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x55cc5] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x12825] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x3ed4ef] in driver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame: PyObject_Vectorcall [0x149834] in python
+=========         Host Frame: _PyEval_EvalFrameDefault [0x1d7428] in python
+=========         Host Frame: PyEval_EvalCode [0x1d594a] in python
+=========         Host Frame:  [0x208b11] in python
+=========         Host Frame:  [0x2b54b2] in python
+=========         Host Frame: _PyRun_SimpleFileObject [0x2b5219] in python
+=========         Host Frame: _PyRun_AnyFileObject [0x2b504e] in python
+=========         Host Frame: Py_RunMain [0x2bd0b4] in python
+=========         Host Frame: Py_BytesMain [0x2bcb9c] in python
+=========         Host Frame: __libc_start_call_main in libc_start_call_main.h:58 [0x2a1c9] in libc.so.6
+=========         Host Frame: __libc_start_main in libc-start.c:360 [0x2a28a] in libc.so.6
+=========         Host Frame: _start [0x258344] in python
+=========         Host Frame: make_kv_map in kernel_v028.py:35
+=========         Host Frame: make_runner in kernel_v028.py:335
+=========         Host Frame: make_cases in bench.py:39
+=========         Host Frame: main in benchmark_source.py:549
+========= 
+========= Program hit CUDA_ERROR_INVALID_VALUE (error 1) due to "invalid argument" on CUDA API call to cuGetProcAddress_v2.
+=========     Saved host backtrace up to driver entry point at error
+=========         Host Frame:  [0xdd62] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x55cc5] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x12825] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x3ed4ef] in driver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame: PyObject_Vectorcall [0x149834] in python
+=========         Host Frame: _PyEval_EvalFrameDefault [0x1d7428] in python
+=========         Host Frame: PyEval_EvalCode [0x1d594a] in python
+=========         Host Frame:  [0x208b11] in python
+=========         Host Frame:  [0x2b54b2] in python
+=========         Host Frame: _PyRun_SimpleFileObject [0x2b5219] in python
+=========         Host Frame: _PyRun_AnyFileObject [0x2b504e] in python
+=========         Host Frame: Py_RunMain [0x2bd0b4] in python
+=========         Host Frame: Py_BytesMain [0x2bcb9c] in python
+=========         Host Frame: __libc_start_call_main in libc_start_call_main.h:58 [0x2a1c9] in libc.so.6
+=========         Host Frame: __libc_start_main in libc-start.c:360 [0x2a28a] in libc.so.6
+=========         Host Frame: _start [0x258344] in python
+=========         Host Frame: make_kv_map in kernel_v028.py:35
+=========         Host Frame: make_runner in kernel_v028.py:335
+=========         Host Frame: make_cases in bench.py:39
+=========         Host Frame: main in benchmark_source.py:549
+========= 
+========= Program hit CUDA_ERROR_INVALID_VALUE (error 1) due to "invalid argument" on CUDA API call to cuGetProcAddress_v2.
+=========     Saved host backtrace up to driver entry point at error
+=========         Host Frame:  [0xde46] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x55cc5] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x12825] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x3ed4ef] in driver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame: PyObject_Vectorcall [0x149834] in python
+=========         Host Frame: _PyEval_EvalFrameDefault [0x1d7428] in python
+=========         Host Frame: PyEval_EvalCode [0x1d594a] in python
+=========         Host Frame:  [0x208b11] in python
+=========         Host Frame:  [0x2b54b2] in python
+=========         Host Frame: _PyRun_SimpleFileObject [0x2b5219] in python
+=========         Host Frame: _PyRun_AnyFileObject [0x2b504e] in python
+=========         Host Frame: Py_RunMain [0x2bd0b4] in python
+=========         Host Frame: Py_BytesMain [0x2bcb9c] in python
+=========         Host Frame: __libc_start_call_main in libc_start_call_main.h:58 [0x2a1c9] in libc.so.6
+=========         Host Frame: __libc_start_main in libc-start.c:360 [0x2a28a] in libc.so.6
+=========         Host Frame: _start [0x258344] in python
+=========         Host Frame: make_kv_map in kernel_v028.py:35
+=========         Host Frame: make_runner in kernel_v028.py:335
+=========         Host Frame: make_cases in bench.py:39
+=========         Host Frame: main in benchmark_source.py:549
+========= 
+========= Program hit CUDA_ERROR_INVALID_VALUE (error 1) due to "invalid argument" on CUDA API call to cuGetProcAddress_v2.
+=========     Saved host backtrace up to driver entry point at error
+=========         Host Frame:  [0xeb54] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x55cc5] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x12825] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x3ed4ef] in driver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame: PyObject_Vectorcall [0x149834] in python
+=========         Host Frame: _PyEval_EvalFrameDefault [0x1d7428] in python
+=========         Host Frame: PyEval_EvalCode [0x1d594a] in python
+=========         Host Frame:  [0x208b11] in python
+=========         Host Frame:  [0x2b54b2] in python
+=========         Host Frame: _PyRun_SimpleFileObject [0x2b5219] in python
+=========         Host Frame: _PyRun_AnyFileObject [0x2b504e] in python
+=========         Host Frame: Py_RunMain [0x2bd0b4] in python
+=========         Host Frame: Py_BytesMain [0x2bcb9c] in python
+=========         Host Frame: __libc_start_call_main in libc_start_call_main.h:58 [0x2a1c9] in libc.so.6
+=========         Host Frame: __libc_start_main in libc-start.c:360 [0x2a28a] in libc.so.6
+=========         Host Frame: _start [0x258344] in python
+=========         Host Frame: make_kv_map in kernel_v028.py:35
+=========         Host Frame: make_runner in kernel_v028.py:335
+=========         Host Frame: make_cases in bench.py:39
+=========         Host Frame: main in benchmark_source.py:549
+========= 
+========= Program hit CUDA_ERROR_INVALID_VALUE (error 1) due to "invalid argument" on CUDA API call to cuGetProcAddress_v2.
+=========     Saved host backtrace up to driver entry point at error
+=========         Host Frame:  [0xf545] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x55cc5] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x12825] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x3ed4ef] in driver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame: PyObject_Vectorcall [0x149834] in python
+=========         Host Frame: _PyEval_EvalFrameDefault [0x1d7428] in python
+=========         Host Frame: PyEval_EvalCode [0x1d594a] in python
+=========         Host Frame:  [0x208b11] in python
+=========         Host Frame:  [0x2b54b2] in python
+=========         Host Frame: _PyRun_SimpleFileObject [0x2b5219] in python
+=========         Host Frame: _PyRun_AnyFileObject [0x2b504e] in python
+=========         Host Frame: Py_RunMain [0x2bd0b4] in python
+=========         Host Frame: Py_BytesMain [0x2bcb9c] in python
+=========         Host Frame: __libc_start_call_main in libc_start_call_main.h:58 [0x2a1c9] in libc.so.6
+=========         Host Frame: __libc_start_main in libc-start.c:360 [0x2a28a] in libc.so.6
+=========         Host Frame: _start [0x258344] in python
+=========         Host Frame: make_kv_map in kernel_v028.py:35
+=========         Host Frame: make_runner in kernel_v028.py:335
+=========         Host Frame: make_cases in bench.py:39
+=========         Host Frame: main in benchmark_source.py:549
+========= 
+========= Program hit CUDA_ERROR_INVALID_VALUE (error 1) due to "invalid argument" on CUDA API call to cuGetProcAddress_v2.
+=========     Saved host backtrace up to driver entry point at error
+=========         Host Frame:  [0xf590] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x55cc5] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x12825] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x3ed4ef] in driver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame: PyObject_Vectorcall [0x149834] in python
+=========         Host Frame: _PyEval_EvalFrameDefault [0x1d7428] in python
+=========         Host Frame: PyEval_EvalCode [0x1d594a] in python
+=========         Host Frame:  [0x208b11] in python
+=========         Host Frame:  [0x2b54b2] in python
+=========         Host Frame: _PyRun_SimpleFileObject [0x2b5219] in python
+=========         Host Frame: _PyRun_AnyFileObject [0x2b504e] in python
+=========         Host Frame: Py_RunMain [0x2bd0b4] in python
+=========         Host Frame: Py_BytesMain [0x2bcb9c] in python
+=========         Host Frame: __libc_start_call_main in libc_start_call_main.h:58 [0x2a1c9] in libc.so.6
+=========         Host Frame: __libc_start_main in libc-start.c:360 [0x2a28a] in libc.so.6
+=========         Host Frame: _start [0x258344] in python
+=========         Host Frame: make_kv_map in kernel_v028.py:35
+=========         Host Frame: make_runner in kernel_v028.py:335
+=========         Host Frame: make_cases in bench.py:39
+=========         Host Frame: main in benchmark_source.py:549
+========= 
+========= Program hit CUDA_ERROR_INVALID_VALUE (error 1) due to "invalid argument" on CUDA API call to cuGetProcAddress_v2.
+=========     Saved host backtrace up to driver entry point at error
+=========         Host Frame:  [0xf602] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x55cc5] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x12825] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x3ed4ef] in driver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame: PyObject_Vectorcall [0x149834] in python
+=========         Host Frame: _PyEval_EvalFrameDefault [0x1d7428] in python
+=========         Host Frame: PyEval_EvalCode [0x1d594a] in python
+=========         Host Frame:  [0x208b11] in python
+=========         Host Frame:  [0x2b54b2] in python
+=========         Host Frame: _PyRun_SimpleFileObject [0x2b5219] in python
+=========         Host Frame: _PyRun_AnyFileObject [0x2b504e] in python
+=========         Host Frame: Py_RunMain [0x2bd0b4] in python
+=========         Host Frame: Py_BytesMain [0x2bcb9c] in python
+=========         Host Frame: __libc_start_call_main in libc_start_call_main.h:58 [0x2a1c9] in libc.so.6
+=========         Host Frame: __libc_start_main in libc-start.c:360 [0x2a28a] in libc.so.6
+=========         Host Frame: _start [0x258344] in python
+=========         Host Frame: make_kv_map in kernel_v028.py:35
+=========         Host Frame: make_runner in kernel_v028.py:335
+=========         Host Frame: make_cases in bench.py:39
+=========         Host Frame: main in benchmark_source.py:549
+========= 
+========= Program hit CUDA_ERROR_INVALID_VALUE (error 1) due to "invalid argument" on CUDA API call to cuGetProcAddress_v2.
+=========     Saved host backtrace up to driver entry point at error
+=========         Host Frame:  [0xf628] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x55cc5] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x12825] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x3ed4ef] in driver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame: PyObject_Vectorcall [0x149834] in python
+=========         Host Frame: _PyEval_EvalFrameDefault [0x1d7428] in python
+=========         Host Frame: PyEval_EvalCode [0x1d594a] in python
+=========         Host Frame:  [0x208b11] in python
+=========         Host Frame:  [0x2b54b2] in python
+=========         Host Frame: _PyRun_SimpleFileObject [0x2b5219] in python
+=========         Host Frame: _PyRun_AnyFileObject [0x2b504e] in python
+=========         Host Frame: Py_RunMain [0x2bd0b4] in python
+=========         Host Frame: Py_BytesMain [0x2bcb9c] in python
+=========         Host Frame: __libc_start_call_main in libc_start_call_main.h:58 [0x2a1c9] in libc.so.6
+=========         Host Frame: __libc_start_main in libc-start.c:360 [0x2a28a] in libc.so.6
+=========         Host Frame: _start [0x258344] in python
+=========         Host Frame: make_kv_map in kernel_v028.py:35
+=========         Host Frame: make_runner in kernel_v028.py:335
+=========         Host Frame: make_cases in bench.py:39
+=========         Host Frame: main in benchmark_source.py:549
+========= 
+========= Program hit CUDA_ERROR_INVALID_VALUE (error 1) due to "invalid argument" on CUDA API call to cuGetProcAddress_v2.
+=========     Saved host backtrace up to driver entry point at error
+=========         Host Frame:  [0xf64e] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x55cc5] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x12825] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x3ed4ef] in driver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame: PyObject_Vectorcall [0x149834] in python
+=========         Host Frame: _PyEval_EvalFrameDefault [0x1d7428] in python
+=========         Host Frame: PyEval_EvalCode [0x1d594a] in python
+=========         Host Frame:  [0x208b11] in python
+=========         Host Frame:  [0x2b54b2] in python
+=========         Host Frame: _PyRun_SimpleFileObject [0x2b5219] in python
+=========         Host Frame: _PyRun_AnyFileObject [0x2b504e] in python
+=========         Host Frame: Py_RunMain [0x2bd0b4] in python
+=========         Host Frame: Py_BytesMain [0x2bcb9c] in python
+=========         Host Frame: __libc_start_call_main in libc_start_call_main.h:58 [0x2a1c9] in libc.so.6
+=========         Host Frame: __libc_start_main in libc-start.c:360 [0x2a28a] in libc.so.6
+=========         Host Frame: _start [0x258344] in python
+=========         Host Frame: make_kv_map in kernel_v028.py:35
+=========         Host Frame: make_runner in kernel_v028.py:335
+=========         Host Frame: make_cases in bench.py:39
+=========         Host Frame: main in benchmark_source.py:549
+========= 
+========= Program hit CUDA_ERROR_INVALID_VALUE (error 1) due to "invalid argument" on CUDA API call to cuGetProcAddress_v2.
+=========     Saved host backtrace up to driver entry point at error
+=========         Host Frame:  [0xf674] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x55cc5] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x12825] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x3ed4ef] in driver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame: PyObject_Vectorcall [0x149834] in python
+=========         Host Frame: _PyEval_EvalFrameDefault [0x1d7428] in python
+=========         Host Frame: PyEval_EvalCode [0x1d594a] in python
+=========         Host Frame:  [0x208b11] in python
+=========         Host Frame:  [0x2b54b2] in python
+=========         Host Frame: _PyRun_SimpleFileObject [0x2b5219] in python
+=========         Host Frame: _PyRun_AnyFileObject [0x2b504e] in python
+=========         Host Frame: Py_RunMain [0x2bd0b4] in python
+=========         Host Frame: Py_BytesMain [0x2bcb9c] in python
+=========         Host Frame: __libc_start_call_main in libc_start_call_main.h:58 [0x2a1c9] in libc.so.6
+=========         Host Frame: __libc_start_main in libc-start.c:360 [0x2a28a] in libc.so.6
+=========         Host Frame: _start [0x258344] in python
+=========         Host Frame: make_kv_map in kernel_v028.py:35
+=========         Host Frame: make_runner in kernel_v028.py:335
+=========         Host Frame: make_cases in bench.py:39
+=========         Host Frame: main in benchmark_source.py:549
+========= 
+========= Program hit CUDA_ERROR_INVALID_VALUE (error 1) due to "invalid argument" on CUDA API call to cuGetProcAddress_v2.
+=========     Saved host backtrace up to driver entry point at error
+=========         Host Frame:  [0xf69a] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x55cc5] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x12825] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x3ed4ef] in driver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame: PyObject_Vectorcall [0x149834] in python
+=========         Host Frame: _PyEval_EvalFrameDefault [0x1d7428] in python
+=========         Host Frame: PyEval_EvalCode [0x1d594a] in python
+=========         Host Frame:  [0x208b11] in python
+=========         Host Frame:  [0x2b54b2] in python
+=========         Host Frame: _PyRun_SimpleFileObject [0x2b5219] in python
+=========         Host Frame: _PyRun_AnyFileObject [0x2b504e] in python
+=========         Host Frame: Py_RunMain [0x2bd0b4] in python
+=========         Host Frame: Py_BytesMain [0x2bcb9c] in python
+=========         Host Frame: __libc_start_call_main in libc_start_call_main.h:58 [0x2a1c9] in libc.so.6
+=========         Host Frame: __libc_start_main in libc-start.c:360 [0x2a28a] in libc.so.6
+=========         Host Frame: _start [0x258344] in python
+=========         Host Frame: make_kv_map in kernel_v028.py:35
+=========         Host Frame: make_runner in kernel_v028.py:335
+=========         Host Frame: make_cases in bench.py:39
+=========         Host Frame: main in benchmark_source.py:549
+========= 
+========= Program hit CUDA_ERROR_INVALID_VALUE (error 1) due to "invalid argument" on CUDA API call to cuGetProcAddress_v2.
+=========     Saved host backtrace up to driver entry point at error
+=========         Host Frame:  [0xf6c0] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x55cc5] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x12825] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x3ed4ef] in driver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame: PyObject_Vectorcall [0x149834] in python
+=========         Host Frame: _PyEval_EvalFrameDefault [0x1d7428] in python
+=========         Host Frame: PyEval_EvalCode [0x1d594a] in python
+=========         Host Frame:  [0x208b11] in python
+=========         Host Frame:  [0x2b54b2] in python
+=========         Host Frame: _PyRun_SimpleFileObject [0x2b5219] in python
+=========         Host Frame: _PyRun_AnyFileObject [0x2b504e] in python
+=========         Host Frame: Py_RunMain [0x2bd0b4] in python
+=========         Host Frame: Py_BytesMain [0x2bcb9c] in python
+=========         Host Frame: __libc_start_call_main in libc_start_call_main.h:58 [0x2a1c9] in libc.so.6
+=========         Host Frame: __libc_start_main in libc-start.c:360 [0x2a28a] in libc.so.6
+=========         Host Frame: _start [0x258344] in python
+=========         Host Frame: make_kv_map in kernel_v028.py:35
+=========         Host Frame: make_runner in kernel_v028.py:335
+=========         Host Frame: make_cases in bench.py:39
+=========         Host Frame: main in benchmark_source.py:549
+========= 
+========= Program hit CUDA_ERROR_INVALID_VALUE (error 1) due to "invalid argument" on CUDA API call to cuGetProcAddress_v2.
+=========     Saved host backtrace up to driver entry point at error
+=========         Host Frame:  [0xf6e6] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x55cc5] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x12825] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x3ed4ef] in driver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame: PyObject_Vectorcall [0x149834] in python
+=========         Host Frame: _PyEval_EvalFrameDefault [0x1d7428] in python
+=========         Host Frame: PyEval_EvalCode [0x1d594a] in python
+=========         Host Frame:  [0x208b11] in python
+=========         Host Frame:  [0x2b54b2] in python
+=========         Host Frame: _PyRun_SimpleFileObject [0x2b5219] in python
+=========         Host Frame: _PyRun_AnyFileObject [0x2b504e] in python
+=========         Host Frame: Py_RunMain [0x2bd0b4] in python
+=========         Host Frame: Py_BytesMain [0x2bcb9c] in python
+=========         Host Frame: __libc_start_call_main in libc_start_call_main.h:58 [0x2a1c9] in libc.so.6
+=========         Host Frame: __libc_start_main in libc-start.c:360 [0x2a28a] in libc.so.6
+=========         Host Frame: _start [0x258344] in python
+=========         Host Frame: make_kv_map in kernel_v028.py:35
+=========         Host Frame: make_runner in kernel_v028.py:335
+=========         Host Frame: make_cases in bench.py:39
+=========         Host Frame: main in benchmark_source.py:549
+========= 
+========= Program hit CUDA_ERROR_INVALID_VALUE (error 1) due to "invalid argument" on CUDA API call to cuGetProcAddress_v2.
+=========     Saved host backtrace up to driver entry point at error
+=========         Host Frame:  [0xf70c] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x55cc5] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x12825] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x3ed4ef] in driver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame: PyObject_Vectorcall [0x149834] in python
+=========         Host Frame: _PyEval_EvalFrameDefault [0x1d7428] in python
+=========         Host Frame: PyEval_EvalCode [0x1d594a] in python
+=========         Host Frame:  [0x208b11] in python
+=========         Host Frame:  [0x2b54b2] in python
+=========         Host Frame: _PyRun_SimpleFileObject [0x2b5219] in python
+=========         Host Frame: _PyRun_AnyFileObject [0x2b504e] in python
+=========         Host Frame: Py_RunMain [0x2bd0b4] in python
+=========         Host Frame: Py_BytesMain [0x2bcb9c] in python
+=========         Host Frame: __libc_start_call_main in libc_start_call_main.h:58 [0x2a1c9] in libc.so.6
+=========         Host Frame: __libc_start_main in libc-start.c:360 [0x2a28a] in libc.so.6
+=========         Host Frame: _start [0x258344] in python
+=========         Host Frame: make_kv_map in kernel_v028.py:35
+=========         Host Frame: make_runner in kernel_v028.py:335
+=========         Host Frame: make_cases in bench.py:39
+=========         Host Frame: main in benchmark_source.py:549
+========= 
+========= Program hit CUDA_ERROR_INVALID_VALUE (error 1) due to "invalid argument" on CUDA API call to cuGetProcAddress_v2.
+=========     Saved host backtrace up to driver entry point at error
+=========         Host Frame:  [0xf732] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x55cc5] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x12825] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x3ed4ef] in driver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame: PyObject_Vectorcall [0x149834] in python
+=========         Host Frame: _PyEval_EvalFrameDefault [0x1d7428] in python
+=========         Host Frame: PyEval_EvalCode [0x1d594a] in python
+=========         Host Frame:  [0x208b11] in python
+=========         Host Frame:  [0x2b54b2] in python
+=========         Host Frame: _PyRun_SimpleFileObject [0x2b5219] in python
+=========         Host Frame: _PyRun_AnyFileObject [0x2b504e] in python
+=========         Host Frame: Py_RunMain [0x2bd0b4] in python
+=========         Host Frame: Py_BytesMain [0x2bcb9c] in python
+=========         Host Frame: __libc_start_call_main in libc_start_call_main.h:58 [0x2a1c9] in libc.so.6
+=========         Host Frame: __libc_start_main in libc-start.c:360 [0x2a28a] in libc.so.6
+=========         Host Frame: _start [0x258344] in python
+=========         Host Frame: make_kv_map in kernel_v028.py:35
+=========         Host Frame: make_runner in kernel_v028.py:335
+=========         Host Frame: make_cases in bench.py:39
+=========         Host Frame: main in benchmark_source.py:549
+========= 
+========= Program hit CUDA_ERROR_INVALID_VALUE (error 1) due to "invalid argument" on CUDA API call to cuGetProcAddress_v2.
+=========     Saved host backtrace up to driver entry point at error
+=========         Host Frame:  [0xf758] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x55cc5] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x12825] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x3ed4ef] in driver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame: PyObject_Vectorcall [0x149834] in python
+=========         Host Frame: _PyEval_EvalFrameDefault [0x1d7428] in python
+=========         Host Frame: PyEval_EvalCode [0x1d594a] in python
+=========         Host Frame:  [0x208b11] in python
+=========         Host Frame:  [0x2b54b2] in python
+=========         Host Frame: _PyRun_SimpleFileObject [0x2b5219] in python
+=========         Host Frame: _PyRun_AnyFileObject [0x2b504e] in python
+=========         Host Frame: Py_RunMain [0x2bd0b4] in python
+=========         Host Frame: Py_BytesMain [0x2bcb9c] in python
+=========         Host Frame: __libc_start_call_main in libc_start_call_main.h:58 [0x2a1c9] in libc.so.6
+=========         Host Frame: __libc_start_main in libc-start.c:360 [0x2a28a] in libc.so.6
+=========         Host Frame: _start [0x258344] in python
+=========         Host Frame: make_kv_map in kernel_v028.py:35
+=========         Host Frame: make_runner in kernel_v028.py:335
+=========         Host Frame: make_cases in bench.py:39
+=========         Host Frame: main in benchmark_source.py:549
+========= 
+========= Program hit CUDA_ERROR_INVALID_VALUE (error 1) due to "invalid argument" on CUDA API call to cuGetProcAddress_v2.
+=========     Saved host backtrace up to driver entry point at error
+=========         Host Frame:  [0xf77e] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x55cc5] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x12825] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x3ed4ef] in driver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame: PyObject_Vectorcall [0x149834] in python
+=========         Host Frame: _PyEval_EvalFrameDefault [0x1d7428] in python
+=========         Host Frame: PyEval_EvalCode [0x1d594a] in python
+=========         Host Frame:  [0x208b11] in python
+=========         Host Frame:  [0x2b54b2] in python
+=========         Host Frame: _PyRun_SimpleFileObject [0x2b5219] in python
+=========         Host Frame: _PyRun_AnyFileObject [0x2b504e] in python
+=========         Host Frame: Py_RunMain [0x2bd0b4] in python
+=========         Host Frame: Py_BytesMain [0x2bcb9c] in python
+=========         Host Frame: __libc_start_call_main in libc_start_call_main.h:58 [0x2a1c9] in libc.so.6
+=========         Host Frame: __libc_start_main in libc-start.c:360 [0x2a28a] in libc.so.6
+=========         Host Frame: _start [0x258344] in python
+=========         Host Frame: make_kv_map in kernel_v028.py:35
+=========         Host Frame: make_runner in kernel_v028.py:335
+=========         Host Frame: make_cases in bench.py:39
+=========         Host Frame: main in benchmark_source.py:549
+========= 
+========= Program hit CUDA_ERROR_INVALID_VALUE (error 1) due to "invalid argument" on CUDA API call to cuGetProcAddress_v2.
+=========     Saved host backtrace up to driver entry point at error
+=========         Host Frame:  [0xf7a4] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x55cc5] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x12825] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x3ed4ef] in driver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame: PyObject_Vectorcall [0x149834] in python
+=========         Host Frame: _PyEval_EvalFrameDefault [0x1d7428] in python
+=========         Host Frame: PyEval_EvalCode [0x1d594a] in python
+=========         Host Frame:  [0x208b11] in python
+=========         Host Frame:  [0x2b54b2] in python
+=========         Host Frame: _PyRun_SimpleFileObject [0x2b5219] in python
+=========         Host Frame: _PyRun_AnyFileObject [0x2b504e] in python
+=========         Host Frame: Py_RunMain [0x2bd0b4] in python
+=========         Host Frame: Py_BytesMain [0x2bcb9c] in python
+=========         Host Frame: __libc_start_call_main in libc_start_call_main.h:58 [0x2a1c9] in libc.so.6
+=========         Host Frame: __libc_start_main in libc-start.c:360 [0x2a28a] in libc.so.6
+=========         Host Frame: _start [0x258344] in python
+=========         Host Frame: make_kv_map in kernel_v028.py:35
+=========         Host Frame: make_runner in kernel_v028.py:335
+=========         Host Frame: make_cases in bench.py:39
+=========         Host Frame: main in benchmark_source.py:549
+========= 
+========= Program hit CUDA_ERROR_INVALID_VALUE (error 1) due to "invalid argument" on CUDA API call to cuGetProcAddress_v2.
+=========     Saved host backtrace up to driver entry point at error
+=========         Host Frame:  [0xfbcc] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x55cc5] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x12825] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x3ed4ef] in driver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame: PyObject_Vectorcall [0x149834] in python
+=========         Host Frame: _PyEval_EvalFrameDefault [0x1d7428] in python
+=========         Host Frame: PyEval_EvalCode [0x1d594a] in python
+=========         Host Frame:  [0x208b11] in python
+=========         Host Frame:  [0x2b54b2] in python
+=========         Host Frame: _PyRun_SimpleFileObject [0x2b5219] in python
+=========         Host Frame: _PyRun_AnyFileObject [0x2b504e] in python
+=========         Host Frame: Py_RunMain [0x2bd0b4] in python
+=========         Host Frame: Py_BytesMain [0x2bcb9c] in python
+=========         Host Frame: __libc_start_call_main in libc_start_call_main.h:58 [0x2a1c9] in libc.so.6
+=========         Host Frame: __libc_start_main in libc-start.c:360 [0x2a28a] in libc.so.6
+=========         Host Frame: _start [0x258344] in python
+=========         Host Frame: make_kv_map in kernel_v028.py:35
+=========         Host Frame: make_runner in kernel_v028.py:335
+=========         Host Frame: make_cases in bench.py:39
+=========         Host Frame: main in benchmark_source.py:549
+========= 
+========= Program hit CUDA_ERROR_INVALID_VALUE (error 1) due to "invalid argument" on CUDA API call to cuGetProcAddress_v2.
+=========     Saved host backtrace up to driver entry point at error
+=========         Host Frame:  [0x10442] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x55cc5] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x12825] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x3ed4ef] in driver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame: PyObject_Vectorcall [0x149834] in python
+=========         Host Frame: _PyEval_EvalFrameDefault [0x1d7428] in python
+=========         Host Frame: PyEval_EvalCode [0x1d594a] in python
+=========         Host Frame:  [0x208b11] in python
+=========         Host Frame:  [0x2b54b2] in python
+=========         Host Frame: _PyRun_SimpleFileObject [0x2b5219] in python
+=========         Host Frame: _PyRun_AnyFileObject [0x2b504e] in python
+=========         Host Frame: Py_RunMain [0x2bd0b4] in python
+=========         Host Frame: Py_BytesMain [0x2bcb9c] in python
+=========         Host Frame: __libc_start_call_main in libc_start_call_main.h:58 [0x2a1c9] in libc.so.6
+=========         Host Frame: __libc_start_main in libc-start.c:360 [0x2a28a] in libc.so.6
+=========         Host Frame: _start [0x258344] in python
+=========         Host Frame: make_kv_map in kernel_v028.py:35
+=========         Host Frame: make_runner in kernel_v028.py:335
+=========         Host Frame: make_cases in bench.py:39
+=========         Host Frame: main in benchmark_source.py:549
+========= 
+========= Program hit CUDA_ERROR_INVALID_VALUE (error 1) due to "invalid argument" on CUDA API call to cuGetProcAddress_v2.
+=========     Saved host backtrace up to driver entry point at error
+=========         Host Frame:  [0x10468] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x55cc5] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x12825] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x3ed4ef] in driver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame: PyObject_Vectorcall [0x149834] in python
+=========         Host Frame: _PyEval_EvalFrameDefault [0x1d7428] in python
+=========         Host Frame: PyEval_EvalCode [0x1d594a] in python
+=========         Host Frame:  [0x208b11] in python
+=========         Host Frame:  [0x2b54b2] in python
+=========         Host Frame: _PyRun_SimpleFileObject [0x2b5219] in python
+=========         Host Frame: _PyRun_AnyFileObject [0x2b504e] in python
+=========         Host Frame: Py_RunMain [0x2bd0b4] in python
+=========         Host Frame: Py_BytesMain [0x2bcb9c] in python
+=========         Host Frame: __libc_start_call_main in libc_start_call_main.h:58 [0x2a1c9] in libc.so.6
+=========         Host Frame: __libc_start_main in libc-start.c:360 [0x2a28a] in libc.so.6
+=========         Host Frame: _start [0x258344] in python
+=========         Host Frame: make_kv_map in kernel_v028.py:35
+=========         Host Frame: make_runner in kernel_v028.py:335
+=========         Host Frame: make_cases in bench.py:39
+=========         Host Frame: main in benchmark_source.py:549
+========= 
+========= Program hit CUDA_ERROR_INVALID_VALUE (error 1) due to "invalid argument" on CUDA API call to cuGetProcAddress_v2.
+=========     Saved host backtrace up to driver entry point at error
+=========         Host Frame:  [0x1048e] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x55cc5] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x12825] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x3ed4ef] in driver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame: PyObject_Vectorcall [0x149834] in python
+=========         Host Frame: _PyEval_EvalFrameDefault [0x1d7428] in python
+=========         Host Frame: PyEval_EvalCode [0x1d594a] in python
+=========         Host Frame:  [0x208b11] in python
+=========         Host Frame:  [0x2b54b2] in python
+=========         Host Frame: _PyRun_SimpleFileObject [0x2b5219] in python
+=========         Host Frame: _PyRun_AnyFileObject [0x2b504e] in python
+=========         Host Frame: Py_RunMain [0x2bd0b4] in python
+=========         Host Frame: Py_BytesMain [0x2bcb9c] in python
+=========         Host Frame: __libc_start_call_main in libc_start_call_main.h:58 [0x2a1c9] in libc.so.6
+=========         Host Frame: __libc_start_main in libc-start.c:360 [0x2a28a] in libc.so.6
+=========         Host Frame: _start [0x258344] in python
+=========         Host Frame: make_kv_map in kernel_v028.py:35
+=========         Host Frame: make_runner in kernel_v028.py:335
+=========         Host Frame: make_cases in bench.py:39
+=========         Host Frame: main in benchmark_source.py:549
+========= 
+========= Program hit CUDA_ERROR_INVALID_VALUE (error 1) due to "invalid argument" on CUDA API call to cuGetProcAddress_v2.
+=========     Saved host backtrace up to driver entry point at error
+=========         Host Frame:  [0x104b4] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x55cc5] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x12825] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x3ed4ef] in driver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame: PyObject_Vectorcall [0x149834] in python
+=========         Host Frame: _PyEval_EvalFrameDefault [0x1d7428] in python
+=========         Host Frame: PyEval_EvalCode [0x1d594a] in python
+=========         Host Frame:  [0x208b11] in python
+=========         Host Frame:  [0x2b54b2] in python
+=========         Host Frame: _PyRun_SimpleFileObject [0x2b5219] in python
+=========         Host Frame: _PyRun_AnyFileObject [0x2b504e] in python
+=========         Host Frame: Py_RunMain [0x2bd0b4] in python
+=========         Host Frame: Py_BytesMain [0x2bcb9c] in python
+=========         Host Frame: __libc_start_call_main in libc_start_call_main.h:58 [0x2a1c9] in libc.so.6
+=========         Host Frame: __libc_start_main in libc-start.c:360 [0x2a28a] in libc.so.6
+=========         Host Frame: _start [0x258344] in python
+=========         Host Frame: make_kv_map in kernel_v028.py:35
+=========         Host Frame: make_runner in kernel_v028.py:335
+=========         Host Frame: make_cases in bench.py:39
+=========         Host Frame: main in benchmark_source.py:549
+========= 
+========= Program hit CUDA_ERROR_INVALID_VALUE (error 1) due to "invalid argument" on CUDA API call to cuGetProcAddress_v2.
+=========     Saved host backtrace up to driver entry point at error
+=========         Host Frame:  [0x104da] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x55cc5] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x12825] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x3ed4ef] in driver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame: PyObject_Vectorcall [0x149834] in python
+=========         Host Frame: _PyEval_EvalFrameDefault [0x1d7428] in python
+=========         Host Frame: PyEval_EvalCode [0x1d594a] in python
+=========         Host Frame:  [0x208b11] in python
+=========         Host Frame:  [0x2b54b2] in python
+=========         Host Frame: _PyRun_SimpleFileObject [0x2b5219] in python
+=========         Host Frame: _PyRun_AnyFileObject [0x2b504e] in python
+=========         Host Frame: Py_RunMain [0x2bd0b4] in python
+=========         Host Frame: Py_BytesMain [0x2bcb9c] in python
+=========         Host Frame: __libc_start_call_main in libc_start_call_main.h:58 [0x2a1c9] in libc.so.6
+=========         Host Frame: __libc_start_main in libc-start.c:360 [0x2a28a] in libc.so.6
+=========         Host Frame: _start [0x258344] in python
+=========         Host Frame: make_kv_map in kernel_v028.py:35
+=========         Host Frame: make_runner in kernel_v028.py:335
+=========         Host Frame: make_cases in bench.py:39
+=========         Host Frame: main in benchmark_source.py:549
+========= 
+========= Program hit CUDA_ERROR_INVALID_VALUE (error 1) due to "invalid argument" on CUDA API call to cuGetProcAddress_v2.
+=========     Saved host backtrace up to driver entry point at error
+=========         Host Frame:  [0x10a32] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x55cc5] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x12825] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x3ed4ef] in driver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame: PyObject_Vectorcall [0x149834] in python
+=========         Host Frame: _PyEval_EvalFrameDefault [0x1d7428] in python
+=========         Host Frame: PyEval_EvalCode [0x1d594a] in python
+=========         Host Frame:  [0x208b11] in python
+=========         Host Frame:  [0x2b54b2] in python
+=========         Host Frame: _PyRun_SimpleFileObject [0x2b5219] in python
+=========         Host Frame: _PyRun_AnyFileObject [0x2b504e] in python
+=========         Host Frame: Py_RunMain [0x2bd0b4] in python
+=========         Host Frame: Py_BytesMain [0x2bcb9c] in python
+=========         Host Frame: __libc_start_call_main in libc_start_call_main.h:58 [0x2a1c9] in libc.so.6
+=========         Host Frame: __libc_start_main in libc-start.c:360 [0x2a28a] in libc.so.6
+=========         Host Frame: _start [0x258344] in python
+=========         Host Frame: make_kv_map in kernel_v028.py:35
+=========         Host Frame: make_runner in kernel_v028.py:335
+=========         Host Frame: make_cases in bench.py:39
+=========         Host Frame: main in benchmark_source.py:549
+========= 
+========= Program hit CUDA_ERROR_INVALID_VALUE (error 1) due to "invalid argument" on CUDA API call to cuGetProcAddress_v2.
+=========     Saved host backtrace up to driver entry point at error
+=========         Host Frame:  [0x113fe] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x55cc5] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x12825] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x3ed4ef] in driver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame: PyObject_Vectorcall [0x149834] in python
+=========         Host Frame: _PyEval_EvalFrameDefault [0x1d7428] in python
+=========         Host Frame: PyEval_EvalCode [0x1d594a] in python
+=========         Host Frame:  [0x208b11] in python
+=========         Host Frame:  [0x2b54b2] in python
+=========         Host Frame: _PyRun_SimpleFileObject [0x2b5219] in python
+=========         Host Frame: _PyRun_AnyFileObject [0x2b504e] in python
+=========         Host Frame: Py_RunMain [0x2bd0b4] in python
+=========         Host Frame: Py_BytesMain [0x2bcb9c] in python
+=========         Host Frame: __libc_start_call_main in libc_start_call_main.h:58 [0x2a1c9] in libc.so.6
+=========         Host Frame: __libc_start_main in libc-start.c:360 [0x2a28a] in libc.so.6
+=========         Host Frame: _start [0x258344] in python
+=========         Host Frame: make_kv_map in kernel_v028.py:35
+=========         Host Frame: make_runner in kernel_v028.py:335
+=========         Host Frame: make_cases in bench.py:39
+=========         Host Frame: main in benchmark_source.py:549
+========= 
+========= Program hit CUDA_ERROR_INVALID_VALUE (error 1) due to "invalid argument" on CUDA API call to cuGetProcAddress_v2.
+=========     Saved host backtrace up to driver entry point at error
+=========         Host Frame:  [0x11424] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x55cc5] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x12825] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x3ed4ef] in driver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame: PyObject_Vectorcall [0x149834] in python
+=========         Host Frame: _PyEval_EvalFrameDefault [0x1d7428] in python
+=========         Host Frame: PyEval_EvalCode [0x1d594a] in python
+=========         Host Frame:  [0x208b11] in python
+=========         Host Frame:  [0x2b54b2] in python
+=========         Host Frame: _PyRun_SimpleFileObject [0x2b5219] in python
+=========         Host Frame: _PyRun_AnyFileObject [0x2b504e] in python
+=========         Host Frame: Py_RunMain [0x2bd0b4] in python
+=========         Host Frame: Py_BytesMain [0x2bcb9c] in python
+=========         Host Frame: __libc_start_call_main in libc_start_call_main.h:58 [0x2a1c9] in libc.so.6
+=========         Host Frame: __libc_start_main in libc-start.c:360 [0x2a28a] in libc.so.6
+=========         Host Frame: _start [0x258344] in python
+=========         Host Frame: make_kv_map in kernel_v028.py:35
+=========         Host Frame: make_runner in kernel_v028.py:335
+=========         Host Frame: make_cases in bench.py:39
+=========         Host Frame: main in benchmark_source.py:549
+========= 
+========= Program hit CUDA_ERROR_INVALID_VALUE (error 1) due to "invalid argument" on CUDA API call to cuGetProcAddress_v2.
+=========     Saved host backtrace up to driver entry point at error
+=========         Host Frame:  [0x1144a] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x55cc5] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x12825] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x3ed4ef] in driver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame: PyObject_Vectorcall [0x149834] in python
+=========         Host Frame: _PyEval_EvalFrameDefault [0x1d7428] in python
+=========         Host Frame: PyEval_EvalCode [0x1d594a] in python
+=========         Host Frame:  [0x208b11] in python
+=========         Host Frame:  [0x2b54b2] in python
+=========         Host Frame: _PyRun_SimpleFileObject [0x2b5219] in python
+=========         Host Frame: _PyRun_AnyFileObject [0x2b504e] in python
+=========         Host Frame: Py_RunMain [0x2bd0b4] in python
+=========         Host Frame: Py_BytesMain [0x2bcb9c] in python
+=========         Host Frame: __libc_start_call_main in libc_start_call_main.h:58 [0x2a1c9] in libc.so.6
+=========         Host Frame: __libc_start_main in libc-start.c:360 [0x2a28a] in libc.so.6
+=========         Host Frame: _start [0x258344] in python
+=========         Host Frame: make_kv_map in kernel_v028.py:35
+=========         Host Frame: make_runner in kernel_v028.py:335
+=========         Host Frame: make_cases in bench.py:39
+=========         Host Frame: main in benchmark_source.py:549
+========= 
+========= Program hit CUDA_ERROR_INVALID_VALUE (error 1) due to "invalid argument" on CUDA API call to cuGetProcAddress_v2.
+=========     Saved host backtrace up to driver entry point at error
+=========         Host Frame:  [0x11470] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x55cc5] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x12825] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x3ed4ef] in driver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame: PyObject_Vectorcall [0x149834] in python
+=========         Host Frame: _PyEval_EvalFrameDefault [0x1d7428] in python
+=========         Host Frame: PyEval_EvalCode [0x1d594a] in python
+=========         Host Frame:  [0x208b11] in python
+=========         Host Frame:  [0x2b54b2] in python
+=========         Host Frame: _PyRun_SimpleFileObject [0x2b5219] in python
+=========         Host Frame: _PyRun_AnyFileObject [0x2b504e] in python
+=========         Host Frame: Py_RunMain [0x2bd0b4] in python
+=========         Host Frame: Py_BytesMain [0x2bcb9c] in python
+=========         Host Frame: __libc_start_call_main in libc_start_call_main.h:58 [0x2a1c9] in libc.so.6
+=========         Host Frame: __libc_start_main in libc-start.c:360 [0x2a28a] in libc.so.6
+=========         Host Frame: _start [0x258344] in python
+=========         Host Frame: make_kv_map in kernel_v028.py:35
+=========         Host Frame: make_runner in kernel_v028.py:335
+=========         Host Frame: make_cases in bench.py:39
+=========         Host Frame: main in benchmark_source.py:549
+========= 
+========= Program hit CUDA_ERROR_INVALID_VALUE (error 1) due to "invalid argument" on CUDA API call to cuGetProcAddress_v2.
+=========     Saved host backtrace up to driver entry point at error
+=========         Host Frame:  [0x115c6] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x55cc5] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x12825] in cydriver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame:  [0x3ed4ef] in driver.cpython-312-x86_64-linux-gnu.so
+=========         Host Frame: PyObject_Vectorcall [0x149834] in python
+=========         Host Frame: _PyEval_EvalFrameDefault [0x1d7428] in python
+=========         Host Frame: PyEval_EvalCode [0x1d594a] in python
+=========         Host Frame:  [0x208b11] in python
+=========         Host Frame:  [0x2b54b2] in python
+=========         Host Frame: _PyRun_SimpleFileObject [0x2b5219] in python
+=========         Host Frame: _PyRun_AnyFileObject [0x2b504e] in python
+=========         Host Frame: Py_RunMain [0x2bd0b4] in python
+=========         Host Frame: Py_BytesMain [0x2bcb9c] in python
+=========         Host Frame: __libc_start_call_main in libc_start_call_main.h:58 [0x2a1c9] in libc.so.6
+=========         Host Frame: __libc_start_main in libc-start.c:360 [0x2a28a] in libc.so.6
+=========         Host Frame: _start [0x258344] in python
+=========         Host Frame: make_kv_map in kernel_v028.py:35
+=========         Host Frame: make_runner in kernel_v028.py:335
+=========         Host Frame: make_cases in bench.py:39
+=========         Host Frame: main in benchmark_source.py:549
+========= 
+{
+  "gpu": "NVIDIA B300 SXM6 AC",
+  "capability": [
+    10,
+    3
+  ],
+  "versions": {
+    "torch": "2.13.0+cu130",
+    "cuda": "13.0",
+    "flashinfer-python": "0.6.18",
+    "flash-mla": "not installed as a distribution",
+    "flashmla_source_revision": "unreported"
+  },
+  "args": {
+    "mode": "bench",
+    "backends": [
+      "cute"
+    ],
+    "scope": "native",
+    "chunk": 0,
+    "rank": 0,
+    "seed": 1234,
+    "warmup_iters": 1,
+    "repeat_iters": 1,
+    "profile_iters": 20,
+    "timing": "cuda-event",
+    "cache": "warm",
+    "check_rows": 2,
+    "check_atol": 0.01,
+    "check_rtol": 0.05,
+    "trace_path": null,
+    "output_json": "artifacts/v028_memcheck.json",
+    "with_stack": false
+  },
+  "workload": {
+    "local_tokens": 512,
+    "cp": 4,
+    "context_len": 32768,
+    "heads": 64,
+    "qk_dim": 576,
+    "v_dim": 512,
+    "topk": 2048,
+    "page_size": 64,
+    "softmax_scale": 0.0625,
+    "bmm2_scale": 1.0,
+    "synthetic": true,
+    "enable_dcp": false
+  },
+  "tensors": {
+    "query": {
+      "shape": [
+        512,
+        1,
+        64,
+        576
+      ],
+      "dtype": "torch.float8_e4m3fn",
+      "stride": [
+        36864,
+        36864,
+        576,
+        1
+      ]
+    },
+    "kv_cache": {
+      "shape": [
+        512,
+        1,
+        64,
+        576
+      ],
+      "dtype": "torch.float8_e4m3fn",
+      "stride": [
+        36864,
+        36864,
+        576,
+        1
+      ]
+    },
+    "block_tables": {
+      "shape": [
+        512,
+        1,
+        2048
+      ],
+      "dtype": "torch.int32",
+      "stride": [
+        2048,
+        2048,
+        1
+      ]
+    },
+    "seq_lens": {
+      "shape": [
+        512
+      ],
+      "dtype": "torch.int32",
+      "stride": [
+        1
+      ]
+    }
+  },
+  "cases": {
+    "cute-v028/native": "FP8 Q/KV; preallocated BF16 output; block_k=128"
+  }
+}
+[CHECK] cute-v028/native: PASS {"rows": [0, 511], "max_abs": 0.006182491779327393, "rmse": 0.0009376351372338831, "relative_rmse": 0.001277217118736953, "atol": 0.01, "rtol": 0.05}
+[BENCH] profiler=off; API elapsed time; timing=cuda-event
+Eager Events include host launch gaps; Graph replay changes that execution regime.
+warm=repeated input reuse; cold=best-effort L2 eviction before each call.
+native excludes adapters; adapted converts FULL Q and KV on EVERY call.
+FlashMLA APIs allocate output/auxiliary tensors; TRTLLM reuses its output.
+
+case                           cache   median/us      p05/us      p95/us   TRT/this
+cute-v028/native               warm      6208.77     6208.77     6208.77        n/a
+[RESULT] /tmp/glm53_sparse_mla_dev/artifacts/v028_memcheck.json
+========= ERROR SUMMARY: 34 errors

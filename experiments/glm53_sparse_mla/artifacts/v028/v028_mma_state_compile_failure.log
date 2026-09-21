@@ -1,0 +1,16 @@
+
+[91m[1m[Internal Error] The compiler hit a problem it could not trace back to your code.[0m
+This is a bug in the DSL, not a mistake in your kernel.
+
+[94mDetail:[0m 🧊🧊🧊 ICE IR Verification Failed 🧊🧊🧊
+
+[94mCause:[0m Caused exception: Verification failed:
+error: unknown: operand #2 does not dominate this use
+ note: unknown: see current operation: "scf.yield"(%106, %arg4, %1079, %950) : (!cute.memref<f32, smem, "64:1">, !cute.memref<bf16, gmem, align<16>, "(2,64,512):(32768,512,1)">, !cute.tiled_mma<!cute_nvgpu.sm100.mma<64x128x32, num_cta = 1, ab_major = (k, k), elem_type = (f8E4M3FN, f8E4M3FN, f32), frag_kind = ss, c_scale_exp = 0>, atom_layout_MNK = <"(1,1,1):(0,0,0)">, permutation_MNK = <"[_;_;_]">>, !cute.tiled_mma<!cute_nvgpu.sm100.mma<64x256x32, num_cta = 1, ab_major = (k, mn), elem_type = (f8E4M3FN, f8E4M3FN, f32), frag_kind = ss, c_scale_exp = 0>, atom_layout_MNK = <"(1,1,1):(0,0,0)">, permutation_MNK = <"[_;_;_]">>) -> ()
+ note: unknown: operand defined here (op in a child region)
+
+[92mWhat to do:[0m
+  [92mPlease report this with the snippet above and your kernel.[0m
+  [92mRe-run with CUTE_DSL_SHOW_STACKTRACE=1 to include the full technical detail.[0m
+
+====================================================================================================

@@ -1,0 +1,122 @@
+{
+  "gpu": "NVIDIA B300 SXM6 AC",
+  "capability": [
+    10,
+    3
+  ],
+  "versions": {
+    "torch": "2.13.0+cu130",
+    "cuda": "13.0",
+    "flashinfer-python": "0.6.18",
+    "flash-mla": "not installed as a distribution",
+    "flashmla_source_revision": "unreported"
+  },
+  "args": {
+    "mode": "bench",
+    "backends": [
+      "trtllm",
+      "cute"
+    ],
+    "scope": "native",
+    "chunk": 3,
+    "rank": 0,
+    "seed": 1234,
+    "warmup_iters": 20,
+    "repeat_iters": 100,
+    "profile_iters": 20,
+    "timing": "cuda-graph",
+    "cache": "both",
+    "check_rows": 64,
+    "check_atol": 0.01,
+    "check_rtol": 0.05,
+    "trace_path": null,
+    "output_json": "artifacts/v016_full_graph.json",
+    "with_stack": false
+  },
+  "workload": {
+    "local_tokens": 8192,
+    "cp": 4,
+    "context_len": 131072,
+    "heads": 64,
+    "qk_dim": 576,
+    "v_dim": 512,
+    "topk": 2048,
+    "page_size": 64,
+    "softmax_scale": 0.0625,
+    "bmm2_scale": 1.0,
+    "synthetic": true,
+    "enable_dcp": false
+  },
+  "tensors": {
+    "query": {
+      "shape": [
+        8192,
+        1,
+        64,
+        576
+      ],
+      "dtype": "torch.float8_e4m3fn",
+      "stride": [
+        36864,
+        36864,
+        576,
+        1
+      ]
+    },
+    "kv_cache": {
+      "shape": [
+        2048,
+        1,
+        64,
+        576
+      ],
+      "dtype": "torch.float8_e4m3fn",
+      "stride": [
+        36864,
+        36864,
+        576,
+        1
+      ]
+    },
+    "block_tables": {
+      "shape": [
+        8192,
+        1,
+        2048
+      ],
+      "dtype": "torch.int32",
+      "stride": [
+        2048,
+        2048,
+        1
+      ]
+    },
+    "seq_lens": {
+      "shape": [
+        8192
+      ],
+      "dtype": "torch.int32",
+      "stride": [
+        1
+      ]
+    }
+  },
+  "cases": {
+    "trtllm/native": "Q FP8 [4096,1,64,576]; KV FP8 [pages,1,64,576]; preallocated output",
+    "cute-v016/native": "FP8 Q/KV; preallocated BF16 output; block_k=128"
+  }
+}
+[CHECK] trtllm/native: PASS {"rows": [0, 8191, 511, 512, 130, 260, 390, 520, 650, 780, 910, 1040, 1170, 1300, 1430, 1560, 1690, 1820, 1950, 2080, 2210, 2340, 2470, 2600, 2730, 2860, 2990, 3120, 3250, 3380, 3510, 3640, 3770, 3900, 4030, 4160, 4290, 4420, 4550, 4680, 4810, 4940, 5070, 5200, 5330, 5460, 5590, 5720, 5850, 5980, 6110, 6240, 6370, 6500, 6630, 6760, 6890, 7020, 7150, 7280, 7410, 7540, 7670, 7800], "max_abs": 0.010130457580089569, "rmse": 0.0013615916250273585, "relative_rmse": 0.014879350832316679, "atol": 0.01, "rtol": 0.05}
+[CHECK] cute-v016/native: PASS {"rows": [0, 8191, 511, 512, 130, 260, 390, 520, 650, 780, 910, 1040, 1170, 1300, 1430, 1560, 1690, 1820, 1950, 2080, 2210, 2340, 2470, 2600, 2730, 2860, 2990, 3120, 3250, 3380, 3510, 3640, 3770, 3900, 4030, 4160, 4290, 4420, 4550, 4680, 4810, 4940, 5070, 5200, 5330, 5460, 5590, 5720, 5850, 5980, 6110, 6240, 6370, 6500, 6630, 6760, 6890, 7020, 7150, 7280, 7410, 7540, 7670, 7800], "max_abs": 0.00975489616394043, "rmse": 0.0013455429580062628, "relative_rmse": 0.014703972442343755, "atol": 0.01, "rtol": 0.05}
+[BENCH] profiler=off; API elapsed time; timing=cuda-graph
+Eager Events include host launch gaps; Graph replay changes that execution regime.
+warm=repeated input reuse; cold=best-effort L2 eviction before each call.
+native excludes adapters; adapted converts FULL Q and KV on EVERY call.
+FlashMLA APIs allocate output/auxiliary tensors; TRTLLM reuses its output.
+
+case                           cache   median/us      p05/us      p95/us   TRT/this
+trtllm/native                  warm      1873.92     1772.72     1915.01     1.000x
+cute-v016/native               warm      2997.23     2994.43     2999.52     0.625x
+trtllm/native                  cold      1876.53     1859.41     1941.80     1.000x
+cute-v016/native               cold      3000.50     2998.30     3002.53     0.625x
+[RESULT] /tmp/glm53_sparse_mla_dev/artifacts/v016_full_graph.json

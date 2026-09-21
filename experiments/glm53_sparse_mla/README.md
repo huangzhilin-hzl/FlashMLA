@@ -51,7 +51,7 @@ python3 experiments/glm53_sparse_mla/summarize.py > docs/glm53_sparse_mla/RESULT
 ## Validation limits
 
 Full-target iterations use the original FP32 reference and unchanged tolerances
-(`atol=0.01`, `rtol=0.05`). The usual tuning check samples 8 rows. v013 also
+(`atol=0.01`, `rtol=0.05`). The usual tuning check samples 8 rows. v013 and v016 also
 passed 64 sampled rows on the target chunk3, with graph warm/cold measurements.
 That is not exhaustive validation of all rows, shapes or quantization scales.
 

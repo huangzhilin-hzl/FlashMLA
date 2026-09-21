@@ -1,0 +1,13 @@
+========= COMPUTE-SANITIZER
+usage: bench.py [-h] [--mode {bench,profile}]
+                [--backends {trtllm,flashmla-prefill,flashmla-decode,cute} [{trtllm,flashmla-prefill,flashmla-decode,cute} ...]]
+                [--scope {native,adapted,both}] [--chunk {0,1,2,3}]
+                [--rank {0,1,2,3,4,5,6,7}] [--seed SEED]
+                [--warmup-iters WARMUP_ITERS] [--repeat-iters REPEAT_ITERS]
+                [--profile-iters PROFILE_ITERS]
+                [--timing {cuda-event,cuda-graph}] [--cache {warm,cold,both}]
+                [--check-rows CHECK_ROWS] [--check-atol CHECK_ATOL]
+                [--check-rtol CHECK_RTOL] [--trace-path TRACE_PATH]
+                [--output-json OUTPUT_JSON] [--with-stack]
+bench.py: error: unrecognized arguments: --chunk-idx 0
+========= Error: Target application terminated before first instrumented API call

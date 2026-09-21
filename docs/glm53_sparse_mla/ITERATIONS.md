@@ -756,3 +756,46 @@ waits for the next KV stage, avoiding the specific dependency exposed by
 v017/v018. Producer stage reuse still waits for PV completion. The compute
 warps wait for previous PV before O correction and final PV before epilogue.
 This changes concurrency and requires fresh numerical and memory validation.
+
+### Iteration 028 result and validation
+
+The initial CuTeDSL compile reported an SSA dominance error when mutable MMA
+state was shared across conditional helper calls. Creating local QK/PV MMA
+objects in the issuing branch/helper fixes it; the failed compiler log is kept.
+Smoke/full 8-row numerical checks PASS. Paired warm medians: TRTLLM 1689.98 us,
+v028 3247.42 us (0.52041x), still slower than v026 and the best v016.
+NCU: 168 registers, 202056 shared bytes, occupancy 12.445%, tensor active
+34.056%, eligible warps 0.29561, long scoreboard 4.08047. Local sectors zero;
+shared-load/store conflicts 8084040 / 689638. Diagnostic duration 5.19114 ms.
+
+The b512/chunk0 test covers lengths 1 through 2045, including invalid indices
+and partial final tiles. Checked rows 0 and 511 PASS numerically (max_abs
+0.00618249). Default Compute Sanitizer reports 34 CUDA_ERROR_INVALID_VALUE
+errors, all in CUDA Python's cuGetProcAddress_v2 feature lookup during tensor
+map binding initialization; no device access error appears in that log. A
+separate memcheck run with --report-api-errors no retains device memory
+instrumentation and returns ERROR SUMMARY: 0 errors. Preserve both logs and
+do not describe the original default run as an unconditional sanitizer pass.
+An earlier misspelled --chunk-idx invocation did not instrument any API and
+is retained separately as a CLI failure, not as validation evidence.
+
+### Stable Graph and expanded target check for v016
+
+The current best event candidate v016 passes 64 sampled rows on full b8192,
+chunk3, seed1234. max_abs 0.00975490, relative_RMSE 0.01470397. TRTLLM also
+passes with max_abs 0.01013046, relative_RMSE 0.01487935. Tolerances unchanged.
+20 warmups/100 Graph repeats: warm TRTLLM 1873.92 us versus v016 2997.23 us
+(0.62522x); cold TRTLLM 1876.53 us versus v016 3000.50 us (0.62541x).
+The long run confirms the candidate latency and continuing 1.60x gap to TRTLLM;
+short event ratios and Graph ratios remain separately identified.
+
+## Iteration 029 — separate softmax and correction warpgroups
+
+File: `experiments/glm53_sparse_mla/kernel_v029.py`, based on v028.
+Use 416 threads: 128 softmax, 128 TMA producer, 128 output correction, 32 MMA.
+Softmax publishes P and per-head correction to a two-stage ready barrier. The
+correction group waits for previous PV, updates O, then releases current PV.
+Softmax can progress to the already-issued next QK while correction is running.
+Separate alpha and denominator storage prevents epilogue/last-correction aliasing.
+This further tests pipeline overlap while retaining two KV/S/P stages. Pending
+numerical, resource, and performance checks.
