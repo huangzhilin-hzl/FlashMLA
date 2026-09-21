@@ -1,0 +1,15 @@
+
+[91m[1m[Internal Error] The compiler hit a problem it could not trace back to your code.[0m
+This is a bug in the DSL, not a mistake in your kernel.
+
+[94mDetail:[0m 🧊🧊🧊 ICE IR Verification Failed 🧊🧊🧊
+
+[94mCause:[0m Caused exception: Verification failed:
+error: unknown: 'cute.copy' op '!cute_nvgpu.atom.tmem_load<f32, 16 DP, 128 bit, x16>' require tmem memref aligned at 2 cols (8B) at least, but got tmem align 4 bytes
+ note: unknown: see current operation: "cute.copy"(%253, %657, %668) <{operandSegmentSizes = array<i32: 1, 1, 1, 0>}> : (!cute.tiled_copy<!cute_nvgpu.atom.tmem_load<f32, 16 DP, 128 bit, x16>, layout_copy_tv = <"((32,4),(64,16)):((0,1),(64,4))">, tiler_mn = <"[(4,16):(16,1);64:1]">>, !cute.memref<f32, tmem, "(((64,16),1),(1,1)):(((1,65536),0),(0,0))">, !cute.memref<f32, rmem, align<32>, "(((2,16),1),(1,1)):(((1,2),0),(0,0))">) -> ()
+
+[92mWhat to do:[0m
+  [92mPlease report this with the snippet above and your kernel.[0m
+  [92mRe-run with CUTE_DSL_SHOW_STACKTRACE=1 to include the full technical detail.[0m
+
+====================================================================================================

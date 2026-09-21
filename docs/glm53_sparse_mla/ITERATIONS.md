@@ -298,3 +298,17 @@ Why: two output CTAs repeat QK and gather the same selected KV. Assign the full
 Retain v008's small correction/epilogue fragments. O now needs 512 TMEM columns;
 S uses the complementary lanes. This trades concurrent TMEM users for less
 work, so measurement must decide whether it helps. Validation pending.
+
+### Iteration 008 result
+
+Initial compilation required an explicit true 64-column alignment assertion on
+the subtile TMEM pointer; the verifier failure log is retained. Corrected full
+b8192 8-row check PASS with the same errors as v007. Paired warm event medians:
+TRTLLM 1691.01 us, v008 7083.84 us; ratio 0.23871x. NCU: 255 registers/thread,
+78.604 KB shared memory, occupancy 12.418%, tensor active 23.513%, eligible
+warps/scheduler 0.42921, long scoreboard 1.59163. Local-load/store sectors
+373293056 / 11952196. Shared-load/store conflicts 10383563 / 3279318.
+Smaller O fragments reduce spilling but do not eliminate it; the original
+hypothesis was incomplete. The next register analysis must inspect generated
+code and compiler liveness rather than assuming O alone causes the pressure.
+NCU diagnostic duration 11.4620 ms.
