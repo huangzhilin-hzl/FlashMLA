@@ -590,8 +590,7 @@ Test tcgen05.mma.ws for FP8 QK and PV. This is the hardware weight-stationary
 instruction form, separate from software loader/compute warp specialization.
 The PTX documentation and CUTLASS tmem_frg_ws implementation specify a 2x2
 layout for M64: N halves occupy DP[0:64] and DP[64:128]. O occupies 256 columns
-and S occupies another 64, within a 512-column allocation. Emit the installed
-CuTeDSL NVVM operation using CuTe-generated SMEM descriptors; retain FP32
+and S occupies another 64, within a 512-column allocation. Emit inline PTX from CuTeDSL using CuTe-generated SMEM descriptors; retain FP32
 accumulation and FP8 P. Rewrite TMEM fragment layouts and output column offsets
 accordingly. This is a new layout hypothesis requiring smoke, full numerical,
 and memory checks; no performance claim is made before measurements.
@@ -600,3 +599,40 @@ References for this experiment:
 - https://docs.nvidia.com/cuda/parallel-thread-execution/#tcgen05-data-path-layout
 - https://docs.nvidia.com/cuda/parallel-thread-execution/#tcgen05-instructions-tcgen05-mma-ws
 - CUTLASS include/cute/atom/mma_traits_sm100.hpp, tmem_frg_ws<M_MMA=64>.
+
+### Iteration 021 rejected; isolated QK diagnosis
+
+Initial descriptor generation required the MMA-vector mode to be a nested
+rank-2 layout; wrapping the logical matrix layout fixed the verification error.
+The installed NVVM weight-stationary op then failed in libNVVM with no useful
+backend explanation. Emitting the documented instruction through DSL inline
+PTX compiled successfully. Both compiler logs are retained.
+
+The b2 complete-attention check FAILED (90.9% elements mismatched); no timing or
+NCU comparison is accepted. `kernel_v021_diag.py` isolates just the first QK
+tile and dumps its unscaled FP32 result. It passes against FP32 matmul with
+maximum absolute error 7.63e-6. The descriptor and raw Layout-E QK values are
+therefore correct for this sample. Printed copy coordinates show that automatic
+TMEM tiling gives each thread TWO heads and distributes N halves across warps.
+The inherited single-head max/sum/correction logic is invalid for that mapping.
+This rejects v021 as a candidate; it is kept only as a reproducible failed
+experiment, alongside `diagnose_v021.py` and its coordinate/result log.
+
+## Iteration 022 — explicit warp-local head assignment for Layout E
+
+File: `experiments/glm53_sparse_mla/kernel_v022.py`, based on v021.
+Assign 16 consecutive heads to each compute warp. Use a 16x64 TMEM copy view,
+then load both Layout-E N halves into each thread's registers. Each thread now
+has one head and 64 score elements; XOR16 combines the two lanes per head.
+Apply the same warp-local addressing to O correction and epilogue. Output
+column offsets still follow Layout E's split N halves. Pending validation.
+
+### Baseline code-generation evidence
+
+Exported SASS directly from the existing TRTLLM NCU report, without another
+GPU profiling run. It contains `UTMALDG.2D.GATHER4` for sparse KV gathering and
+`UTCQMMA` for FP8 matrix operations. The former confirms TMA gather4 as a
+concrete loading difference from the candidate's 16-byte cp.async instructions.
+The latter mnemonic alone does not establish whether the baseline uses PTX
+weight-stationary mode; no such claim is made. Full export is retained under
+`artifacts/baseline_codegen`.

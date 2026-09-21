@@ -59,7 +59,7 @@ The extra b1024/chunk0/seed5678 test fails the original tolerance for both v013
 and TRTLLM; the failed numerical checks remain explicit in the iteration log.
 Memory checks and numerical checks are recorded separately. v002/v003 have an
 undersized TMEM allocation and are retained only as rejected historical
-experiments; `kernel_v004_unsafe.py` and diagnostic files are also not candidates.
+experiments; `kernel_v004_unsafe.py`, v021 (failed numerical layout experiment), and diagnostic files are also not candidates.
 
 Candidates use online softmax, FP8 probabilities and FP32 accumulators. They
 process the supplied sparse indices and do not call TRTLLM, FlashMLA, reference

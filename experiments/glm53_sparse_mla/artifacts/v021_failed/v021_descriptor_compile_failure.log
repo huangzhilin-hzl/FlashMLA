@@ -1,0 +1,15 @@
+
+[91m[1m[Internal Error] The compiler hit a problem it could not trace back to your code.[0m
+This is a bug in the DSL, not a mistake in your kernel.
+
+[94mDetail:[0m 🧊🧊🧊 ICE IR Verification Failed 🧊🧊🧊
+
+[94mCause:[0m Caused exception: Verification failed:
+error: unknown: 'cute_nvgpu.make_umma_smem_desc' op Expect rank-2 vec_mode layout but got 64:64
+ note: unknown: see current operation: %878 = "cute_nvgpu.make_umma_smem_desc"(%867) <{layout = #cute.layout<"(64,32):(64,1)">, major = #cute_nvgpu.major<k>}> : (!cute.ptr<f8E4M3FN, smem, align<32>, S<2,4,3>>) -> !cute_nvgpu.smem_desc
+
+[92mWhat to do:[0m
+  [92mPlease report this with the snippet above and your kernel.[0m
+  [92mRe-run with CUTE_DSL_SHOW_STACKTRACE=1 to include the full technical detail.[0m
+
+====================================================================================================

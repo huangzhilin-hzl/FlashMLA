@@ -1,4 +1,4 @@
-"""Iteration 021: weight-stationary M64 QK/PV with compact 2x2 TMEM.
+"""Diagnostic: isolate v021 QK and TMEM layout.
 
 One CTA owns one query and all 512 output channels. Both PV N tiles reuse
 one QK/softmax computation and one gathered KV tile. No input expansion,
@@ -116,7 +116,7 @@ class SparseMLA:
         if tid >= 128:
             load_tid = tid - 128
             nvalid = lens[qi]
-            for block in cutlass.range(cute.ceil_div(nvalid, self.block_k)):
+            for block in cutlass.range(1):
                 stage = block % 2
                 if block >= 2:
                     cute.arch.mbarrier_wait(empty + stage, ((block // 2) - 1) % 2)
@@ -164,7 +164,7 @@ class SparseMLA:
             rowsum = cutlass.Float32(0.0)
             phase = cutlass.Int32(0)
             nvalid = lens[qi]
-            num_blocks = cute.ceil_div(nvalid, self.block_k)
+            num_blocks = 1
             for block in cutlass.range(num_blocks):
                 stage = block % 2
                 cute.arch.mbarrier_wait(full + stage, (block // 2) % 2)
@@ -185,62 +185,11 @@ class SparseMLA:
                 cute.arch.fence_view_async_tmem_load()
                 for j in cutlass.range(cute.size(rs), unroll_full=True):
                     h, col = coords_s[j]
-                    val = cutlass.Float32(-1.0e30)
-                    if valid[col] >= 0:
-                        val = rs[j] * (0.0625 * math.log2(math.e))
-                    rs[j] = val
-                newmax = rs.load().reduce(cute.ReductionOp.MAX, rowmax, 0)
-                newmax = cute.arch.fmax(newmax, cute.arch.shuffle_sync_bfly(newmax, offset=16))
-                correction = cute.math.exp2(rowmax - newmax, fastmath=True)
-                probs = cute.math.exp2(rs.load() - newmax, fastmath=True)
-                blocksum = probs.reduce(cute.ReductionOp.ADD, cutlass.Float32(0.0), 0)
-                blocksum += cute.arch.shuffle_sync_bfly(blocksum, offset=16)
-                rowsum = rowsum * correction + blocksum
-                rowmax = newmax
-                packed_p = cute.make_rmem_tensor(cute.size(rs), cutlass.Float8E4M3FN)
-                packed_p.store((probs * 256.0).to(cutlass.Float8E4M3FN))
-                for j in cutlass.range(cute.size(rs) // 16, unroll_full=True):
-                    h, col = coords_s[j * 16]
-                    rvec = cute.make_tensor(packed_p.iterator + j * 16, cute.make_layout(16))
-                    svec = cute.make_tensor(sp.iterator + cute.assume(sp.layout((h, col)), divby=16),
-                                            cute.make_layout(16))
-                    cute.copy(store128, rvec, svec)
-                skip_correction = cute.arch.vote_all_sync(correction == 1.0)
-                if (block > 0) & (not skip_correction):
-                    for tile in cutlass.range(8, unroll_full=True):
-                        otile = cute.make_tensor(tp + cute.assume((tile // 4) * 128 + (tile % 2) * 64 + ((tile // 2) % 2) * (64 << 16), divby=64), ochunk_layout)
-                        src_o = ct.partition_S(otile)
-                        dst_o = cstore.get_slice(tid).partition_D(otile)
-                        cute.copy(ccopy, src_o, rc)
-                        cute.arch.fence_view_async_tmem_load()
-                        rc.store(rc.load() * correction)
-                        cute.copy(cstore, rc, dst_o)
-                        cute.arch.fence_view_async_tmem_store()
-                cute.arch.barrier(barrier_id=1, number_of_threads=128)
-                cute.arch.fence_view_async_shared()
-                if warp == 0:
-                    with cute.arch.elect_one():
-                        for ntile in cutlass.range(2, unroll_full=True):
-                            for k in cutlass.range(4, unroll_full=True):
-                                pa = cute.local_tile(sp, (64, 32), (0, k))
-                                vb = cute.local_tile(sk_transposed, (256, 32), (ntile, k))
-                                mma_ws(tp + ntile * 128, pa, vb, 256, True, (block > 0) | (k > 0))
-                        tcgen05.commit(bar)
-                cute.arch.mbarrier_wait(bar, phase)
-                phase ^= 1
-                cute.arch.barrier(barrier_id=1, number_of_threads=128)
-                if tid == 0:
-                    cute.arch.mbarrier_arrive(empty + stage)
-            if tid % 32 < 16:
-                denom[coords_s[0][0]] = rowsum
-            cute.arch.barrier(barrier_id=1, number_of_threads=128)
-            for tile in cutlass.range(8, unroll_full=True):
-                src_o = ot.partition_S(cute.make_tensor(tp + cute.assume((tile // 4) * 128 + (tile % 2) * 64 + ((tile // 2) % 2) * (64 << 16), divby=64), ochunk_layout))
-                cute.copy(ocopy, src_o, ro)
-                cute.arch.fence_view_async_tmem_load()
-                for j in cutlass.range(cute.size(ro), unroll_full=True):
-                    h, d = coords_o[j]
-                    out[qi, h, tile * 64 + d] = (ro[j] / (denom[h] * 256.0)).to(cutlass.BFloat16)
+                    out[qi, h, col] = rs[j]
+                if qi == 0:
+                    if (tid == 0) | (tid == 16) | (tid == 32) | (tid == 64):
+                        cute.printf("tid %d Sfirst %d,%d Slast %d,%d\n", tid,
+                            coords_s[0][0], coords_s[0][1], coords_s[cute.size(rs)-1][0], coords_s[cute.size(rs)-1][1])
             cute.arch.barrier(barrier_id=1, number_of_threads=128)
             if warp == 0:
                 cute.arch.dealloc_tmem(tp, 512)
@@ -278,7 +227,7 @@ def make_runner(inputs, block_k=128):
     kv = inputs['kv_cache'].view(-1, 576)
     idx = inputs['block_tables'].view(q.shape[0], -1)
     lens = inputs['seq_lens']
-    out = torch.empty((q.shape[0], 64, 512), device=q.device, dtype=torch.bfloat16)
+    out = torch.full((q.shape[0], 64, 512), float("nan"), device=q.device, dtype=torch.float32)
     args = [from_dlpack(t, assumed_align=16) for t in (q, kv, idx, lens, out)]
     stream = cuda.CUstream(torch.cuda.current_stream().cuda_stream)
     compiled = cute.compile(SparseMLA(block_k), *args, stream)
