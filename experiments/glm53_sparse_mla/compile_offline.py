@@ -25,7 +25,7 @@ descriptors = [
     (cutlass.Int32, (8192, 2048), (2048, 1)),
     (cutlass.Int32, (8192,), (1,)),
     (cutlass.BFloat16, (8192, 64, 512), (32768, 512, 1)),
-    (cutlass.Uint8, (256,), (1,)),
+    (cutlass.Uint8, (getattr(module, "TENSOR_MAP_BYTES", 256),), (1,)),
 ]
 tensors = [make_fake_tensor(dtype, shape, stride, assumed_align=16)
            for dtype, shape, stride in descriptors]

@@ -1290,3 +1290,90 @@ The alias footprint is statically checked against the old KV stage. No
 additional shared allocation is introduced. The extra shared round trip and
 barrier may offset the better global transaction pattern; this is a measured
 hypothesis, not a claimed gain. Numerical/memory validation and NCU pending.
+
+### Iteration 045 short-run result
+
+Smoke and full-target 8-row checks pass with the same errors as v044. Paired
+warm median 1988.80 us versus TRTLLM 1691.94 us: approximately 12.7% faster
+than v044. NCU: 122 registers, 194864 shared bytes, occupancy 17.862%, tensor
+26.330%, eligible 0.45347, long scoreboard 4.85273, local sectors 0/0, shared
+conflicts 4321759/1935330, diagnostic 3.356544 ms. The extra shared staging
+round trip is outweighed by the improved output transaction/instruction
+pattern. Expanded numerical/Graph/device-memory validation is running.
+
+## Iteration 046 — eight TMA producer warps
+
+Based on v045, increase CTA size from 384 to 512 threads while retaining
+256 compute threads. Eight producer warps each issue four gather4 groups,
+instead of four warps each issuing eight groups. The first 128 producer
+threads still load the 128 sparse indices and initial Q; all 256 producers
+participate in the named producer barriers. Gather coverage is unchanged:
+warp-local row = (warp-8)*16 + group*4, covering rows 0..127 exactly once.
+No additional shared allocation or numerical operation is introduced.
+This tests reduction of per-warp gather descriptor/issue serialization
+against the extra active-warp/register costs. Validation/NCU pending.
+
+### Iteration 045 expanded validation
+
+64-row Graph checks pass with unchanged max_abs 0.009754896 and relative_RMSE
+0.014703941. Warm candidate 1992.83 us versus TRTLLM 1874.18 us; cold candidate
+1998.91 us versus TRTLLM 1927.30 us. Qualified b512/chunk0 device memcheck
+reports zero errors, and rows 0/511 pass unchanged tolerances. This validates
+the shared KV/output alias on that test. v045 becomes the best validated
+version. The warm Graph gap is about 6.3%; the short-event gap is larger,
+so these measurement regimes must remain separately reported.
+
+## Iteration 047 — load Q through five tiled TMA transfers
+
+Based on v045, replace the initial 2304 per-thread 16-byte Q copies per CTA
+with four 128x64-byte main-dimension TMA tiles and one 64x64-byte tail tile.
+New Q tensor-map descriptors use the unchanged global 576-byte row stride
+and 64-row boxes, preserving the SW128 main / SW64 tail shared layout. A
+dedicated transaction barrier tracks all 36864 bytes and is drained before
+compute begins. Descriptor construction occurs once in runner setup, just
+like the existing KV maps; inputs are not expanded or repacked.
+
+The v039 source profile attributes substantial excessive shared wavefronts
+to the initial LDGSTS sequence. This change targets that startup cost and
+instruction count while preserving all mainloop arithmetic. The map storage
+grows from 256 to 512 bytes; offline compiler descriptors now follow the
+module's TENSOR_MAP_BYTES constant. Layout/runtime checks and NCU pending.
+Reference: [PTX tensor tile copies](https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#data-movement-and-conversion-instructions-cp-async-bulk-tensor).
+
+### Iterations 046 and 047 measured results
+
+Both pass b2 and full-target 8-row checks with unchanged v045 errors.
+v046 paired median 1976.22 us versus TRTLLM 1691.87 us. NCU: 120 registers,
+194864 shared bytes, occupancy 23.342%, tensor 26.573%, eligible 0.51079,
+long scoreboard 5.82319, local sectors 0/0, shared conflicts 3544225/3347238,
+diagnostic 3.324192 ms. Extra producer warps give a small approximately 0.6%
+short-run improvement; increased occupancy alone does not establish a gain.
+
+v047 paired median 1972.42 us versus TRTLLM 1691.81 us. NCU: 122 registers,
+194872 shared bytes, occupancy 17.861%, tensor 26.509%, eligible 0.45579,
+long scoreboard 5.00835, local sectors 0/0, shared conflicts 4474251/1903455,
+diagnostic 3.334432 ms. Q TMA gives a small approximately 0.8% short-run
+improvement; expanded checks will be applied to the combined survivor.
+
+The v045 source profile confirms vectorized output code generation:
+1048576 dynamic warp STG.E.128 instructions, versus v039's 8388608 STG.E.U16.
+Static SASS rows also shrink from 4040 to 1672 (including normalization changes).
+This directly supports the output-path diagnosis rather than relying solely
+on aggregate memory counters. Source sampling still concentrates at MMA and
+producer-stage completion waits.
+
+## Iteration 048 — compose Q TMA and eight producer warps
+
+Based on v047, apply the same eight-warp KV-gather partition as v046. This
+tests whether the two independently small gains compose. Q still completes
+before all threads start the mainloop. Validation pending.
+
+## Iteration 049 — overlap initial Q and KV transfers
+
+Based on v048, let compute warp0 issue Q TMA while producer warps immediately
+start filling KV stages. Only compute threads wait for the Q transaction
+barrier, before consuming Q. Remove the post-Q all-CTA barrier; the initial
+barrier following mbarrier initialization and TMEM allocation remains. This
+allows the independent Q/KV transfers to overlap at startup, with unchanged
+mainloop/softmax/epilogue behavior. Correctness and memory checks are required
+for this synchronization change; no performance claim yet.
