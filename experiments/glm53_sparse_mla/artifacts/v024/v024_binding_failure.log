@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "/tmp/glm53_sparse_mla_dev/bench.py", line 46, in <module>
+    source.main(rest)
+  File "/tmp/glm53_sparse_mla_dev/benchmark_source.py", line 549, in main
+    cases = make_cases(inputs, args)
+            ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/glm53_sparse_mla_dev/bench.py", line 39, in make_cases
+    run = kernel.make_runner(inputs, probe.block_k)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/glm53_sparse_mla_dev/kernel_v024.py", line 299, in make_runner
+    tensor_map = make_kv_map(kv)
+                 ^^^^^^^^^^^^^^^
+  File "/tmp/glm53_sparse_mla_dev/kernel_v024.py", line 35, in make_kv_map
+    status, desc = cuda.cuTensorMapEncodeTiled(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "cuda/bindings/driver.pyx", line 46972, in cuda.bindings.driver.cuTensorMapEncodeTiled
+TypeError: Cannot convert int to cuda.bindings.driver.cuuint32_t

@@ -677,3 +677,82 @@ completion bytes signal the existing full barrier. Invalid row indices use
 hardware out-of-bounds zero fill and retain the softmax mask. Q loading remains
 unchanged. Descriptor preparation and storage allocation occur outside timing;
 the kernel still gathers only the supplied sparse indices. Validation pending.
+
+### Iteration 024 result
+
+CUDA Python required explicit cuuint32_t/cuuint64_t array entries when encoding
+the tensor map; the original binding failure log is retained. Smoke and full
+8-row checks then PASS, with the same numerical errors as v020. Paired event
+medians: TRTLLM 1691.58 us, v024 8754.30 us (0.19323x), a large regression.
+NCU: 130 registers, 193840 shared bytes, occupancy 11.972%, tensor active
+11.727%, eligible warps 0.11834, long scoreboard 7.40876. Local sectors zero;
+shared-load/store conflicts 101893 / 10852. Diagnostic duration 15.04928 ms.
+
+SASS export shows an ELECT/R2UR/BRA loop around each TMA instruction to
+serialize lane-varying coordinates. All 32 gather groups were assigned to a
+single producer warp, causing costly repeated coordinate broadcasts and
+uniform-register spill/fill moves. Those SASS MOV.SPILL/R2UR.FILL operations
+are not local-memory spills: measured local sectors remain zero. TMA itself
+is not sufficient; its instruction issue organization matters.
+
+## Iteration 025 — distribute TMA across four producer warps
+
+File: `experiments/glm53_sparse_mla/kernel_v025.py`, based on v024.
+Select one lane in each group of four across all 128 producer threads, instead
+of using only the first 32 threads. The same 32 gather4 groups are distributed
+as eight per warp. All tensor maps, buffers and numerical math are unchanged.
+
+Smoke/full 8-row checks PASS. Paired medians: TRTLLM 1692.19 us, v025 3482.69 us
+(0.48589x). This improves the first TMA version by 2.51x but still loses to the
+cp.async base. NCU: 130 registers, 193840 shared bytes, occupancy 11.137%, tensor
+active 30.264%, eligible warps 0.34098, long scoreboard 2.01679. Local sectors
+zero; shared-load/store conflicts 498476 / 2205093. Diagnostic duration 5.836 ms.
+
+## Iteration 026 — explicit elected TMA issuer per warp
+
+File: `experiments/glm53_sparse_mla/kernel_v026.py`, based on v025.
+Elect one lane per producer warp and explicitly unroll its eight gather groups.
+This avoids asking the compiler to serialize eight active lanes separately for
+each of the nine TMA column instructions. Keep the four producer warps and
+existing SW64 layout to isolate issue overhead. Validation pending.
+
+### Iteration 026 result
+
+Smoke and full 8-row checks PASS. Paired warm medians: TRTLLM 1691.84 us,
+v026 3114.18 us (0.54327x). Explicit elected issue improves v025 by 1.12x,
+but is still slightly slower than the best cp.async version. NCU: 130 registers,
+193840 shared bytes, occupancy 10.875%, tensor active 33.113%, eligible warps
+0.30700, long scoreboard 3.37771. Local sectors zero; shared-load/store
+conflicts 1997049 / 708552. Diagnostic duration 5.33619 ms.
+
+## Iteration 027 — compose uniform TMA with weight-stationary MMA
+
+File: `experiments/glm53_sparse_mla/kernel_v027.py`, based on v023, with the
+validated TMA producer from v026. Both changes individually reduce specific
+instruction/cycle costs but have not improved the end-to-end best time. Test
+whether faster loading exposes the faster Layout-E MMA path, rather than
+assuming their benefits compose. Softmax reduction and output mapping remain
+those of v023. Validation pending.
+
+### Iteration 027 result
+
+Smoke and full 8-row checks PASS. Paired warm medians: TRTLLM 1691.84 us,
+v027 3458.37 us (0.48920x). Combining TMA with weight-stationary MMA does not
+improve the candidate. NCU: 121 registers, 194864 shared bytes, occupancy
+11.225%, tensor active 15.368%, eligible warps 0.40178, long scoreboard 1.32199.
+Local sectors zero; shared-load/store conflicts 2473850 / 1695965. Diagnostic
+duration 5.74912 ms. The reduction in some stall/cycle metrics does not imply
+an end-to-end gain; measured runtime is worse than both parent designs.
+
+## Iteration 028 — dedicated MMA warp and independent correction progress
+
+File: `experiments/glm53_sparse_mla/kernel_v028.py`, based on v026.
+Use 288 threads: 128 compute, 128 producer, and one dedicated 32-thread MMA
+warp. Allocate two P buffers and two nonoverlapping S regions in the upper
+TMEM lane half. The MMA warp primes QK0, issues next-QK before current PV,
+waits for a compute-ready barrier, and signals stage reuse directly from PV
+completion. Compute warps can run softmax and O correction while the MMA warp
+waits for the next KV stage, avoiding the specific dependency exposed by
+v017/v018. Producer stage reuse still waits for PV completion. The compute
+warps wait for previous PV before O correction and final PV before epilogue.
+This changes concurrency and requires fresh numerical and memory validation.
