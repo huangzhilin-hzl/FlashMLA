@@ -61,13 +61,17 @@ The full 8192-row/seed1234 audit checks all 268,435,456 output elements:
 | TRTLLM | 9 | Baseline FP8 precision |
 | v054, P scale448 | 9, identical coordinates/values to TRTLLM | Fast baseline-precision path |
 | v049, P scale256 | 11 | Earlier timing reference |
-| v053, residual FP8 | 0 | Higher-precision path, slower due to second PV |
+| v053, residual FP8 | 0 | Original higher-precision path |
+| v065, residual FP8 with V collector reuse | 0 via full bitwise equivalence to v053 | Faster higher-precision path |
 
 v054 matches about 99.96% of TRTLLM BF16 outputs bitwise on this input.
 It passes 512 sampled rows for seeds1234/5678/42, but it does **not** pass the
 strict all-row tolerance. v053 passes the entire seed1234 target and the
 additional sampled, short and masked cases recorded in the iteration log.
-None of these tests proves every possible input or scale.
+v065 matches all v053 output bits in three full-target/seed1234 runs. Its
+Graph warm/cold medians are 2279.70/2269.34 µs, versus paired TRTLLM
+1871.50/1947.44 µs. This is still slower than TRTLLM, with higher reference
+accuracy on the audited input. None of these tests proves every possible input or scale.
 
 To reproduce the full shared-reference audit (accuracy only):
 
@@ -78,7 +82,8 @@ To reproduce the full shared-reference audit (accuracy only):
 ```
 
 This audit records every backend's failures before returning nonzero if any
-fails. For residual-P performance, use `--kernel-version v053` with `bench.py`.
+fails. For residual-P performance, use `--kernel-version v065` with `bench.py`;
+v053 remains the direct full-reference-audit baseline.
 No tolerance is relaxed to obtain a pass.
 
 Full-target iterations use the original FP32 reference and unchanged tolerances

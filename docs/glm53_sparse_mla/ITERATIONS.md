@@ -1774,3 +1774,162 @@ query loop. Their total61440 fits a128-register512-thread CTA's65536-register
 pool; confirm v062's own allocation before runtime. No per-query repeated
 setmaxnreg operation is added. Numerical mapping and synchronization remain
 unchanged. This tests the spill hypothesis separately from scheduling. Pending.
+
+### Iteration 061 initial result
+
+The b300/chunk0 smoke exercises multiple differently sized queries per CTA
+and passes its two sampled rows. Full-target8-row check also passes with
+v054's displayed errors. Warm events1988.83us versusTRT1691.94us regress.
+NCU:128 registers,194872 shared bytes,occupancy25.003%,tensor26.511%,
+eligible0.549299,long-scoreboard5.766146,local read/write11026432/398384
+sectors,shared conflicts3504375/3677948,diagnostic3.327936ms.
+The register-specialized follow-up is intended to separate that local-memory
+penalty from persistent scheduling itself. No promotion at this point.
+
+## Iteration 063 — one producer barrier per KV tile
+
+Based onv054, move the single transaction-expectation arrival before the
+index-publication barrier. That barrier then publishes both the indices and
+expectation before any gather4 is issued, eliminating the second barrier.
+Remove the post-gather producer barrier: the next tile uses separate indices
+and KV storage; reuse of a stage waits for its compute/PV empty notification.
+The next tile's publication barrier still waits for all producer threads,
+and transaction completion accounts for all current-tile DMA before compute
+can read it. Producer synchronization falls from three to one per tile.
+
+No score arithmetic, addresses, byte counts or compute ordering changes.
+This synchronization optimization requires fresh smoke, equivalence and
+qualified device-memory checks if it improves performance. Pending.
+
+### Iteration 062 offline resource rejection
+
+The compiler reduced initial CUBIN REG usage to110 (STACK0), invalidating the
+assumed128-register starting pool. Even rounding110 up to112 gives57344
+registers, below the requested61440. **Do not launch this configuration.**
+There is no GPU timing, numerical result or NCU measurement forv062. Preserve
+the compile/resource evidence and inspect generated register-control SASS.
+
+## Iteration 064 — reduce the persistent role budget
+
+Based onv062, request176 compute registers and32 producer registers:53248
+total, within a104-register initial512-thread pool. Compilation may again
+change initial resource usage; check it before any launch. This keeps the
+persistent schedule and numerical operations unchanged. Pending.
+
+### Iteration 062 SASS inspection supersedes the preliminary rejection
+
+The PTX contains the requested48/192 setmaxnreg operations, but the final
+CUBIN SASS contains **zero USETMAXREG instructions**. By contrast v058 emits
+USETMAXREG.DEALLOC.CTAPOOL and ALLOC.CTAPOOL. Therefore v062 does not actually
+request the nominal61440-register role total at runtime, and the preliminary
+resource-deadlock rejection above does not apply to this compiled binary.
+In this placement, the role branches immediately reconverge before the query
+loop; the final optimizer output has no register-control instructions. Its REG110/STACK0 code generation is still
+worth measuring, but any improvement must not be attributed to dynamic
+register redistribution without evidence in the generated instructions.
+A bounded runtime check is now appropriate after SASS inspection.
+
+### Iteration 063 initial result
+
+Smoke/full-target8-row checks pass with the same displayed v054 error values.
+Warm events1890.69us versusTRT1691.94us are about0.5% belowv054, a small gain
+requiring stable paired Graph measurement. NCU:126 registers,194872 shared
+bytes,occupancy23.253%,tensor27.586%,eligible0.510583,long-scoreboard5.86779,
+zero local sectors,shared conflicts3947070/2334346,diagnostic3.200544ms.
+Expanded equivalence, reference/Graph and qualified memcheck pending.
+
+### Iteration 062 measured result
+
+After confirming no dynamic register-control instructions in final SASS,
+the b300/chunk0 and full-target8-row checks pass. Warm events1904.77us versus
+TRT1691.94us recover most ofv061's regression, but do not beatv054/v063.
+NCU:110 registers,194872 shared bytes,occupancy24.995%,tensor27.487%,
+eligible0.546396,long-scoreboard5.519212,zero local sectors,shared conflicts
+4315995/2179636,diagnostic3.215936ms. Attribute the change to generated code
+and removal of local traffic, not an executed setmaxnreg mechanism.
+
+v064 likewise emits no USETMAXREG instructions; offline resources areREG91,
+STACK0. Its nominal role-budget arithmetic is therefore not a runtime
+allocation requirement for the inspected binary. Runtime validation pending.
+
+### Iteration 063 expanded validation
+
+Full8192/seed1234 equivalence versusv054 passes all268435456 BF16 bit patterns
+in each of three runs. It therefore inherits v054's nine original-tolerance
+failures on this input; it is not a strict-reference pass. The independent
+512-row Graph check passes. Warm1913.23us versusTRT1869.90us and cold1900.56us
+versusTRT1941.54us do not establish a stable warm gain overv054. Qualified
+b512/chunk0 memcheck with --report-api-errors no reports zero device errors,
+and its two reference rows pass. Keep the default/reference versionv054.
+
+### Iteration 064 result
+
+The b300/chunk0 and full-target8-row checks pass. Warm2121.76us versus
+TRT1693.92us regress despite lower registers and zero local traffic.
+NCU:91 registers,194872 shared bytes,occupancy24.987%,tensor24.271%,
+eligible0.492440,long-scoreboard6.187685,shared conflicts4337694/566972,
+diagnostic3.639552ms. Lower static register count is not sufficient evidence
+of better code generation. No promotion.
+
+## Iteration 065 — cache V across high/residual PV operations
+
+Based on the full-audit-passing residual v053, use the four weight-stationary
+B collector buffers. For each output N256 tile, the four high-P K32 MMAs fill
+buffers b0..b3, then the four residual-P MMAs consume their matching buffer
+with lastuse. The B matrices/descriptors are identical between matching
+high/residual operations, and no intervening operation overwrites a buffer.
+Each output element retains its accumulation order; the independent N tiles
+are scheduled high/residual together to prevent collector overwrite. QK keeps its default discard
+behavior, after the previous PV has completed. No memory layout or numerical
+formula changes, and v063's producer change is not composed yet.
+
+This targets repeated V reads into the Tensor Core operand collector for the
+second PV term. The weight-stationary b0..b3 mechanism is distinct from the
+newer ordinary-MMA collector::b qualifiers that requireSM107f; the WS form is
+available in PTX8.6/SM100. See [NVIDIA tcgen05.mma.ws](https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#tcgen05-mma-ws).
+Offline syntax/resource inspection, bounded smoke, equivalence and NCU pending.
+
+### Iteration 065 initial result
+
+Offline compile, b2 and full-target8-row reference checks pass. Full max_abs
+0.001884818 and relative_RMSE0.001690517 retain the residual path's accuracy.
+Warm events2224.06us versusTRT1693.57us improve about4.0% fromv053.
+NCU:102 registers,203064 shared bytes,occupancy23.315%,tensor34.389%,
+eligible0.523675,long-scoreboard6.429123,zero local sectors,shared conflicts
+3731712/3012490,diagnostic3.776832ms. Full-output equivalence, stable Graph
+and final SASS collector inspection are in progress.
+
+### Iteration 065 full equivalence and stable timing
+
+All268435456 BF16 output bit patterns matchv053 in three full-target/seed1234
+runs. Consequently the full-reference pass ofv053 applies to these identical
+outputs; this is transitive evidence for that input, not a new independent
+FP32 audit or a claim about arbitrary inputs. The512-row Graph check passes.
+Warm2279.70us versusTRT1871.50us and cold2269.34us versusTRT1947.44us improve
+overv053's2356.21/2332.77us, respectively. Final SASS explicitly contains
+B_KEEP followed by B_REUSE for collector buffers0..3 on both output tiles,
+confirming the intended mechanism. Qualified memory/short-input checks pending.
+
+## Iteration 066 — bounded scaling anchor with residual probabilities
+
+Based onv065, retain the running softmax anchor while the next tile maximum
+is at most2.5 log2 units above it. Use probability scale64 instead of256,
+leaving maximum high-P input64*2^2.5≈362.04 below E4M3's448 finite limit.
+When the bound is exceeded, update the anchor to the new maximum and perform
+the usual output/denominator correction. Numerator and denominator always
+share the same anchor. This preserves the real-arithmetic attention formula.
+
+Earlier single-P anchor versionv051 failed expanded accuracy; this version
+retains residual FP8 PV to recover probability rounding error. Lower scaling
+can still increase underflow/quantization error, so it requires independent
+full-reference validation, additional seeds and short/masked inputs. No
+accuracy pass is inherited fromv065. The purpose is to skip more identity
+output corrections while keeping strict-reference accuracy. Pending.
+
+### Iteration 065 short-input and memory validation
+
+b1024/chunk0/seed5678 matchesv053 on all33554432 output bit patterns in each
+of three runs. Qualified b512/chunk0 device memcheck with --report-api-errors
+no reports zero errors and passes its two sampled reference rows. The README
+now points residual performance runs tov065, retainingv053 as the independently
+audited full-reference baseline andv054 as the fast baseline-precision path.

@@ -60,6 +60,11 @@ B300 physical GPU1; b8192, H64, D576/512, TopK2048, chunk3. Each row is a paired
 | v058 | 1949.73 | 1691.78 | 0.8677x | 96 | 2.10 / 2.13 | 26.67% | prototype |
 | v059 | 2580.70 | 1689.86 | 0.6548x | 96 | 18.35 / 29.36 | 21.47% | prototype |
 | v060 | 1937.54 | 1691.84 | 0.8732x | 96 | 0.00 / 0.00 | 26.84% | prototype |
+| v061 | 1988.83 | 1691.94 | 0.8507x | 128 | 11.03 / 0.40 | 26.51% | prototype |
+| v062 | 1904.77 | 1691.94 | 0.8883x | 110 | 0.00 / 0.00 | 27.49% | prototype |
+| v063 | 1890.69 | 1691.94 | 0.8949x | 126 | 0.00 / 0.00 | 27.59% | same 9 all-row failures as TRT |
+| v064 | 2121.76 | 1693.92 | 0.7984x | 91 | 0.00 / 0.00 | 24.27% | prototype |
+| v065 | 2224.06 | 1693.57 | 0.7615x | 102 | 0.00 / 0.00 | 34.39% | bitwise v053 on all8192 rows, seed1234 |
 
 Raw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. No fully validated implementation has yet established a speedup over TRTLLM.
 
@@ -89,5 +94,9 @@ These are separate warm/cold runs with 20 warmups and 100 repeats; sampled row c
 | v053 | 512 | cold | 2332.77 | 1939.60 | 0.8315x |
 | v054 | 512 | warm | 1912.83 | 1869.98 | 0.9776x |
 | v054 | 512 | cold | 1910.88 | 1931.20 | 1.0106x |
+| v063 | 512 | warm | 1913.23 | 1869.90 | 0.9774x |
+| v063 | 512 | cold | 1900.56 | 1941.54 | 1.0216x |
+| v065 | 512 | warm | 2279.70 | 1871.50 | 0.8209x |
+| v065 | 512 | cold | 2269.34 | 1947.44 | 0.8582x |
 
 See [ITERATIONS.md](ITERATIONS.md) for changes, failed hypotheses, correctness limits and source references.
