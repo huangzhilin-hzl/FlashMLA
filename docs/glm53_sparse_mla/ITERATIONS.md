@@ -358,3 +358,24 @@ NCU: 78.604 KB shared memory; occupancy 12.413%; tensor active 32.250%; eligible
 warps/scheduler 0.28713; long scoreboard 3.23416. Shared-load/store conflicts
 26863016 / 6124491. Diagnostic duration 8.35981 ms. With spilling removed,
 serialized loads/computation and duplicate QK remain major optimization targets.
+
+### Iteration 011 result
+
+Full b8192 8-row correctness PASS. Paired warm medians: TRTLLM 1691.90 us,
+v011 5798.05 us, ratio 0.29181x. Still slower than v010 (5277.73 us), so
+retain the split-output design as the optimization base. NCU: 128 registers,
+78.604 KB shared memory, occupancy 12.368%, tensor active 19.304%, eligible
+warps 0.16600, long scoreboard 2.46240. Local-load/store sectors 2097152 /
+134664 (much reduced but nonzero). Shared-load/store conflicts 364 / 236013.
+Diagnostic duration 9.13267 ms. Reduced work alone is insufficient while the
+pipeline has long serialized phases and only one CTA can own the 512 columns.
+
+## Iteration 012 — overlap sparse KV loads with attention computation
+
+File: `experiments/glm53_sparse_mla/kernel_v012.py`, based on v010.
+Why: with spills eliminated, v010 spends more cycles waiting for global loads.
+Allocate two K/valid buffers. Gather tile 0 before the loop; while QK/softmax/PV
+use the current tile, issue cp.async loads for the next tile into the other
+buffer. Wait for pending copies after PV, before switching buffers. Retain
+all existing masking/zero-fill logic. Expected shared usage stays just under
+the limit for two resident CTAs. Full correctness and NCU are pending.
