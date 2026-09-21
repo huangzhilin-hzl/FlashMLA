@@ -30,15 +30,15 @@ cd /tmp/glm53_sparse_mla_dev
 export CUDA_VISIBLE_DEVICES=GPU-2dc4b50c-07a5-26d6-f5ce-54ef728d56b2
 export CUTE_DSL_ARCH=sm_103a
 
-# Full target, paired comparison, expanded sampled correctness, stable timing.
+# Fast single-P path with closely matching TRTLLM precision; see all-row limits below.
 /opt/sglang/bin/python bench.py \
-  --kernel-version v049 --block-k 128 \
-  --backends trtllm cute --scope native --check-rows 64 \
+  --kernel-version v054 --block-k 128 \
+  --backends trtllm cute --scope native --check-rows 512 \
   --warmup-iters 20 --repeat-iters 100 --cache both --timing cuda-graph \
-  --output-json artifacts/v049_full_graph.json
+  --output-json artifacts/v054_accuracy512_graph.json
 
 # Short event-based tuning run, followed by one warmed NCU invocation.
-bash run_iteration.sh v049 128
+bash run_iteration.sh v054 128
 ```
 
 `run_iteration.sh` saves raw JSON, logs, NCU details/CSV and an immutable per-run
@@ -54,16 +54,37 @@ python3 experiments/glm53_sparse_mla/summarize.py > docs/glm53_sparse_mla/RESULT
 
 ## Validation limits
 
-**New expanded check:** v049 fails 1 of 16,777,216 outputs in the full-target
-512-row/seed1234 check; v051 fails 2. TRTLLM passes that same check. The v049
-command above is a performance reference with a known accuracy failure,
-not a generally validated implementation. A residual-FP8 probability path
-is being evaluated without loosening the original tolerances.
+The full 8192-row/seed1234 audit checks all 268,435,456 output elements:
+
+| Candidate | Original-tolerance failures | Intended comparison |
+|---|---:|---|
+| TRTLLM | 9 | Baseline FP8 precision |
+| v054, P scale448 | 9, identical coordinates/values to TRTLLM | Fast baseline-precision path |
+| v049, P scale256 | 11 | Earlier timing reference |
+| v053, residual FP8 | 0 | Higher-precision path, slower due to second PV |
+
+v054 matches about 99.96% of TRTLLM BF16 outputs bitwise on this input.
+It passes 512 sampled rows for seeds1234/5678/42, but it does **not** pass the
+strict all-row tolerance. v053 passes the entire seed1234 target and the
+additional sampled, short and masked cases recorded in the iteration log.
+None of these tests proves every possible input or scale.
+
+To reproduce the full shared-reference audit (accuracy only):
+
+```bash
+/opt/sglang/bin/python validate_full_accuracy.py \
+  --kernel-versions v049 v053 v054 --include-trtllm \
+  --output-json artifacts/full_accuracy_seed1234.json
+```
+
+This audit records every backend's failures before returning nonzero if any
+fails. For residual-P performance, use `--kernel-version v053` with `bench.py`.
+No tolerance is relaxed to obtain a pass.
 
 Full-target iterations use the original FP32 reference and unchanged tolerances
 (`atol=0.01`, `rtol=0.05`). The usual tuning check samples 8 rows. v013, v016, v034, v037, v039, v044, v045 and v049 also
 passed 64 sampled rows on the target chunk3, with graph warm/cold measurements.
-That is not exhaustive validation of all rows, shapes or quantization scales.
+Those historical sampled checks do not supersede the full audit above.
 
 The extra b1024/chunk0/seed5678 test fails the original tolerance for both v013
 and TRTLLM; the failed numerical checks remain explicit in the iteration log.

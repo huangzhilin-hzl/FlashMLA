@@ -1500,3 +1500,164 @@ eligible 0.52178, long scoreboard 3.49455, zero local sectors, shared conflicts
 stall accounting substantially without a comparable latency gain. This
 does not address the probability-quantization failure found in v049; keep
 it only as a scheduling building block for the accuracy repair.
+
+### Iteration 053 initial compile correction
+
+The first compile rejects subtraction between the score TensorSSA shape
+(32,1) and the flat packed-probability shape (32). No GPU kernel ran. Make
+the FP8 register fragment inherit the score fragment's shape so conversion
+back to FP32 preserves the arithmetic profile. Preserve the initial compile
+log; numerical/performance validation still pending for the corrected file.
+
+## Iteration 054 — use the full E4M3 finite probability range
+
+Based on v049, change only probability scale and matching output denominator
+from 256 to 448. This is motivated by concrete baseline evidence: preserved
+TRTLLM SASS line2495 selects 8.807354927 (log2(448)) immediately before
+pre-exponential FMAs, and line2874 selects 448 as a scaling value. The
+predicates/full baseline algorithm are not reconstructed, so this does not
+claim exact TRTLLM numerical equivalence.
+
+The standard E4M3 finite maximum uses more available range without the second
+PV of v053. It changes rounding-bin alignment and may or may not eliminate
+rare tolerance failures; no scale search tuned to the failing element will
+be performed. Require 512-row and additional-seed checks before judging it.
+Keep v053's residual path as the robust precision option while this is tested.
+
+### Iteration 053 corrected results
+
+Smoke and full-target 8-row checks pass. Full max_abs improves to 0.001884818
+and relative_RMSE to 0.001690517. Paired warm events: 2316.42 us versus TRTLLM
+1687.81 us. NCU: 101 registers, 203064 shared bytes, occupancy 23.313%, tensor
+32.942%, eligible 0.49948, long scoreboard 6.86680, zero local sectors, shared
+conflicts 3469229/2488035, diagnostic 3.943296 ms. The second PV costs about
+22% versus v049's short run, while removing most probability-rounding error.
+
+The original failing 512-row/seed1234 case now PASSES: max_abs 0.003831148 and
+relative_RMSE 0.001693299, versus TRTLLM 0.014106080 / 0.015002753. This is
+sampled evidence, not an all-shapes accuracy guarantee. Paired Graph20/100
+warm candidate 2356.21 us versus TRTLLM 1861.66 us; cold 2332.77 us versus
+1939.60 us. The expanded Graph table now shows sampled row counts explicitly.
+Additional seed, short-sequence/mask and device-memory checks are running.
+
+### Iteration 053 additional validation
+
+Qualified b512/chunk0 device memcheck: zero errors; two checked rows pass
+with max_abs 0.001525640. The previously failing holes/partial-tile case now
+passes the independent FP32 check: valid counts 2038/126, max_abs 0.003903151.
+validate_masks.py gains --reference-only for precision-changing candidates;
+the default historical bitwise-v020 mode is unchanged.
+
+Full-target seed5678, 512 checked rows: PASS, max_abs 0.003912091 and
+relative_RMSE 0.001692613. b1024/chunk0/seed5678, 64 rows: PASS, max_abs
+0.006079197 and relative_RMSE 0.001140024, covering the earlier short-input
+numerical failure.
+
+### Iteration 054 initial results and broader accuracy checks
+
+Smoke/full-target 8-row checks pass. Full max_abs 0.007641070 and relative_RMSE
+0.015046225 nearly match the paired TRTLLM statistics, supporting the scale
+diagnosis. Warm events: 1900.90 us versus TRTLLM 1691.84 us. NCU: 126 registers,
+194872 shared bytes, occupancy 23.283%, tensor 27.433%, eligible 0.51443,
+long scoreboard 5.72494, zero local sectors, shared conflicts 3693140/2291661,
+diagnostic 3.221664 ms.
+
+512-row checks PASS independently for seeds1234,5678,42; max_abs respectively
+0.014106080, 0.012659281, 0.012925267, relative_RMSE 0.015002714, 0.015003934,
+0.014990480. This still does not establish all-row correctness.
+
+The new validate_full_accuracy.py is auditing all 8192 rows in batches using
+the unchanged source.reference_rows FP32 expression, TF32 disabled, original
+atol=0.01/rtol=0.05. It records failures for every backend before returning,
+including example coordinates and allowed error; it never reports its wall
+time as a kernel benchmark. TRTLLM, v049, v053 and v054 share exactly the same
+inputs/reference for this run. Full-target audit is in progress.
+
+## Iteration 055 — preserve the probability fragment shape
+
+Based on v054, make the FP8 probability fragment inherit the score fragment's
+shape instead of flattening it. v053 required this shape preservation for
+residual arithmetic and compiled with fewer registers, though other changes
+prevent attributing that difference to layout alone. This isolated experiment
+checks code-generation/register effects without changing probability values,
+MMA order, synchronization or storage coordinates. Validation/NCU pending.
+
+### Full 8192-row seed1234 accuracy audit
+
+All four backends were checked on the same 268435456 output elements, with
+the unchanged FP32 reference and original combined tolerance. Results:
+
+| Backend | Tolerance failures | Max absolute error | Relative RMSE |
+|---|---:|---:|---:|
+| TRTLLM | 9 | 0.019369811 | 0.014979338 |
+| v049, P scale256 | 11 | 0.020210505 | 0.014776585 |
+| v054, P scale448 | 9 | 0.019369811 | 0.014979332 |
+| v053, residual FP8 | 0 | 0.005918741 | 0.001693324 |
+
+v054's nine failure coordinates and values exactly match TRTLLM's recorded
+examples. Only 108223/268435456 BF16 outputs differ from TRTLLM, approximately
+0.0403%. This establishes closely matching baseline precision for this input,
+not a strict all-row tolerance pass. v053 passes every output on this full
+input, plus the additional sampled/short/mask cases above; other inputs are
+not proven. Continue the fast single-P path with explicit baseline-equivalent
+accuracy limits, and retain the residual path for the stricter full-reference
+criterion. No tolerances or failing counts are hidden/changed.
+
+### Iteration 055 result
+
+Shape preservation alone has no measurable effect: 1900.77 us versus TRTLLM
+1691.94 us, unchanged 8-row errors and 126 registers. NCU: shared 194872 bytes,
+occupancy 23.277%, tensor 27.450%, eligible 0.51423, long scoreboard 5.72394,
+zero local sectors, shared conflicts 3666848/2324535, diagnostic 3.220000 ms.
+The v053 register reduction cannot be attributed to this change alone.
+
+## Iteration 056 — four compute groups with 16 scores per thread
+
+Based on v055, distribute score processing across four compute groups, each
+reading 16 physical TMEM columns and holding one head per thread. Eight
+partial maxima/sums per head replace four. Each group corrects 64 physical
+output columns, corresponding to two disjoint logical channel blocks;
+shared output staging uses the exact N256 Layout-E address mapping.
+
+Use four producer warps and 640 total threads to limit the added register
+footprint, returning to the prior four-warp gather partition. The final
+shared-output redistribution uses 512 compute threads. This changes both
+compute distribution and producer count, so performance cannot be attributed
+to one factor alone. Coordinate coverage, register/spill behavior and fresh
+numerical/performance checks are required. Validation pending.
+
+### Iteration 054 stable timing and device-memory check
+
+512-row Graph20/100 validation passes its sampled rows. Warm candidate
+1912.83 us versus TRTLLM 1869.98 us; cold 1910.88 us versus TRTLLM 1931.20 us.
+The full-target nine-error limitation remains explicit; this sampled pass
+does not override it. Qualified b512/chunk0 device memcheck reports zero
+device errors and its two numerical rows pass. The README now presents both
+v054's baseline-precision path and v053's full-audit-passing residual path,
+instead of treating the earlier 64-row result as a general accuracy claim.
+
+### Iteration 056 result
+
+Score/output coordinate audits, smoke and full-target 8-row checks pass;
+full relative_RMSE 0.015046224 is unchanged to the shown precision. Warm
+events 1958.11 us versus TRTLLM 1691.84 us regress from v054. NCU: 96 registers,
+195896 shared bytes, occupancy 30.260%, tensor 26.552%, eligible 0.71029,
+long scoreboard 6.83057, local read/write sectors 6291456/6398904, shared
+conflicts 6133068/2818160, diagnostic 3.331168 ms. Higher occupancy/eligibility
+does not offset local traffic and extra cross-group bookkeeping. Do not
+promote the four-group configuration as measured.
+
+## Iteration 057 — redistribute registers across four compute groups
+
+Based on v056, producer threads release registers to a 48-register budget
+and compute threads request 112. The role budgets total
+128*48 + 512*112 = 63488 registers, below the 65536-register SM budget; each
+role covers whole warp groups and producers release before entering their
+loop, so compute register acquisition does not depend on later stage release.
+The pattern follows FlashInfer's explicit setmaxregister_decrease/increase
+warp-specialized roles. No numerical operation or memory layout changes.
+
+This tests whether the v056 local traffic comes from the static per-thread
+budget and can be reduced by moving registers from its producer role. That
+cause is a hypothesis, not established solely by the 96-register metric.
+Compiler/runtime validation and measured local sectors are pending.

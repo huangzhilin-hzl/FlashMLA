@@ -6,6 +6,7 @@ import benchmark_source as source
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--kernel-version', required=True)
+parser.add_argument('--reference-only', action='store_true', help='Use FP32 reference without the old bitwise v020 assertion')
 args = parser.parse_args()
 source.LOCAL_TOKENS = 2
 source.make_sparse_indices.__defaults__ = (2, source.TOPK)
@@ -18,9 +19,10 @@ indices[1, 129:] = -1
 indices[1, [31, 32, 127]] = -1
 inputs['seq_lens'][1] = 129
 candidate = importlib.import_module(f'kernel_{args.kernel_version}').make_runner(inputs, 128)().float()
-base = importlib.import_module('kernel_v020').make_runner(inputs, 128)().float()
-print('candidate_vs_v020', {'unequal': (candidate != base).sum().item(), 'max_abs': (candidate-base).abs().max().item()})
-torch.testing.assert_close(candidate, base, atol=0, rtol=0)
+if not args.reference_only:
+    base = importlib.import_module('kernel_v020').make_runner(inputs, 128)().float()
+    print('candidate_vs_v020', {'unequal': (candidate != base).sum().item(), 'max_abs': (candidate-base).abs().max().item()})
+    torch.testing.assert_close(candidate, base, atol=0, rtol=0)
 q = inputs['query'].squeeze(1).float()
 kv = inputs['kv_cache'].view(-1, 576).float()
 reference = []

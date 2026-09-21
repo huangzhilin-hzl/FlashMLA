@@ -1,0 +1,25 @@
+Traceback (most recent call last):
+  File "/tmp/glm53_sparse_mla_dev/bench.py", line 46, in <module>
+    source.main(rest)
+  File "/tmp/glm53_sparse_mla_dev/benchmark_source.py", line 549, in main
+    cases = make_cases(inputs, args)
+            ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/glm53_sparse_mla_dev/bench.py", line 39, in make_cases
+    run = kernel.make_runner(inputs, probe.block_k)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/glm53_sparse_mla_dev/kernel_v053.py", line 417, in make_runner
+    compiled = cute.compile(SparseMLA(block_k), *args, stream)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/glm53_sparse_mla_dev/kernel_v053.py", line 131, in __call__
+    qlayout, klayout, playout, vlayout, qtail_layout, ktail_layout).launch(
+                                                                    ^^^^^^^
+  File "/tmp/glm53_sparse_mla_dev/kernel_v053.py", line 185, in kernel
+    if tid >= 256:
+  File "/tmp/glm53_sparse_mla_dev/kernel_v053.py", line 248, in else_block_20
+    for block in cutlass.range(num_blocks):
+  File "/tmp/glm53_sparse_mla_dev/kernel_v053.py", line 310, in loop_body_21
+    packed_p.store((probs * 256.0 - packed_p.load().to(cutlass.Float32)).to(cutlass.Float8E4M3FN))
+                    ~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  File "/opt/sglang/lib/python3.12/site-packages/nvidia_cutlass_dsl/dsl_packages/cutlass/cute/tuple.py", line 361, in transform_leaf
+    raise TypeError(f"profile of input tuples doesn't match: {args}")
+TypeError: profile of input tuples doesn't match: ((32, 1), 32)

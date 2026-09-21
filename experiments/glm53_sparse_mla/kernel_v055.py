@@ -1,4 +1,4 @@
-"""Iteration 053: weight-stationary MMA with one-head TMEM loads and deferred sums.
+"""Iteration 055: weight-stationary MMA with one-head TMEM loads and deferred sums.
 
 One CTA owns one query and all 512 output channels. Both PV N tiles reuse
 one QK/softmax computation and one gathered KV tile. No input expansion,
@@ -106,7 +106,7 @@ def mma_ws(d, a, b, n, b_transpose, accumulate, *, loc=None, ip=None):
 
 class SparseMLA:
     def __init__(self, block_k=128):
-        assert block_k == 128, "v053 requires --block-k 128"
+        assert block_k == 128, "v055 requires --block-k 128"
         self.block_k = block_k
 
     @cute.jit
@@ -152,7 +152,6 @@ class SparseMLA:
         sk_tail_base = alloc.allocate_tensor(cutlass.Float8E4M3FN, cute.make_layout(2 * ktbytes),
                                              byte_alignment=128, swizzle=ktail_layout.inner)
         sp = alloc.allocate_tensor(cutlass.Float8E4M3FN, playout.outer, byte_alignment=128, swizzle=playout.inner)
-        sp_residual = alloc.allocate_tensor(cutlass.Float8E4M3FN, playout.outer, byte_alignment=128, swizzle=playout.inner)
         denom = alloc.allocate_tensor(cutlass.Float32, cute.make_layout(64))
         partial_max = alloc.allocate_tensor(cutlass.Float32, cute.make_layout(256))
         partial_sum = partial_max  # Reused only after the final score tile.
@@ -295,7 +294,7 @@ class SparseMLA:
                 rowsum = rowsum * correction + blocksum
                 rowmax = newmax
                 packed_p = cute.make_fragment_like(rs, cutlass.Float8E4M3FN)
-                packed_p.store((probs * 256.0).to(cutlass.Float8E4M3FN))
+                packed_p.store((probs * 448.0).to(cutlass.Float8E4M3FN))
                 for j in cutlass.range(cute.size(rs) // 16, unroll_full=True):
                     dp, col = coords_s[j * 16]
                     h = dp % 64
@@ -303,17 +302,6 @@ class SparseMLA:
                     rvec = cute.make_tensor(packed_p.iterator + j * 16, cute.make_layout(16))
                     svec = cute.make_tensor(sp.iterator + cute.assume(sp.layout((h, col)), divby=16),
                                             cute.make_layout(16))
-                    cute.copy(store128, rvec, svec)
-                # Represent scaled probabilities as two FP8 terms. The low
-                # term recovers the high term's rounding residual using the
-                # same FP8 tensor-core PV path and unchanged denominator.
-                packed_p.store((probs * 256.0 - packed_p.load().to(cutlass.Float32)).to(cutlass.Float8E4M3FN))
-                for j in cutlass.range(cute.size(rs) // 16, unroll_full=True):
-                    dp, col = coords_s[j * 16]
-                    h = dp % 64
-                    col = col + (dp // 64) * 64 + cgroup * 32
-                    rvec = cute.make_tensor(packed_p.iterator + j * 16, cute.make_layout(16))
-                    svec = cute.make_tensor(sp_residual.iterator + cute.assume(sp_residual.layout((h, col)), divby=16), cute.make_layout(16))
                     cute.copy(store128, rvec, svec)
                 skip_correction = cute.arch.vote_all_sync(correction == 1.0)
                 if (block > 0) & (not skip_correction):
@@ -340,12 +328,6 @@ class SparseMLA:
                                     cute.local_tile(sp, (64, 32), (0, k)),
                                     cute.local_tile(sk_transposed, (256, 32), (ntile, k)),
                                     256, True, (block > 0) | (k > 0))
-                        for ntile in cutlass.range(2, unroll_full=True):
-                            for k in cutlass.range(4, unroll_full=True):
-                                mma_ws(tp + ntile * 128,
-                                    cute.local_tile(sp_residual, (64, 32), (0, k)),
-                                    cute.local_tile(sk_transposed, (256, 32), (ntile, k)),
-                                    256, True, True)
                         tcgen05.commit(bar)
                 cute.arch.mbarrier_wait(bar, phase)
                 tmem_after_sync()
@@ -362,7 +344,7 @@ class SparseMLA:
             tmem_after_sync()
             if tid < 64:
                 total_sum = (partial_sum[head] + partial_sum[64 + head]) + (partial_sum[128 + head] + partial_sum[192 + head])
-                denom[head] = 1.0 / (total_sum * 256.0)
+                denom[head] = 1.0 / (total_sum * 448.0)
             tmem_before_sync()
             cute.arch.barrier(barrier_id=1, number_of_threads=256)
             tmem_after_sync()

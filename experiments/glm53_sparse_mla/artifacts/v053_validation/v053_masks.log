@@ -1,0 +1,3 @@
+valid_counts [2038, 126]
+fp32_reference {'max_abs': 0.0039031505584716797, 'rmse': 0.00030936766415834427, 'atol': 0.01, 'rtol': 0.05}
+MASK CHECK PASS
