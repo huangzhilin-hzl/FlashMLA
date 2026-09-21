@@ -225,3 +225,15 @@ concurrent TMEM allocations. This is different from the invalid column packing
 in v002/v003. Compile-time column bounds are asserted. Validation pending.
 Primary ISA reference:
 https://docs.nvidia.com/cuda/parallel-thread-execution/#tcgen05-data-path-layout
+
+### Iteration 005 result
+
+Full b8192 8-row correctness PASS (same errors as corrected v004). Paired
+warm event medians: TRTLLM 1693.66 us, v005 14399.74 us; TRT/candidate=0.11762x.
+NCU: registers fall from 253 to 186/thread; shared memory 94.988 KB; achieved
+occupancy 12.430%; tensor active 11.467%; eligible warps/scheduler 0.28741;
+long scoreboard 0.86799. Local sectors remain zero. Shared-load/store conflicts
+428 / 203079187: probability vectorization removed roughly half the remaining
+store conflicts. The other major path is scalar TMEM-to-shared score writes.
+Diagnostic NCU duration 23.5537 ms. Next softmax layout should bypass that
+intermediate score buffer and distribute reduction directly over TMEM fragments.
