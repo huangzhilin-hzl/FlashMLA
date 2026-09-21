@@ -150,3 +150,27 @@ FP8 PV can use an MN-major V operand on Blackwell. Replace the K-major PV operan
 and explicit transpose buffer with an MN-major view of the already gathered K
 buffer, slicing the correct 256 output channels. No arithmetic precision change.
 Validation pending; remaining local-memory pressure is the next target.
+
+### Iteration 003 result
+
+Full target 8-row correctness PASS (same errors as v001/v002). Paired warm
+event medians: TRTLLM 1691.81 us, v003 19413.22 us; TRT/candidate=0.08715x.
+Removing the transpose improved v002 by 1.36x, but remains 11.48x slower than
+TRTLLM. NCU: 255 registers/thread; 94.988 KB shared memory; occupancy 6.252%;
+eligible warps/scheduler 0.23354; tensor active 8.2868%; long scoreboard 0.75130.
+Local-load/store sectors: 195297280 / 138193716. Shared-load/store bank conflicts:
+102061 / 402653220. The shared-load conflicts almost disappeared, confirming
+the transpose was a bottleneck. Store conflicts and register spilling remain.
+NCU diagnostic duration 32.5455 ms.
+
+## Iteration 004 — keep online output in TMEM
+
+File: `experiments/glm53_sparse_mla/kernel_v004.py`.
+Why: v003 still generates 333 million local-memory sectors; persistent output
+plus temporary PV accumulators exceed the register budget. Keep the running
+output in TMEM, load/rescale/store it before the next PV MMA and accumulate
+directly into it. Keep the probability factor 256 throughout and divide it out
+at final normalization. Also release the TMEM allocation permit immediately
+after allocation, as in NVIDIA examples, instead of keeping it for the CTA
+lifetime. Smoke b2 passes with the same numeric errors. Full target and NCU
+measurements are pending.
