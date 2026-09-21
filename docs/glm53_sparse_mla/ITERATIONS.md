@@ -432,3 +432,44 @@ use separate 128-thread named barriers. Producers can prepare the next stage
 while compute warps continue, without requiring the same warps to issue loads.
 Retain alpha/denominator aliasing to stay within the two-CTA shared-memory limit.
 Numerical behavior is unchanged by construction but still requires validation.
+
+### Extended validation and stable graph measurements for v013
+
+The exact target b8192/chunk3/seed1234 passes the expanded 64-row FP32 check:
+v013 max_abs 0.00975490, relative_RMSE 0.0146073; TRTLLM max_abs 0.0101305,
+relative_RMSE 0.0148794. Tolerances remain atol=0.01, rtol=0.05.
+
+CUDA Graph, 20 warmups/100 repeats: warm TRTLLM 1879.84 us versus v013
+4482.27 us (0.41939x); cold TRTLLM 1896.74 us versus v013 4485.31 us
+(0.42288x). These use the original graph timing/eviction code and are kept
+separate from the short CUDA-event tuning table. Both cache modes confirm
+v013 remains substantially slower; cache eviction does not explain the gap.
+
+For the extra b1024/chunk0/seed5678 partial-TopK test, TRTLLM also fails the
+unchanged tolerance: 19/524288 elements, largest offending absolute error
+0.0221396, at the same row/head/channel as v013's largest offending value.
+v013 has 6 failing elements with 0.0154580. This supports a shared FP8
+approximation limitation rather than evidence of a pipeline-specific memory
+error; it does not turn either failed check into a pass. Broader numerical
+coverage remains limited and needs separate treatment. Memcheck reports zero
+addressing errors for that case. Raw failures are preserved under
+`artifacts/v013_validation`.
+
+### Iteration 014 result
+
+Full b8192 8-row correctness PASS, same errors as v013. Paired medians: TRTLLM
+1691.81 us, v014 3567.87 us; ratio 0.47418x. Loader/compute specialization
+improves v013 by 1.26x. NCU: 124 registers/thread, shared memory 115504 bytes,
+occupancy 23.224%, tensor active 43.641%, eligible warps 0.58263, long
+scoreboard 4.11929. Local sectors remain zero; shared-load/store conflicts
+22254878 / 11457038. Diagnostic duration 6.18675 ms. Increased warp residency
+and overlapping work improve throughput, but the kernel still takes 2.11x
+the paired TRTLLM time.
+
+## Iteration 015 — revisit full-output CTAs with specialized loading
+
+File: `experiments/glm53_sparse_mla/kernel_v015.py`, based on v014.
+Assign all 512 output channels to one CTA while keeping a separate producer
+warpgroup. Use the explicit nonoverlapping 256-column N-tile stride learned
+in v009. This tests whether better loading overlap changes the earlier
+full-output versus duplicated-QK tradeoff. Validation pending.
