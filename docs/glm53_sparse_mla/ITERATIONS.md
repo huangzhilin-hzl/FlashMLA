@@ -379,3 +379,28 @@ use the current tile, issue cp.async loads for the next tile into the other
 buffer. Wait for pending copies after PV, before switching buffers. Retain
 all existing masking/zero-fill logic. Expected shared usage stays just under
 the limit for two resident CTAs. Full correctness and NCU are pending.
+
+### Iteration 012 result — occupancy regression
+
+Full b8192 8-row correctness PASS. Paired medians: TRTLLM 1693.89 us, v012
+7994.75 us; ratio 0.21188x, slower than v010. NCU: 128 registers, no local
+sectors and no shared bank conflicts, but shared memory 115724 bytes/CTA and
+occupancy only 6.240% (one CTA/SM). Tensor active 20.813%, eligible warps
+0.17831, long scoreboard 1.86402; diagnostic duration 13.0101 ms.
+
+NCU launch data reports an additional 1024 driver-reserved shared bytes/CTA;
+the physical SM limit is 233472 bytes. Two CTAs require
+`2 * (115724 + 1024) = 233496` bytes, exceeding that limit by 24 bytes even
+before any allocation rounding. The prior estimate ignored driver reservation.
+The runtime selected only 135168 bytes of shared carveout, sufficient for one
+CTA, and the profiler explicitly reports a shared-memory block limit of one.
+
+## Iteration 013 — reuse softmax metadata storage
+
+File: `experiments/glm53_sparse_mla/kernel_v013.py`, based on v012.
+Alpha factors are needed during online O correction; denominators are only
+needed during the final epilogue. Alias their 64-float shared buffers, and write
+the denominators once after the final PV and a synchronization. This saves
+256 bytes/CTA and removes unnecessary per-tile denominator stores. The goal
+is to restore two resident CTAs without changing the double-buffered pipeline.
+Full target correctness, NCU and partial-tile checks are pending.
