@@ -2985,3 +2985,127 @@ The v098 masked audit exits nonzero because it includes the known 78 TRT
 failures. Preserve its complete report and inspect candidate-specific pass and
 bitwise-equivalence fields before resuming; do not treat that wrapper exit as
 a new kernel failure or ignore unexpected candidate errors.
+
+## Iteration 099 — warp-local register exchange for TMA indices
+
+Based on v097. Each of the four producer warps already owns 32 global indices
+in lane-private registers. Broadcast the four indices for each gather4 group
+with four warp shuffles before electing its one TMA issuer. All 32 lanes execute
+each shuffle, with sources 0..31. Remove the now-unused shared index array and
+its stores/loads, retaining shared validity bitmaps, all three producer barriers,
+stage waiting and single-thread raw-PTX TMA issuance. Expected traffic reduction
+may be offset by 32 shuffle instructions and repeated elect/reconvergence per
+warp/tile; offline and runtime evidence are pending.
+
+The installed DSL exposes shuffle_sync with full-warp mask and lane-index
+semantics in cute/arch/nvvm_wrappers.py. The official TMA documentation describes
+single-thread issuance and implicit election for its high-level copy API:
+https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/cute_dsl_api/cute_nvgpu_cpasync.html
+This kernel uses raw PTX helpers and retains explicit election; it does not wrap
+the high-level TMA copy API in an additional election.
+
+## Iteration 100 — four producer warps on the higher-precision path
+
+Based on v098. Retain all 256 compute threads, residual FP8 math, original
+per-score masks and synchronization, but reduce producers from 256 to 128
+threads. Each producer warp issues eight gather4 groups rather than four,
+covering the same 128 rows. This tests whether v097's producer-count gain also
+helps the higher-precision path. Offline, bounded smoke, qualified memcheck,
+bitwise equivalence and paired timing are pending.
+
+### Iteration 097 promotion — four producer warps remain beneficial
+
+All 8192-row outputs on seeds1234/5678 and all1024 short-case outputs match v096
+bitwise in three repeats each. Masked equality and qualified b512 memcheck also
+pass. Eager20/100 warm/cold medians are1787.86/1784.90 us versusTRT1883.94/
+1929.81 us; Graph1794.08/1783.62 us versusTRT1869.82/1918.70 us. Rotating
+orders give warm v0971759.42/1757.28/1761.38 us, v0961771.58/1771.60/1771.63 us,
+TRT1867.87/1876.13/1878.16 us. Cold v0971755.33/1759.06/1760.75 us improves
+on paired v0961767.82/1769.26/1772.58 us; TRT1855.68/1863.76/1857.50 us.
+Promote v097 as the current baseline-precision path, retaining every documented
+FP8 accuracy limit and the distinction from short tuning timings.
+
+### Iteration 098 initial result — index overlap also helps residual FP8
+
+Bounded smoke/eight-row checks, all8192 seed1234 bitwise comparison with v075
+(three repeats), masked exact equality and qualified b512 memcheck pass. Both
+v075/v098 pass the masked FP32 tolerance; only the included TRT baseline fails
+there. Warm1924.90 us versusTRT1691.71 us improves from v0751990.94 us.
+NCU base/stable:118 registers,203064 shared bytes, occupancy23.172%, tensor
+39.405%, eligible0.534069, long-scoreboard6.488646, zero local sectors,
+aggregate shared conflicts3345307/644141, diagnostic3.299680 ms. Further
+full-seed/short/extended/rotation evidence is being inspected before promotion.
+
+### Iteration 098 promotion — full accuracy inheritance and sustained gain
+
+All8192 output bits on seeds1234/5678 and all1024 short-case bits match v075
+in three repeats each, with masked equality and qualified memcheck already
+passing. This inherits v075's full-reference passes on those inputs. Eager
+20/100 medians:2051.90/2043.68 us warm/cold versusTRT1887.10/1916.66 us;
+Graph2056.35/2037.58 us versusTRT1871.82/1918.86 us. Rotating warm medians
+v0982005.14/2007.23/2013.14 us versusv0752043.94/2046.02/2046.66 us and
+TRT1868.77/1876.10/1878.14 us. Cold v0982009.15/2009.22/2009.02 us versus
+v0752047.89/2047.81/2048.03 us andTRT1863.60/1861.68/1867.68 us. Promote
+v098 as the current higher-precision path. It remains slower than TRT.
+
+### v097 source profile at unlocked clocks
+
+Clock-control none / pipeline-boost-state dynamic reports598327236 executed
+instructions, with28655616 shared wavefronts equal to ideal and zero excessive.
+Long-scoreboard samples total62518: QK completion19768, PV completion14429,
+producer stage-reuse9447, and index-validity comparison9023. The last comparison
+is now before the producer stage wait in generated SASS. The scheduling change
+therefore overlaps index load/consumption with preceding compute work; the
+source profile does not establish that the load remains outstanding during the
+wait itself. Per-site sample counts are not time or speedup fractions, especially
+when comparing different resident warp counts.
+
+Correction FMUL2 instructions consuming TMEM loads account for several leading
+short-scoreboard sites. Four producer warps leave register capacity for testing
+64-column correction fragments that spilled in an older512-thread version.
+All completion/thread fences must remain; only fragment shape is changed next.
+
+## Iteration 101 — wider correction transfers with a 384-thread CTA
+
+Based on v097. Change only accumulator-correction TMEM fragments from32 to64
+physical columns: two Ld32x32b/St32x32b repetition64 transfers per compute
+group replace four repetition32 transfers. Keep every load/store and thread
+fence, per-head correction arithmetic, score transfer shape and output epilogue
+unchanged. A previous512-thread experiment spilled with wider fragments;384
+threads increase the per-thread register capacity at one CTA per SM. Inspect
+actual resources and local traffic before evaluating this hypothesis. Pending.
+
+v099 offline compilation uses REG80/STACK88, indicating nonzero stack storage;
+v100 uses REG122/STACK0. Runtime validation and NCU local-sector counts will
+distinguish the cost before either is considered for promotion.
+
+### Iteration 099 result — shared exchange removal spills registers
+
+Smoke/eight-row checks, full8192 seed1234 bitwise equivalence to v097 (three
+repeats), masked equality and qualified b512 memcheck pass. Warm1968.35 us
+versusTRT1691.71 us regresses fromv0971749.06 us. NCU base/stable:80 registers,
+193880 shared bytes, occupancy17.689%, tensor26.181%, eligible0.371592,
+long-scoreboard5.285820, local read/write sectors70130400/32550984, aggregate
+shared conflicts57771/506731, diagnostic3.378144 ms. The1024-byte shared saving
+and lower shared counters do not compensate for the generated local traffic.
+No promotion or expanded timing validation.
+
+## Iteration 102 — allow one-CTA register allocation for warp shuffles
+
+Based on v099, set explicit min_blocks_per_mp=1 for its384-thread launch.
+The approximately194KB shared footprint already limits this shape to one CTA
+per SM. Test whether this launch bound avoids the compiler's80-register result
+and local traffic. No explicit runtime register redistribution is requested.
+Compilation requires the existing initialize-CUDA option for the DSL device
+attribute query, on the selected GPU1 after idle preflight; fake inputs are
+still used and compilation launches no kernel. Pending.
+
+### Iteration 100 result — fewer producers do not help residual FP8
+
+Smoke/eight-row checks, full8192 seed1234 bitwise equality to v098 in three
+repeats, masked equality/FP32 pass and qualified b512 memcheck pass. Warm
+1931.39 us versusTRT1691.58 us is slightly slower than v0981924.90 us. NCU
+base/stable:122 registers,203064 shared bytes, occupancy17.767%, tensor39.258%,
+eligible0.452134, long-scoreboard5.223805, zero local sectors, aggregate shared
+conflicts4572493/747802, diagnostic3.311328 ms. No promotion or expanded
+validation; retain v098's eight producer warps for the higher-precision path.

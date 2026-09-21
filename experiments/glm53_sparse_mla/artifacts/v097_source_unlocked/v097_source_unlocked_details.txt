@@ -1,0 +1,46 @@
+[3140] python3.12@127.0.0.1
+  kernel_cutlass_kernel_kernel_v097SparseMLA_object_at__tensorptrf8E4M3FNgmemalign16o819264576368645761_tensorptrf8E4M3FNgmemalign16o1310725765761_tensorptri32gmemalign16o8192204820481_tens_0 (8192, 1, 1)x(384, 1, 1), Context 1, Stream 7, Device 0, CC 10.3
+    Warning: Data collection happened without fixed GPU frequencies. Profiling results may be inconsistent.
+    Section: Warp State Statistics
+    ---------------------------------------- ----------- ------------
+    Metric Name                              Metric Unit Metric Value
+    ---------------------------------------- ----------- ------------
+    Warp Cycles Per Issued Instruction             cycle        10.04
+    Warp Cycles Per Executed Instruction           cycle        10.04
+    Avg. Active Threads Per Warp                                24.01
+    Avg. Not Predicated Off Threads Per Warp                    23.37
+    ---------------------------------------- ----------- ------------
+
+    OPT   Est. Local Speedup: 55.64%                                                                                    
+          On average, each warp of this workload spends 5.6 cycles being stalled waiting for a scoreboard dependency on 
+          a L1TEX (local, global, surface, texture) operation. Find the instruction producing the data being waited     
+          upon to identify the culprit. To reduce the number of cycles waiting on L1TEX data accesses verify the        
+          memory access patterns are optimal for the target architecture, attempt to increase cache hit rates by        
+          increasing data locality (coalescing), or by changing the cache configuration. Consider moving frequently     
+          used data to shared memory. This stall type represents about 55.6% of the total average of 10.0 cycles        
+          between issuing two instructions.                                                                             
+    ----- --------------------------------------------------------------------------------------------------------------
+    INF   Check the Warp Stall Sampling (All Samples) table for the top stall locations in your source based on         
+          sampling data. The Profiling Guide                                                                            
+          (https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#metrics-reference) provides more details    
+          on each stall reason.                                                                                         
+    ----- --------------------------------------------------------------------------------------------------------------
+    OPT   Est. Local Speedup: 26.96%                                                                                    
+          Instructions are executed in warps, which are groups of 32 threads. Optimal instruction throughput is         
+          achieved if all 32 threads of a warp execute the same instruction. The chosen launch configuration, early     
+          thread completion, and divergent flow control can significantly lower the number of active threads in a warp  
+          per cycle. This workload achieves an average of 24.0 threads being active per cycle. This is further reduced  
+          to 23.4 threads per warp due to predication. The compiler may use predication to avoid an actual branch.      
+          Instead, all instructions are scheduled, but a per-thread condition code or predicate controls which threads  
+          execute the instructions. Try to avoid different execution paths within a warp when possible.                 
+
+    Section: Source Counters
+    ------------------------- ----------- ------------
+    Metric Name               Metric Unit Metric Value
+    ------------------------- ----------- ------------
+    Branch Instructions Ratio           %         0.02
+    Branch Instructions              inst   12,247,040
+    Branch Efficiency                   %        94.61
+    Avg. Divergent Branches      branches       899.46
+    ------------------------- ----------- ------------
+

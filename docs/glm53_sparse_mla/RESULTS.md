@@ -92,12 +92,15 @@ B300 physical GPU1; b8192, H64, D576/512, TopK2048, chunk3. Each row is a paired
 | v091 | 1820.90 | 1691.81 | 0.9291x | 118 | 0.00 / 0.00 | 28.73% | bitwise v090, full2seeds/short/masks; FP8 limits retained |
 | v092 | 2005.18 | 1691.81 | 0.8437x | 96 | 0.00 / 0.00 | 38.15% | bitwise v075 on all8192 rows, seed1234 |
 | v093 | 1876.19 | 1691.84 | 0.9017x | 124 | 0.00 / 0.00 | 27.79% | bitwise v090 on full seed1234/mask; slower |
-| v094 | 1816.99 | 1691.71 | 0.9311x | 120 | 0.00 / 0.00 | 28.74% | bitwise v091, full2seeds/short/masks; FP8 limits retained |
+| v094 | 1816.99 | 1691.71 | 0.9311x | 120 | 0.00 / 0.00 | 28.74% | bitwise validated predecessor, full2seeds/short/masks; FP8 limits retained |
 | v095 | 1816.64 | 1691.84 | 0.9313x | 118 | 0.00 / 0.00 | 28.81% | full seed1234 bitwise equivalence; see iteration log |
-| v096 | 1761.38 | 1691.74 | 0.9605x | 118 | 0.00 / 0.00 | 29.31% | bitwise v091, full2seeds/short/masks; FP8 limits retained |
-| v097 | 1749.06 | 1691.90 | 0.9673x | 120 | 0.00 / 0.00 | 29.51% | full seed1234 bitwise equivalence; see iteration log |
+| v096 | 1761.38 | 1691.74 | 0.9605x | 118 | 0.00 / 0.00 | 29.31% | bitwise validated predecessor, full2seeds/short/masks; FP8 limits retained |
+| v097 | 1749.06 | 1691.90 | 0.9673x | 120 | 0.00 / 0.00 | 29.51% | bitwise validated predecessor, full2seeds/short/masks; FP8 limits retained |
+| v098 | 1924.90 | 1691.71 | 0.8789x | 118 | 0.00 / 0.00 | 39.41% | bitwise v075, full2seeds/short/masks; higher precision |
+| v099 | 1968.35 | 1691.71 | 0.8595x | 80 | 70.13 / 32.55 | 26.18% | bitwise v097 full seed1234/mask; spills; slower |
+| v100 | 1931.39 | 1691.58 | 0.8758x | 122 | 0.00 / 0.00 | 39.26% | bitwise v098 full seed1234/mask; no gain |
 
-Raw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. v090/v091/v094/v096 have an observed sustained warm advantage in the extended eager-event, Graph and rotating-order runs, at baseline-level FP8 precision; v096 is the current fast path. Short five-event tuning still favors TRT; use the matching execution regime. v086 is near parity warm and its initial cold advantage does not reproduce in its rotating-order audit.
+Raw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. v090/v091/v094/v096/v097 have an observed sustained warm advantage in the extended eager-event, Graph and rotating-order runs, at baseline-level FP8 precision; v097 is the current fast path. Short five-event tuning still favors TRT; use the matching execution regime. v086 is near parity warm and its initial cold advantage does not reproduce in its rotating-order audit.
 
 ## CUDA Graph validation runs
 
@@ -151,6 +154,10 @@ These are separate warm/cold runs with 20 warmups and 100 repeats; sampled row c
 | v094 | 512 | cold | 1827.62 | 1927.14 | 1.0545x |
 | v096 | 512 | warm | 1806.54 | 1880.22 | 1.0408x |
 | v096 | 512 | cold | 1796.08 | 1920.86 | 1.0695x |
+| v097 | 512 | warm | 1794.08 | 1869.82 | 1.0422x |
+| v097 | 512 | cold | 1783.62 | 1918.70 | 1.0757x |
+| v098 | 512 | warm | 2056.35 | 1871.82 | 0.9103x |
+| v098 | 512 | cold | 2037.58 | 1918.86 | 0.9417x |
 
 ## Extended eager CUDA-event runs
 
@@ -166,6 +173,10 @@ These are separate warm/cold runs with 20 warmups and 100 repeats; sampled row c
 | v094 | 512 | cold | 1837.06 | 1923.28 | 1.0469x |
 | v096 | 512 | warm | 1806.46 | 1886.18 | 1.0441x |
 | v096 | 512 | cold | 1795.95 | 1916.88 | 1.0673x |
+| v097 | 512 | warm | 1787.86 | 1883.94 | 1.0537x |
+| v097 | 512 | cold | 1784.90 | 1929.81 | 1.0812x |
+| v098 | 512 | warm | 2051.90 | 1887.10 | 0.9197x |
+| v098 | 512 | cold | 2043.68 | 1916.66 | 0.9378x |
 
 ## Same-process rotating-order audits
 
@@ -173,6 +184,10 @@ Ranges below are the minimum and maximum per-round medians or paired ratios, not
 
 | Audit | Candidate | Cache | Rounds | Candidate median range µs | Paired TRT/candidate range |
 |---|---|---|---:|---:|---:|
+| v075_v098_round_robin | cute-v075/native | warm | 3 | 2043.94–2046.66 | 0.9143–0.9177x |
+| v075_v098_round_robin | cute-v075/native | cold | 3 | 2047.81–2048.03 | 0.9091–0.9119x |
+| v075_v098_round_robin | cute-v098/native | warm | 3 | 2005.14–2013.14 | 0.9320–0.9347x |
+| v075_v098_round_robin | cute-v098/native | cold | 3 | 2009.02–2009.22 | 0.9266–0.9296x |
 | v086_v088_round_robin | cute-v086/native | warm | 3 | 1871.92–1872.16 | 0.9998–1.0000x |
 | v086_v088_round_robin | cute-v086/native | cold | 3 | 1878.13–1878.30 | 0.9881–0.9891x |
 | v086_v088_round_robin | cute-v088/native | warm | 3 | 2037.79–2037.89 | 0.9185–0.9186x |
@@ -195,5 +210,9 @@ Ranges below are the minimum and maximum per-round medians or paired ratios, not
 | v094_v096_round_robin | cute-v094/native | cold | 3 | 1826.93–1827.06 | 1.0166–1.0206x |
 | v094_v096_round_robin | cute-v096/native | warm | 3 | 1769.98–1771.74 | 1.0554–1.0601x |
 | v094_v096_round_robin | cute-v096/native | cold | 3 | 1767.50–1769.44 | 1.0498–1.0549x |
+| v096_v097_round_robin | cute-v096/native | warm | 3 | 1771.58–1771.63 | 1.0544–1.0601x |
+| v096_v097_round_robin | cute-v096/native | cold | 3 | 1767.82–1772.58 | 1.0479–1.0534x |
+| v096_v097_round_robin | cute-v097/native | warm | 3 | 1757.28–1761.38 | 1.0616–1.0676x |
+| v096_v097_round_robin | cute-v097/native | cold | 3 | 1755.33–1760.75 | 1.0549–1.0595x |
 
 See [ITERATIONS.md](ITERATIONS.md) for changes, failed hypotheses, correctness limits and source references.
