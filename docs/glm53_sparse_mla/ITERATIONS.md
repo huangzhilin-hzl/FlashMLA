@@ -799,3 +799,25 @@ Softmax can progress to the already-issued next QK while correction is running.
 Separate alpha and denominator storage prevents epilogue/last-correction aliasing.
 This further tests pipeline overlap while retaining two KV/S/P stages. Pending
 numerical, resource, and performance checks.
+
+### Iteration 029 result
+
+Smoke and full 8-row checks PASS. Paired warm medians: TRTLLM 1690.02 us,
+v029 3284.10 us (0.51461x). More warpgroup separation does not improve runtime.
+NCU: 128 registers, 202584 shared bytes, occupancy 17.468%, tensor active
+33.733%, eligible warps 0.30565, long scoreboard 7.00844. Local sectors zero;
+shared-load/store conflicts 7977472 / 47823. Diagnostic duration 5.23386 ms.
+Higher occupancy here includes more waiting/synchronizing work; it is not a
+throughput improvement. Keep v016 as the best measured candidate.
+
+## Iteration 030 — split 512-dimensional main storage from 64-dimensional tail
+
+File: `experiments/glm53_sparse_mla/kernel_v030.py`, based on v026.
+Use SW128 for Q/K's first 512 dimensions and SW64 for the remaining 64. Each
+four-index group now needs four 128-byte main gathers and one 64-byte tail
+gather, instead of nine 64-byte gathers. Two tensor maps share the same KV
+allocation; there is no expanded input copy. QK performs 16 K32 MMAs on the
+main descriptors and two on the tail descriptors, preserving accumulation
+order. PV consumes only the main 512-dimensional buffer. Total KV shared
+storage is unchanged. This isolates TMA issue count and memory-layout effects
+from the larger warpgroup pipeline experiments. Validation pending.
