@@ -60,7 +60,7 @@ for directory in sorted(root.glob("v[0-9][0-9][0-9]")):
     if version == "v113":
         status = "smoke/eight-row and qualified sanitizers pass; slower; no full audit"
     if version == "v114":
-        status = "full2seeds/short/masks PASS; current higher precision"
+        status = "full2seeds/short/masks PASS; earlier higher precision"
     if version in ("v115", "v116"):
         status = "bitwise predecessor full seed1234/mask; no short-run gain"
     if version in ("v117", "v118"):
@@ -80,7 +80,9 @@ for directory in sorted(root.glob("v[0-9][0-9][0-9]")):
     if version == "v127":
         status = "bitwise v112 full seed1234/mask; spills unchanged; slower"
     if version == "v128":
-        status = "bitwise v114 full seed1234/mask; extended validation pending"
+        status = "bitwise v114 full2seeds/short/masks; current higher precision"
+    if version == "v129":
+        status = "bitwise v125 full seed1234/mask; cache-policy validation pending"
     if version == "v109":
         status = "bitwise v105 full seed1234; slower overlap control"
     if version == "v098":

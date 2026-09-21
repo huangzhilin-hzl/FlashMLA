@@ -3919,3 +3919,53 @@ occupancy19.327%, tensor42.186%, eligible0.455513, long-scoreboard6.168872,
 zero local sectors, aggregate shared conflicts6480575/1448818, diagnostic
 3.083040 ms. Second-seed/short/synccheck and sustained performance validation
 are in progress before promotion.
+
+## Iteration 130 — evict-last priority for gathered KV
+
+Based on v125, keeping its normal output L2 priority to isolate the input policy.
+Create a fractional evict-last policy with fraction1.0 for the producer role and
+pass it through .L2::cache_hint on both KV gather4 copies. Query TMA descriptors,
+addresses, data, completion barriers and arithmetic are unchanged. This tests
+whether prioritizing the72MiB KV backing store reduces competition from streaming
+Q/output. Any additional policy/address registers and issue cost must be measured;
+a hint alone does not prove improved cache residency. The policy is created once
+per producer thread before the tile loop. Offline compilation and bounded/full
+bitwise tests precede any performance claim.
+
+PTX cp.async.bulk.tensor supports an optional64-bit cache policy following the
+completion barrier, with .L2::cache_hint. Source:
+https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#data-movement-and-conversion-instructions-cp-async-bulk-tensor
+
+### Profiling caveat for v125's256-bit output stores
+
+SourceCounters reports theoretical global STG sectors524288 for v125 versus
+16777216 for v112, despite both writing the same512MiB output. The former equals
+the number of warp-level STG256 instructions and is inconsistent with the full
+32 active lanes'32-byte stores. Do not interpret this32x difference as actual
+memory-traffic reduction; it appears to be a theoretical-source-counter limitation
+for this opcode/instrumentation path. Hardware memory counters are needed to
+assess cache-policy experiments. The shared-wavefront reduction comes from the
+removed shared transpose and is a separate metric.
+
+### Iteration 128 promotion — direct writeback retains higher precision
+
+Both full8192 seeds1234/5678 and full1024 short/chunk0 seed5678 match v114
+bitwise in three repeats, along with masked equality/reference pass and qualified
+b2 synccheck/b512 memcheck. Eager20/100 warm/cold1941.71/1945.70 us versusTRT
+1880.22/1916.98 us; Graph1970.22/1945.54 us versusTRT1871.52/1916.35 us.
+Three-order warm medians (us):v1281922.99/1925.22/1923.31,
+v1141939.60/1939.54/1939.66,TRT1869.34/1878.03/1882.32. Cold v128
+1916.94/1916.85/1917.02 versusv1141929.12/1927.20/1927.39 andTRT1857.57/
+1865.76/1857.36. Promote v128 for improvement in every recorded ordering,
+retaining its remaining performance gap toTRT and the audited higher precision.
+
+### Iteration 129 initial result — output cache priority nearly ties
+
+Offline REG85/STACK0; SASS shows STG.E.NA.EFL2.256 in place of v125's ENL2.
+Full8192 seed1234 output bits and masked bits match v125, with qualified b512
+memcheck reporting zero errors. Short warm1646.72 us versusTRT1693.63 us is
+only about2 us belowv125. NCU base/stable:85 registers,194920 shared bytes,
+occupancy19.311%, tensor31.398%, eligible0.388990, long-scoreboard6.191804,
+zero local sectors, aggregate shared conflicts6372695/1916474, diagnostic
+2.815552 ms. No sustained-gain claim until rotating orders and hardware memory
+counters assess the cache policy. Extra seed/short audits are not yet performed.
