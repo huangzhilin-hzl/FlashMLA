@@ -113,6 +113,13 @@ B300 physical GPU1; b8192, H64, D576/512, TopK2048, chunk3. Each row is a paired
 | v112 | 1669.31 | 1693.76 | 1.0146x | 85 | 0.00 / 0.00 | 30.99% | same9/6 full-seed failures asTRT; current fast path |
 | v113 | 2177.28 | 1691.65 | 0.7770x | 92 | 0.00 / 0.00 | 23.63% | smoke/eight-row and qualified sanitizers pass; slower; no full audit |
 | v114 | 1828.93 | 1691.78 | 0.9250x | 122 | 0.00 / 0.00 | 41.67% | full2seeds/short/masks PASS; current higher precision |
+| v115 | 1677.60 | 1691.84 | 1.0085x | 85 | 0.00 / 0.00 | 30.82% | bitwise predecessor full seed1234/mask; no short-run gain |
+| v116 | 1835.04 | 1693.47 | 0.9229x | 122 | 0.00 / 0.00 | 41.45% | bitwise predecessor full seed1234/mask; no short-run gain |
+| v117 | 2068.80 | 1691.58 | 0.8177x | 101 | 0.00 / 0.00 | 25.85% | smoke/eight-row and qualified sanitizers pass; slower; no full audit |
+| v118 | 1898.53 | 1692.22 | 0.8913x | 112 | 0.00 / 0.00 | 27.15% | smoke/eight-row and qualified sanitizers pass; slower; no full audit |
+| v119 | 1714.18 | 1691.65 | 0.9869x | 128 | 0.00 / 0.01 | 30.28% | bitwise v112 full seed1234/short; slower |
+| v120 | 1831.14 | 1691.71 | 0.9239x | 122 | 0.00 / 0.00 | 41.55% | bitwise v114 full seed1234/mask; no short-run gain |
+| v121 | 1784.00 | 1691.84 | 0.9483x | 128 | 71.67 / 41.19 | 28.93% | bitwise v112 full seed1234/mask; spills; slower |
 
 Raw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. v090/v091/v094/v096/v097/v105/v108/v112 have an observed sustained warm advantage in the extended eager-event, Graph and rotating-order runs, at baseline-level FP8 precision; v112 is the current fast path. Short five-event v112 tuning has a small observed advantage; v105 is near parity. Use the matching execution regime and retained distributions. v086 is near parity warm and its initial cold advantage does not reproduce in its rotating-order audit.
 

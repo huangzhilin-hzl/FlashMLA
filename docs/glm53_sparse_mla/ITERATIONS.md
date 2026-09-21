@@ -3563,3 +3563,219 @@ continue to motivate pipeline/granularity work rather than a bank-layout fix.
 SASS already lowers the per-thread MAX reduction into an FMNMX3.NAN tree,
 so v115/v116 are compiler-scheduling experiments; the original maximum is
 not a fully serial32-operation chain. Their gain is therefore uncertain.
+
+### Iterations 115/116 result — maximum trees do not improve
+
+Both retain full8192 seed1234 output bits relative to v112/v114 in three repeats;
+masked outputs also match (v115 retains86 failures, v116 passes), and qualified
+b512 memcheck reports zero errors. Short warm v1151677.60 us versusTRT1691.84 us,
+v1161835.04 us versusTRT1693.47 us regress by about8/6 us from their respective
+predecessors. No promotion or second-seed/short/extended expansion.
+
+NCU base/stable v115:85 registers,194920 shared bytes, occupancy19.224%,
+tensor30.818%, eligible0.403568, long-scoreboard5.866403, zero local sectors,
+aggregate shared conflicts6320404/1911987, diagnostic2.868320 ms. v116:
+122 registers,203080 shared bytes, occupancy19.240%, tensor41.454%, eligible
+0.473865, long-scoreboard5.909734, zero local sectors, aggregate shared
+conflicts6462082/1328559, diagnostic3.140160 ms. The compiler's original
+three-input MAX tree already offers parallelism; explicit binary reassociation
+has no measured latency benefit in these short runs.
+
+## Iteration 117 — N256 tiles with one KV stage in the dedicated pipeline
+
+Based on v112. Double the score/PV reduction tile to256 keys, with one147456-byte
+KV stage so shared memory stays within the SM limit. Retain416 threads and the
+dedicated MMA warp. Each producer loads two indices and publishes two validity
+ballots; each compute thread reads64 score columns and two mask words, using
+Rep64 for scores and retaining Rep32 correction/output loads. P becomes16KiB,
+QK uses M64N256, PV uses eight K32 steps per N256 output tile, and the probability
+sum becomes a64-value balanced tree. Keep the512-column TMEM allocation.
+
+This halves the number of QK instruction groups and softmax handshakes, but
+single-stage KV removes copy/compute overlap and prevents next QK until PV
+releases that stage. Older N256 experiments spilled in different role/compiler
+configurations; the dedicated issuer now permits a separate resource retest.
+Changed grouping requires independent accuracy audits if performance improves.
+Offline compilation, bounded reference/synchronization/memory checks precede
+full timing. Use --block-k256; no reduction in benchmark work or tolerances.
+
+## Iteration 118 — one compute warp group in the dedicated fast path
+
+Based on v112. Keep N128/two KV stages, but use128 compute threads,128 producer
+threads and32 MMA threads (288 total). Each compute thread owns64 scores and
+eight Rep32 output/correction chunks. P-ready and compute named barriers now
+count128 threads, with two partial maxima/sums per head. Producer barriers
+remain separate128-thread barriers. Score loads use Rep64 and output stores
+still cover every64x512 BF16 value, with the physical TMEM N256 tile split
+explicitly preserved in the channel mapping.
+
+This trades less warp-level instruction/synchronization work for more registers
+and work per compute thread. The two-way final denominator reduction changes
+rounding, so precision is not inherited. No dynamic register redistribution or
+undersized TMEM allocation is used. Offline resources and bounded validation
+are pending before full performance/precision claims.
+
+## Iteration 119 — persistent grid with the dedicated issuer
+
+Based on v112 and the phase-carry mechanism already tested in v062. Launch at
+most148 CTAs on the148-SM B300, striding across query rows while retaining the
+512-column TMEM allocation and shared allocations. Initialize barriers once;
+carry the absolute tile count across rows for full/empty/QK/PV/P-ready phase
+selection and toggle Q's phase per query. Running maximum/sum and first-PV
+accumulation still reset per query. A CTA-wide fenced barrier drains all roles
+and the output transpose alias before the next query. Deallocate TMEM only
+at CTA exit, with no dynamic register redistribution.
+
+The hypothesis is lower per-query allocation/CTA setup cost in the newer
+pipeline; v062's older compute/issuer schedule did not demonstrate a gain.
+Register pressure and the additional CTA rendezvous can outweigh savings.
+Bounded b512/chunk0 validation must cover multiple queries per CTA and varying
+stage phases, followed by full bitwise audits if promising. No input data or
+cross-query scores/KV values are reused. Offline resources are pending.
+
+NVIDIA CUTLASS describes pipelining as a way to hide memory latency when large
+storage requirements constrain occupancy, and explicitly discusses the tradeoff
+between tile size and available concurrency. This is background for the N64,
+N256 and warp-count experiments, not evidence that any particular candidate
+must improve: https://docs.nvidia.com/cutlass/latest/media/docs/cpp/efficient_gemm.html
+
+### Iteration 117 result — single-stage N256 loses overlap
+
+Offline REG101/STACK0; bounded reference/eight-row checks and qualified b2
+synccheck/b512 memcheck pass. Short warm2068.80 us versusTRT1691.58 us is
+slower thanv1121669.31 us. NCU base/stable:101 registers,203096 shared bytes,
+occupancy19.306%, tensor25.847%, eligible0.255136, long-scoreboard10.581799,
+zero local sectors, aggregate shared conflicts180/47868, diagnostic3.415968 ms.
+This version avoids the spills of older N256 candidates but still regresses;
+reduced issue/handshake count does not compensate for lost KV overlap. The
+large drop in aggregate shared conflicts does not imply a faster kernel.
+No expanded accuracy or sustained performance audit; reject for this workload.
+
+### Iteration 118 result — halving compute warps reduces throughput
+
+Offline REG112/STACK0; bounded reference/eight-row checks and qualified b2
+synccheck/b512 memcheck pass. Short warm1898.53 us versusTRT1692.22 us is
+slower thanv112. NCU base/stable:112 registers,194408 shared bytes, occupancy
+13.006%, tensor27.147%, eligible0.261547, long-scoreboard5.136814, zero local
+sectors, aggregate shared conflicts6602236/1063473, diagnostic3.258784 ms.
+No spills occur, but fewer active/eligible warps accompany the regression.
+Retain256 compute threads; no expanded accuracy/performance audit for v118.
+
+### Iteration 119 validation invocation correction
+
+Offline REG128/STACK8 and b2 smoke pass. An attempted b512/check-rows512 run
+failed inside the unchanged benchmark's reference selector because it includes
+row512, outside b512. This is a validation invocation error, not a kernel failure;
+the original log is preserved as v119_smoke_reuse_b512_reference_index.log.
+The corrected b1024 reuse smoke uses two rows, followed by full bitwise target/
+short comparisons and qualified b512 sanitizers with check-rows2. No benchmark
+source is edited and no failed precision result is discarded.
+
+## Iteration 120 — combine readiness and stage-release changes on v114
+
+Based on v114. Apply count256 per-thread P-ready publication and remove the
+post-PV compute barrier, retaining the before/after TC fences, shared async
+fence, issuer acquire and each compute warp's PV-completion wait. Both high and
+residual P terms are published by their writing threads. This combines the
+v110/v111 changes after the balanced sum altered register allocation/scheduling;
+the earlier isolated gains were small and inconsistent. Arithmetic is unchanged.
+Require bounded synccheck/memcheck, full bitwise checks and measured performance;
+no gain or precision inheritance is assumed.
+
+## Iteration 121 — wider correction in the lower-register dedicated pipeline
+
+Based on v112. Use two Rep64 TMEM load/multiply/store correction chunks in
+place of four Rep32 chunks, while preserving the independent Rep32 output
+transpose from v101. Earlier v101 spilled and v103's register redistribution
+removed spills without an improvement in its older pipeline. The dedicated
+issuer reduced register pressure, motivating a fresh resource/performance test.
+All arithmetic, probability sums, masks and synchronization stay unchanged.
+No dynamic register redistribution is requested; inspect actual allocation and
+local traffic before interpreting timing. Offline/bounded validation pending.
+
+## Iteration 122 — register-budget control for Rep64 correction
+
+Based on v121. Add an explicit one-block launch bound and request32 registers
+for the five producer/issuer warps and192 for the eight compute warps. Required
+registers are160*32+256*192=54272. Do not launch until the compiled initial
+allocation (including hardware allocation granularity) can support this budget
+and SASS confirms the redistribution instructions. This isolates the effect
+of v121's measured spills; success is not assumed from the source request.
+Offline compilation requires initializing only the authorized GPU1 context.
+
+### Iteration 119 result — persistence does not improve this pipeline
+
+Full8192 seed1234 and full1024 short/chunk0 seed5678 outputs match v112 bitwise
+in three repeats each; qualified b512 synccheck/memcheck report zero errors.
+Corrected reuse smoke and eight target rows pass. Short warm1714.18 us versus
+TRT1691.65 us is about45 us slower thanv112. NCU base/stable:128 registers,
+194920 shared bytes, occupancy20.310%, tensor30.281%, eligible0.392454,
+long-scoreboard6.137702, local load/store sectors0/7696, aggregate shared
+conflicts6502984/1390528, diagnostic2.917056 ms. The small local-store count
+is retained as evidence, without assigning the full regression to it. No
+promotion or second-seed/extended validation.
+
+### Iteration 120 result — combined synchronization does not improve v114
+
+Full8192 seed1234 output bits match v114 in three repeats; masked bits match
+and retain a reference tolerance pass. Qualified b2 synccheck/b512 memcheck
+report zero errors. Short warm1831.14 us versusTRT1691.71 us is slightly slower
+thanv1141828.93 us. NCU base/stable:122 registers,203080 shared bytes,
+occupancy19.235%, tensor41.546%, eligible0.456099, long-scoreboard6.086062,
+zero local sectors, aggregate shared conflicts6884712/1376198, diagnostic
+3.130240 ms. No promotion or additional full-seed/extended audit.
+
+### Iteration 121 result — Rep64 correction still spills
+
+Full8192 seed1234 output bits and masked bits match v112, preserving its known
+FP8 limits. Qualified b2 synccheck/b512 memcheck report zero errors. Offline
+REG128/STACK64. Short warm1784.00 us versusTRT1691.84 us regresses. NCU
+base/stable:128 registers,194920 shared bytes, occupancy19.172%, tensor28.925%,
+eligible0.389745, long-scoreboard5.870859, local sectors71670496 loads /
+41190648 stores, aggregate shared conflicts6973218/1846090, diagnostic
+3.056992 ms. Reject this unbounded-register variant; v122 explicitly tests
+whether removing spills changes the outcome.
+
+## Iteration 123 — correction warps cover16 heads instead of32
+
+Based on v112. Keep the entire QK/softmax/P path and Rep32 output epilogue.
+Change only correction's TMEM copy to16x64b.x32, with two lanes per head and
+four64-column chunks. A sparse DP layout selects0..15 of each32-DP region
+for group0 and16..31 for group1. Warp-local shuffle obtains the corresponding
+head's already-computed correction factor. Each warp's identity vote now covers
+16 heads, allowing unaffected subsets to skip correction more often without
+changing arithmetic or skipping any required output update.
+
+CUTLASS copy_traits_sm100.hpp defines the16dp64b32x destination mapping.
+The proposed offline audit checks all load/store coordinates and complete
+128-DP x256-column output coverage, plus every factor's source lane. Extra
+shuffle/address work can outweigh fewer active correction warps. Retain the
+full512-column allocation, all TC fences and the count256 P-ready handshake.
+Require layout audit, bounded reference/sanitizers and full bitwise comparison
+before precision inheritance; offline compilation is pending.
+
+### Iteration 122 compile failure and warpgroup constraint
+
+The NVVM backend fails while compiling v122; the log supplies no detailed
+backend cause. No candidate kernel was launched. Separately, reviewing its
+register protocol against PTX exposes an incomplete final warpgroup in the
+416-thread block. PTX requires all warps in a warpgroup to execute the same
+setmaxnreg instruction; the source's register-total calculation alone is
+insufficient to establish a valid redistribution protocol. Reject v122 as a
+launchable candidate and retain its compiler failure. The incomplete group
+is a design concern, not a proven explanation for NVVM's generic error.
+
+Source: https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#miscellaneous-instructions-setmaxnreg
+The16-DP correction coordinate/load-store/coverage/shuffle audit passed offline
+before v123 compilation. This validates mapping only, not runtime correctness.
+
+## Iteration 124 — complete warpgroups for the register-budget control
+
+Based on v122. Pad the CTA to512 threads so all four warpgroups are complete.
+Warps0..7 request192 registers; warps8..15 request32. Only8..11 produce TMA
+and warp12 issues MMA, while13..15 exit after the common setup/register step.
+Keep the416-thread version's effective compute/producer/issuer work unchanged.
+The required budget is256*192+256*32=57344 registers; initial allocation and
+SASS must still be inspected before any launch. Additional setup/idle warps
+are a changed resource cost, so this is not a perfectly isolated spill control.
+Offline compilation is pending; no safety or performance claim yet.

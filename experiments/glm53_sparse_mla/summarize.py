@@ -61,6 +61,16 @@ for directory in sorted(root.glob("v[0-9][0-9][0-9]")):
         status = "smoke/eight-row and qualified sanitizers pass; slower; no full audit"
     if version == "v114":
         status = "full2seeds/short/masks PASS; current higher precision"
+    if version in ("v115", "v116"):
+        status = "bitwise predecessor full seed1234/mask; no short-run gain"
+    if version in ("v117", "v118"):
+        status = "smoke/eight-row and qualified sanitizers pass; slower; no full audit"
+    if version == "v119":
+        status = "bitwise v112 full seed1234/short; slower"
+    if version == "v120":
+        status = "bitwise v114 full seed1234/mask; no short-run gain"
+    if version == "v121":
+        status = "bitwise v112 full seed1234/mask; spills; slower"
     if version == "v109":
         status = "bitwise v105 full seed1234; slower overlap control"
     if version == "v098":
