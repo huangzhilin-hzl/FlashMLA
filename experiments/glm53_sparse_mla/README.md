@@ -16,7 +16,10 @@ shapes and `--local-tokens 8192` configuration identify the actual workload.
 
 ## Run in the authorized pod
 
-Run GPU experiments sequentially. The selected UUID is physical GPU1 of
+Run GPU experiments sequentially. `check_gpu_idle.py` performs two read-only
+utilization/memory checks before each `run_iteration.sh` invocation and refuses
+timing/profiling if GPU1 is busy; it never terminates another process. Run this
+preflight manually before other GPU validation commands too. The selected UUID is physical GPU1 of
 `molou/molou-glm53-tp8-ep8-3048-0920`, container `server`. CUDA exposes that
 selected GPU as logical device 0. The remote directory is
 `/tmp/glm53_sparse_mla_dev`; Python is `/opt/sglang/bin/python`.
@@ -57,6 +60,9 @@ That is not exhaustive validation of all rows, shapes or quantization scales.
 
 The extra b1024/chunk0/seed5678 test fails the original tolerance for both v013
 and TRTLLM; the failed numerical checks remain explicit in the iteration log.
+The added v031 internal-hole/short-sequence test matches v020 bitwise but
+fails the original FP32 tolerance; that is not a numerical pass. v033 timing
+is non-isolated due to another GPU1 workload; do not rank that event result.
 Memory checks and numerical checks are recorded separately. v002/v003 have an
 undersized TMEM allocation and are retained only as rejected historical
 experiments; `kernel_v004_unsafe.py`, v021/v022 (failed numerical layout experiments), and diagnostic files are also not candidates.

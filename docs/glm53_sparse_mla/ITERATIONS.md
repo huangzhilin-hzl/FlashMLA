@@ -821,3 +821,92 @@ main descriptors and two on the tail descriptors, preserving accumulation
 order. PV consumes only the main 512-dimensional buffer. Total KV shared
 storage is unchanged. This isolates TMA issue count and memory-layout effects
 from the larger warpgroup pipeline experiments. Validation pending.
+
+### Iteration 030 result
+
+Smoke/full 8-row checks PASS with unchanged numerical errors. Paired warm
+medians: TRTLLM 1691.90 us, v030 3041.60 us (approximately 0.556x). Reducing
+TMA issue count helps v026 modestly but does not beat the stable v016 result.
+NCU: 126 registers, 193840 shared bytes, occupancy 10.810%, tensor active
+33.831%, eligible warps 0.23108, long scoreboard 4.61079; local sectors zero.
+Shared-load/store conflicts 5357811 / 17526; diagnostic duration 5.221376 ms.
+
+## Iteration 031 — ballot-based fully valid tile path
+
+File: `experiments/glm53_sparse_mla/kernel_v031.py`, based on v030.
+Producer warps ballot their valid indices into eight shared Uint32 words
+(two stages). A compute thread whose two words are all ones skips the original
+64 individual shared validity reads; otherwise it retains per-element masking.
+This preserves internal negative-index holes, not just partial final tiles.
+
+Smoke/full 8-row checks PASS. Paired warm medians: TRTLLM 1691.46 us,
+v031 2994.08 us (0.56493x). The 2 us difference from v016 is not evidence of
+a meaningful improvement. NCU: 192 registers (up from 126), 193872 shared
+bytes, occupancy 10.953%, tensor active 34.414%, eligible warps 0.24699,
+long scoreboard 4.30201; local sectors zero. Shared-load/store conflicts
+4775440 / 17219; diagnostic duration 5.134272 ms. The extra branch reduces
+validity reads but substantially increases compiler register requirements.
+
+### Explicit holes and short-sequence numerical check
+
+`validate_masks.py --kernel-version v031` constructs b2/chunk3 with ten internal
+holes in row0 and a length129 row1 with three holes (valid counts 2038 and 126).
+v031 and v020 produce bitwise identical outputs: zero unequal elements.
+The FP32-reference check at the unchanged atol=0.01/rtol=0.05 FAILS for 44 of
+65536 elements, max_abs 0.02133679 at row 1 / head 55 / channel 109. This establishes
+that the new mask path preserves the prior computation, not that this added
+short-sequence case meets tolerance. Retain the failure log under
+`artifacts/v031_validation`; no tolerance was relaxed. FP8-P numerical accuracy
+on short cases remains a limitation requiring a separate improvement.
+
+## Iteration 032 — 256-column output correction chunks
+
+File: `experiments/glm53_sparse_mla/kernel_v032.py`, based on v031.
+Replace eight 64-column TMEM correction chunks with two 256-column chunks,
+using Ld/St16x32bx2 Rep128. This reduces load/store wait boundaries while
+raising the correction fragment to 128 FP32 values per thread. The final
+coalesced epilogue is unchanged.
+
+Smoke/full 8-row checks PASS. Paired warm medians: TRTLLM 1691.65 us,
+v032 3031.30 us (0.55806x). NCU: 255 registers and local-load/store sectors
+30408704 / 13269340, demonstrating compiler spills. Shared 193872 bytes,
+occupancy 10.916%, tensor 33.978%, eligible 0.23941, long scoreboard 4.33177.
+Shared conflicts 4974824 / 17533; diagnostic 5.196512 ms. Larger chunks do not
+improve runtime and are not selected.
+
+## Iteration 033 — isolate correction size from mask-branch pressure
+
+File: `experiments/glm53_sparse_mla/kernel_v033.py`, based on v032.
+Remove the ballot/fully-valid branch and restore v030 elementwise validity
+checks while retaining 256-column correction chunks. This isolates whether
+the mask branch caused the large-chunk spill regression.
+
+Smoke/full 8-row checks PASS with the same errors as v030. NCU still reports
+255 registers and local sectors 33685504 / 18082152; the large correction
+fragments spill even without the mask branch. Shared 193840 bytes,
+occupancy 10.951%, tensor 34.899%, eligible 0.24119, long scoreboard 4.36837,
+shared conflicts 5242053 / 24798, diagnostic 5.091104 ms.
+
+**Timing contaminated by another GPU workload:** paired event medians jump
+to TRTLLM 4419.74 us and v033 8477.82 us; baseline p05 is 2242.16 us. After our
+commands completed, two read-only checks at 18:14:50/18:15:14 pod time found
+physical GPU1 at 100% utilization and 257665 MiB used, while this container
+had no Python/NCU process and NVML exposed no owning process. Treat this as
+non-isolated timing; do not rank its latency or interpret its profiled
+utilization against prior isolated runs. Preserve the raw evidence. GPU
+benchmarking waits for an available authorized GPU1; no other GPU or process
+is modified.
+
+## Iteration 034 — two compute warpgroups per tile (pending)
+
+File: `experiments/glm53_sparse_mla/kernel_v034.py`, based on v030.
+Use 384 threads: two 128-thread compute groups and the original 128-thread TMA
+producer. Each compute group owns all 64 heads and half of each 128-key score
+tile, reducing its score fragment to 32 FP32 values/thread. Two shared
+reductions merge head maxima and sums across the groups. Output correction
+and epilogue each split 512 channels into two 256-channel halves, retaining
+small 64-column TMEM copies. This trades two extra compute barriers for less
+per-thread softmax/correction work and more independently schedulable warps.
+The existing TMEM datapath ownership repeats across four-warp groups; only
+column offsets differ. Numerical/resource/performance validation is pending
+GPU1 availability. This file is not yet a validated candidate.

@@ -10,6 +10,10 @@ export CUDA_VISIBLE_DEVICES=GPU-2dc4b50c-07a5-26d6-f5ce-54ef728d56b2
 export CUTE_DSL_ARCH=sm_103a
 python_bin=/opt/sglang/bin/python
 mkdir -p artifacts
+"$python_bin" check_gpu_idle.py > "artifacts/${version}_gpu_preflight.log" 2>&1 || {
+  cat "artifacts/${version}_gpu_preflight.log"
+  exit 3
+}
 "$python_bin" -u bench.py --backends trtllm cute --kernel-version "$version" --block-k "$block_k" \
   --scope native --check-rows 8 --warmup-iters 3 --repeat-iters 5 --cache warm \
   --output-json "artifacts/${version}_full_event.json" \

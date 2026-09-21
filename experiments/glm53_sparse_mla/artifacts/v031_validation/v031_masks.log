@@ -1,0 +1,13 @@
+candidate_vs_v020 {'unequal': 0, 'max_abs': 0.0}
+valid_counts [2038, 126]
+fp32_reference {'max_abs': 0.021336786448955536, 'rmse': 0.0029361462220549583, 'atol': 0.01, 'rtol': 0.05}
+Traceback (most recent call last):
+  File "/tmp/glm53_sparse_mla_dev/validate_masks.py", line 39, in <module>
+    torch.testing.assert_close(candidate, reference, atol=0.01, rtol=0.05)
+  File "/opt/sglang/lib/python3.12/site-packages/torch/testing/_comparison.py", line 1631, in assert_close
+    raise error_metas[0].to_error(msg)
+AssertionError: Tensor-likes are not close!
+
+Mismatched elements: 44 / 65536 (0.1%)
+Greatest absolute difference: 0.021336786448955536 at index (1, 55, 109) (up to 0.01 allowed)
+Greatest relative difference: 1075.8809814453125 at index (1, 26, 255) (up to 0.05 allowed)
