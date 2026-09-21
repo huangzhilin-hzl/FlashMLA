@@ -261,3 +261,40 @@ in registers and exchange with an XOR-16 shuffle. All 128 threads participate,
 then vector-store FP8 P. Keep O correction and MMA unchanged. Diagnostic source
 and its coordinate mappings are preserved as `kernel_v007_diag.py`.
 Validation pending.
+
+### Concurrent memory-safety check
+
+Compute Sanitizer memcheck on v006, b512, full TopK/context, checked rows 0/511:
+PASS, **ERROR SUMMARY: 0 errors**. The sanitizer covers >1000 CTAs, exercising
+TMEM reuse and concurrent allocations. It does not replace full target numerical
+checks. Sanitizer timing is not a performance result.
+
+### Iteration 007 result
+
+Full b8192 8-row correctness PASS, max_abs 0.00686455, relative_RMSE 0.01479099.
+Paired warm event medians: TRTLLM 1691.71 us, v007 7694.37 us, ratio 0.21986x.
+NCU: 255 registers/thread, 78.604 KB shared memory, occupancy 12.439%, tensor
+active 22.513%, eligible warps/scheduler 0.45178, long scoreboard 1.66207.
+Shared store conflicts fall to 3288796 (98.4% lower than v006); shared load
+conflicts 14907443. But local load/store sectors rise to 579862528 / 22973288.
+Register spilling returned, offsetting much of the reduced shared traffic.
+NCU diagnostic duration 11.9897 ms.
+
+## Iteration 008 — smaller output register fragments
+
+File: `experiments/glm53_sparse_mla/kernel_v008.py`.
+Why: direct softmax leaves more per-thread state alive across the loop; loading
+128 FP32 output elements/thread at once crosses the register budget. Correct
+and write out O in 64-column subtiles (32 elements/thread), retaining O in
+TMEM between subtiles. The MMA shapes, number of CTAs and arithmetic stay
+unchanged. Hypothesis: eliminate local-memory traffic without restoring the
+conflicting shared-score buffer. Validation pending.
+
+## Iteration 009 — eliminate duplicated QK and sparse gather
+
+File: `experiments/glm53_sparse_mla/kernel_v009.py`.
+Why: two output CTAs repeat QK and gather the same selected KV. Assign the full
+512 outputs to one CTA, using two PV N tiles and one QK/softmax computation.
+Retain v008's small correction/epilogue fragments. O now needs 512 TMEM columns;
+S uses the complementary lanes. This trades concurrent TMEM users for less
+work, so measurement must decide whether it helps. Validation pending.
