@@ -2,7 +2,8 @@
 
 Independent CuTeDSL FP8 QK/PV kernels for the requested B300 workload:
 `b=8192, s_q=1, H=64, Dqk=576, Dv=512, TopK=2048`, unit-scale E4M3 Q/KV,
-BF16 output. Each numbered file preserves a measured iteration. These are
+BF16 output. Each numbered file preserves an iteration; the log distinguishes measured
+versions from pending prototypes and rejected experiments. These are
 experimental kernels, not an installed replacement for FlashMLA.
 
 - [Measured results](../../docs/glm53_sparse_mla/RESULTS.md)
@@ -71,3 +72,18 @@ Candidates use online softmax, FP8 probabilities and FP32 accumulators. They
 process the supplied sparse indices and do not call TRTLLM, FlashMLA, reference
 attention, or expand the KV cache. Current wrappers are scoped to the stated
 shape/layout and do not provide general API validation or LSE output.
+
+## Offline compilation
+
+While the authorized GPU is occupied, compile a TMA candidate with fake tensors:
+
+```bash
+CUDA_VISIBLE_DEVICES="" CUTE_DSL_ARCH=sm_103a /opt/sglang/bin/python \
+  compile_offline.py --kernel-version v034
+```
+
+This emits PTX/CUBIN for inspection without allocating or launching GPU work.
+Compilation and static resource reports are not runtime validation. Pending
+v034/v035 additionally make cross-thread TMEM ordering explicit with tcgen05
+fences. Earlier measured versions lack those explicit fences; their sampled
+passes do not establish safety for every compiler or execution schedule.

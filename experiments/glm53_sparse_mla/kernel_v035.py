@@ -1,4 +1,4 @@
-"""Iteration 034: two softmax warpgroups split each score tile and output channels.
+"""Iteration 035: packed TMEM probabilities and interleaved output lane halves.
 
 One CTA owns one query and all 512 output channels. Both PV N tiles reuse
 one QK/softmax computation and one gathered KV tile. No input expansion,
@@ -63,7 +63,7 @@ def make_kv_map(kv):
 
 class SparseMLA:
     def __init__(self, block_k=128):
-        assert block_k == 128, "v034 requires --block-k 128"
+        assert block_k == 128, "v035 requires --block-k 128"
         self.block_k = block_k
 
     @cute.jit
@@ -75,7 +75,7 @@ class SparseMLA:
                                       tcgen05.CtaGroup.ONE, (64, self.block_k))
         pv = bw.make_trivial_tiled_mma(fp8, OperandMajorMode.K,
                                       OperandMajorMode.MN, cutlass.Float32,
-                                      tcgen05.CtaGroup.ONE, (64, 256))
+                                      tcgen05.CtaGroup.ONE, (64, 256), a_source=tcgen05.OperandSource.TMEM)
         atom = tcgen05.make_smem_layout_atom(tcgen05.SmemLayoutAtomKind.K_SW128, fp8)
         tail_atom = tcgen05.make_smem_layout_atom(tcgen05.SmemLayoutAtomKind.K_SW64, fp8)
         qlayout = cute.tile_to_shape(atom, (64, 512), order=(0, 1))
@@ -86,7 +86,7 @@ class SparseMLA:
         vlayout = cute.tile_to_shape(atom, (256, self.block_k), order=(0, 1))
         self.kernel(q, kv, idx, lens, out, tensor_map, qk, pv,
                     qlayout, klayout, playout, vlayout, qtail_layout, ktail_layout).launch(
-                        grid=(q.shape[0], 1, 1), block=(384, 1, 1), stream=stream)
+                        grid=(q.shape[0], 1, 1), block=(256, 1, 1), stream=stream)
 
     @cute.kernel
     def kernel(self, q: cute.Tensor, kv: cute.Tensor, idx: cute.Tensor,
@@ -108,10 +108,7 @@ class SparseMLA:
                                         byte_alignment=128, swizzle=klayout.inner)
         sk_tail_base = alloc.allocate_tensor(cutlass.Float8E4M3FN, cute.make_layout(2 * ktbytes),
                                              byte_alignment=128, swizzle=ktail_layout.inner)
-        sp = alloc.allocate_tensor(cutlass.Float8E4M3FN, playout.outer, byte_alignment=128, swizzle=playout.inner)
         denom = alloc.allocate_tensor(cutlass.Float32, cute.make_layout(64))
-        partial_max = alloc.allocate_tensor(cutlass.Float32, cute.make_layout(128))
-        partial_sum = alloc.allocate_tensor(cutlass.Float32, cute.make_layout(128))
         valid_base = alloc.allocate_tensor(cutlass.Int32, cute.make_layout(2 * self.block_k))
         bar = alloc.allocate_array(cutlass.Int64, 1)
         holding = alloc.allocate_array(cutlass.Int32, 1)
@@ -132,8 +129,8 @@ class SparseMLA:
         load128 = cute.make_copy_atom(
             cute.nvgpu.cpasync.CopyG2SOp(cache_mode=cute.nvgpu.cpasync.LoadCacheMode.GLOBAL),
             cutlass.Float8E4M3FN, num_bits_per_copy=128)
-        if tid >= 256:
-            load_tid = tid - 256
+        if tid >= 128:
+            load_tid = tid - 128
             for row_block in cutlass.range(2, unroll_full=True):
                 h = load_tid // 4 + row_block * 32
                 for col_block in cutlass.range(8, unroll_full=True):
@@ -148,8 +145,8 @@ class SparseMLA:
             cute.arch.cp_async_commit_group()
             cute.arch.cp_async_wait_group(0)
         cute.arch.barrier()
-        if tid >= 256:
-            load_tid = tid - 256
+        if tid >= 128:
+            load_tid = tid - 128
             nvalid = lens[qi]
             for block in cutlass.range(cute.ceil_div(nvalid, self.block_k)):
                 stage = block % 2
@@ -168,7 +165,7 @@ class SparseMLA:
                 cute.arch.barrier(barrier_id=2, number_of_threads=128)
                 with cute.arch.elect_one():
                     for group in cutlass.range(8, unroll_full=True):
-                        row = (warp - 8) * 32 + group * 4
+                        row = (warp - 4) * 32 + group * 4
                         i0, i1 = valid[row], valid[row + 1]
                         i2, i3 = valid[row + 2], valid[row + 3]
                         raw = cute.recast_ptr(sk.iterator)
@@ -181,48 +178,52 @@ class SparseMLA:
                                 i0, i1, i2, i3, full + stage)
                 cute.arch.barrier(barrier_id=2, number_of_threads=128)
         else:
-            cgroup = tid // 128
-            ctid = tid % 128
             tp = cute.arch.retrieve_tmem_ptr(cutlass.Float32, alignment=16,
                                             ptr_to_buffer_holding_addr=holding)
             sq_part = qk.get_slice(0).partition_A(sq)
-            sp_part = pv.get_slice(0).partition_A(sp)
             aq = qk.make_fragment_A(sq_part)
             aq_tail = qk.make_fragment_A(qk.get_slice(0).partition_A(sq_tail))
-            ap = pv.make_fragment_A(sp_part)
             cs = qk.make_fragment_C(qk.partition_shape_C((64, self.block_k)))
+            # Explicitly place the second N256 output tile in the other
+            # 16-lane half: O uses columns [0,256) across all datapaths.
             co_default = pv.make_fragment_C(pv.partition_shape_C((64, 512)))
-            co_layout = cute.make_layout(co_default.shape,
-                stride=(co_default.stride[0], co_default.stride[1], 256))
-            co = cute.make_tensor(co_default.iterator, co_layout)
-            assert tcgen05.find_tmem_tensor_col_offset(cs) <= 128
-            assert tcgen05.find_tmem_tensor_col_offset(co) <= 512
-            # PTX Layout F (M64) supports lane alignments 0 and 16.
-            # S occupies lanes [16:32] of each warp; O occupies [0:16].
-            # They overlap columns but never the same physical cells.
-            ts = cute.make_tensor(tp + (16 << 16), cs.layout)
+            co = cute.make_tensor(co_default.iterator, cute.make_layout(co_default.shape,
+                stride=(co_default.stride[0], co_default.stride[1], 16 << 16)))
+            assert tcgen05.find_tmem_tensor_col_offset(co) == 256
+            # QK scores use the lower lane half at [256,384). P is packed into
+            # [384,416), duplicated across both lane halves so each PV A/D pair
+            # has matching lane alignment as required by PTX Layout F.
+            ts = cute.make_tensor(tp + 256, cs.layout)
+            ap_layout = pv.make_fragment_A(pv.partition_shape_A((64, self.block_k))).layout
+            ap = cute.make_tensor(cute.recast_ptr(tp + 384, dtype=cutlass.Float8E4M3FN), ap_layout)
             to = cute.make_tensor(tp, co.layout)
             ts2 = ts[((None, None), 0, 0)]
             to2 = to[((None, None), 0, 0)]
-            # Both warpgroups own all heads, but disjoint 64-column score halves.
-            # TMEM physical datapath ownership repeats for each four-warp group.
-            score_layout = cute.make_layout((ts2.shape[0], 64),
-                                             stride=(ts2.stride[0], ts2.stride[1]))
-            score_half = cute.make_tensor(tp + (16 << 16) + cgroup * 64, score_layout)
+            # Each thread owns one head and half of the key columns. Lanes
+            # separated by 16 own the same head and exchange max/sum with shuffles.
             scopy = tcgen05.make_tmem_copy(cute.make_copy_atom(
-                tcgen05.copy.Ld16x32bx2Op(tcgen05.copy.Repetition(32)),
-                cutlass.Float32), score_half)
+                tcgen05.copy.Ld16x32bx2Op(tcgen05.copy.Repetition(self.block_k // 2)),
+                cutlass.Float32), ts2)
             ochunk_layout = cute.make_layout((to2.shape[0], 64),
                                              stride=(to2.stride[0], to2.stride[1]))
             ochunk = cute.make_tensor(tp, ochunk_layout)
             ocopy = tcgen05.make_tmem_copy(
                 bw.get_tmem_load_op((64, 64, self.block_k), utils.LayoutEnum.ROW_MAJOR,
                     cutlass.Float32, cutlass.Float32, (64, 64), False), ochunk)
-            st = scopy.get_slice(ctid)
-            ot = ocopy.get_slice(ctid)
-            src_s = st.partition_S(score_half)
-            coords_s = st.partition_D(cute.make_identity_tensor((64, 64)))
+            st = scopy.get_slice(tid)
+            ot = ocopy.get_slice(tid)
+            src_s = st.partition_S(ts2)
+            coords_s = st.partition_D(cute.make_identity_tensor((64, self.block_k)))
             rs = cute.make_fragment_like(coords_s, cutlass.Float32)
+            pfirst = ap[((None, None), 0, 0)]
+            p2 = cute.make_tensor(ap.iterator, cute.make_layout(
+                (pfirst.shape[0], self.block_k), stride=(pfirst.stride[0], pfirst.stride[1])))
+            pstore = tcgen05.make_tmem_copy(cute.make_copy_atom(
+                tcgen05.copy.St16x32bx2Op(tcgen05.copy.Repetition(16)),
+                cutlass.Float8E4M3FN), p2)
+            pt = pstore.get_slice(tid)
+            pcoords = pt.partition_S(cute.make_identity_tensor((64, self.block_k)))
+            packed_p = cute.make_fragment_like(pcoords, cutlass.Float8E4M3FN)
             coords_o = ot.partition_D(cute.make_identity_tensor((64, 64)))
             ro = cute.make_fragment_like(coords_o, cutlass.Float32)
             # This layout gives each lane the same head as its softmax data.
@@ -231,7 +232,7 @@ class SparseMLA:
                 tcgen05.copy.Ld16x32bx2Op(tcgen05.copy.Repetition(32)), cutlass.Float32), ochunk)
             cstore = tcgen05.make_tmem_copy(cute.make_copy_atom(
                 tcgen05.copy.St16x32bx2Op(tcgen05.copy.Repetition(32)), cutlass.Float32), ochunk)
-            ct = ccopy.get_slice(ctid)
+            ct = ccopy.get_slice(tid)
             ccoords = ct.partition_D(cute.make_identity_tensor((64, 64)))
             rc = cute.make_fragment_like(ccoords, cutlass.Float32)
             rowmax = cutlass.Float32(-1.0e30)
@@ -271,82 +272,71 @@ class SparseMLA:
                 for j in cutlass.range(cute.size(rs), unroll_full=True):
                     h, col = coords_s[j]
                     val = cutlass.Float32(-1.0e30)
-                    if valid[col + cgroup * 64] >= 0:
+                    if valid[col] >= 0:
                         val = rs[j] * (0.0625 * math.log2(math.e))
                     rs[j] = val
                 newmax = rs.load().reduce(cute.ReductionOp.MAX, rowmax, 0)
                 newmax = cute.arch.fmax(newmax, cute.arch.shuffle_sync_bfly(newmax, offset=16))
-                head = coords_s[0][0]
-                if ctid % 32 < 16:
-                    partial_max[cgroup * 64 + head] = newmax
-                tmem_before_sync()
-                cute.arch.barrier(barrier_id=1, number_of_threads=256)
-                tmem_after_sync()
-                newmax = cute.arch.fmax(partial_max[head], partial_max[64 + head])
                 correction = cute.math.exp2(rowmax - newmax, fastmath=True)
                 probs = cute.math.exp2(rs.load() - newmax, fastmath=True)
                 blocksum = probs.reduce(cute.ReductionOp.ADD, cutlass.Float32(0.0), 0)
                 blocksum += cute.arch.shuffle_sync_bfly(blocksum, offset=16)
-                if ctid % 32 < 16:
-                    partial_sum[cgroup * 64 + head] = blocksum
-                tmem_before_sync()
-                cute.arch.barrier(barrier_id=1, number_of_threads=256)
-                tmem_after_sync()
-                blocksum = partial_sum[head] + partial_sum[64 + head]
                 rowsum = rowsum * correction + blocksum
                 rowmax = newmax
-                packed_p = cute.make_rmem_tensor(cute.size(rs), cutlass.Float8E4M3FN)
                 packed_p.store((probs * 256.0).to(cutlass.Float8E4M3FN))
-                for j in cutlass.range(cute.size(rs) // 16, unroll_full=True):
-                    h, col = coords_s[j * 16]
-                    rvec = cute.make_tensor(packed_p.iterator + j * 16, cute.make_layout(16))
-                    svec = cute.make_tensor(sp.iterator + cute.assume(sp.layout((h, col + cgroup * 64)), divby=16),
-                                            cute.make_layout(16))
-                    cute.copy(store128, rvec, svec)
+                for lane_half in cutlass.range(2, unroll_full=True):
+                    p_dst = cute.make_tensor(cute.recast_ptr(tp + 384 + (lane_half * 16 << 16),
+                                             dtype=cutlass.Float8E4M3FN), p2.layout)
+                    cute.copy(pstore, packed_p, pt.partition_D(p_dst))
+                cute.arch.fence_view_async_tmem_store()
                 skip_correction = cute.arch.vote_all_sync(correction == 1.0)
                 if (block > 0) & (not skip_correction):
-                    for tile in cutlass.range(4, unroll_full=True):
-                        otile = cute.make_tensor(tp + cute.assume(cgroup * 256 + tile * 64, divby=64), ochunk_layout)
+                    for tile in cutlass.range(8, unroll_full=True):
+                        otile = cute.make_tensor(tp + cute.assume((tile % 4) * 64 + ((tile // 4) * 16 << 16), divby=64), ochunk_layout)
                         src_o = ct.partition_S(otile)
-                        dst_o = cstore.get_slice(ctid).partition_D(otile)
+                        dst_o = cstore.get_slice(tid).partition_D(otile)
                         cute.copy(ccopy, src_o, rc)
                         cute.arch.fence_view_async_tmem_load()
                         rc.store(rc.load() * correction)
                         cute.copy(cstore, rc, dst_o)
                         cute.arch.fence_view_async_tmem_store()
                 tmem_before_sync()
-                cute.arch.barrier(barrier_id=1, number_of_threads=256)
+                cute.arch.barrier(barrier_id=1, number_of_threads=128)
                 tmem_after_sync()
                 cute.arch.fence_view_async_shared()
                 if warp == 0:
-                    pv.set(tcgen05.Field.ACCUMULATE, block > 0)
-                    for k in cutlass.range(cute.size(ap, mode=[2]), unroll_full=True):
-                        cute.gemm(pv, to, ap[None, None, k], bv[None, None, k], to)
-                        pv.set(tcgen05.Field.ACCUMULATE, True)
+                    for ntile in cutlass.range(2, unroll_full=True):
+                        a_pv = cute.make_tensor(cute.recast_ptr(tp + 384 + (ntile * 16 << 16),
+                                               dtype=cutlass.Float8E4M3FN), ap_layout)
+                        pv.set(tcgen05.Field.ACCUMULATE, block > 0)
+                        for k in cutlass.range(cute.size(a_pv, mode=[2]), unroll_full=True):
+                            cute.gemm(pv, to[None, 0, ntile], a_pv[None, 0, k],
+                                      bv[None, ntile, k], to[None, 0, ntile])
+                            pv.set(tcgen05.Field.ACCUMULATE, True)
                     with cute.arch.elect_one():
                         tcgen05.commit(bar)
                 cute.arch.mbarrier_wait(bar, phase)
                 tmem_after_sync()
                 phase ^= 1
                 tmem_before_sync()
-                cute.arch.barrier(barrier_id=1, number_of_threads=256)
+                cute.arch.barrier(barrier_id=1, number_of_threads=128)
                 tmem_after_sync()
                 if tid == 0:
                     cute.arch.mbarrier_arrive(empty + stage)
-            if (cgroup == 0) & (ctid % 32 < 16):
+            if tid % 32 < 16:
                 denom[coords_s[0][0]] = rowsum
             tmem_before_sync()
-            cute.arch.barrier(barrier_id=1, number_of_threads=256)
+            cute.arch.barrier(barrier_id=1, number_of_threads=128)
             tmem_after_sync()
-            for tile in cutlass.range(4, unroll_full=True):
-                src_o = ot.partition_S(cute.make_tensor(tp + cute.assume(cgroup * 256 + tile * 64, divby=64), ochunk_layout))
+            for tile in cutlass.range(8, unroll_full=True):
+                src_o = ot.partition_S(cute.make_tensor(tp + cute.assume((tile % 4) * 64 + ((tile // 4) * 16 << 16), divby=64), ochunk_layout))
                 cute.copy(ocopy, src_o, ro)
                 cute.arch.fence_view_async_tmem_load()
                 for j in cutlass.range(cute.size(ro), unroll_full=True):
                     h, d = coords_o[j]
-                    out[qi, h, cgroup * 256 + tile * 64 + d] = (ro[j] / (denom[h] * 256.0)).to(cutlass.BFloat16)
+                    out[qi, h, tile * 64 + d] = (ro[j] / (denom[h] * 256.0)).to(cutlass.BFloat16)
             tmem_before_sync()
-            cute.arch.barrier(barrier_id=1, number_of_threads=256)
+            cute.arch.barrier(barrier_id=1, number_of_threads=128)
             tmem_after_sync()
             if warp == 0:
                 cute.arch.dealloc_tmem(tp, 512)

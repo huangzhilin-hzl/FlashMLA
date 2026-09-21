@@ -1,0 +1,5 @@
+score_layout (((16,4),128),1,1):(((65536,2097152),1),0,0)
+probability_fragment (((16,4),32),1,4):(((262144,8388608),1),0,32)
+probability_view ((16,4),128):((262144,8388608),1)
+output_layout (((16,4),256),1,2):(((65536,2097152),1),0,1048576)
+LAYOUT COORDINATE AUDIT PASS: 128 threads x 64 values

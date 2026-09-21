@@ -910,3 +910,86 @@ per-thread softmax/correction work and more independently schedulable warps.
 The existing TMEM datapath ownership repeats across four-warp groups; only
 column offsets differ. Numerical/resource/performance validation is pending
 GPU1 availability. This file is not yet a validated candidate.
+
+### Offline compilation while GPU1 is occupied
+
+The new `compile_offline.py` uses CuTe fake descriptors matching full b8192
+shapes/strides and `CUDA_VISIBLE_DEVICES=""`, with explicit SM103a. It allocates
+no input tensors and never calls the compiled function. v034 compiles
+successfully; cuobjdump reports REG90, STACK0, LOCAL0. The static SHARED1024
+field excludes dynamically allocated buffers and is not the total CTA shared
+memory size. Numerical and runtime checks remain pending. The GPU preflight
+correctly refused the v034 timing/profiling command while 257665 MiB remained
+allocated on GPU1; its log is preserved with the offline compilation evidence.
+
+## Iteration 035 — TMEM probabilities with matching A/D lane alignment (pending)
+
+File: `experiments/glm53_sparse_mla/kernel_v035.py`, based on v030.
+The preserved TRTLLM SASS contains PV-like MMA groups using a `tmem[...]`
+A operand (for example lines 3974–3978), while our candidates use SMEM A.
+This is a concrete data-path difference; the mnemonic alone still does not
+identify the PTX .ws qualifier or the full baseline algorithm.
+
+Use explicitly interleaved M64/N256 output fragments: the two N tiles occupy
+opposite 16-lane halves at columns [0,256), instead of 512 columns in one half.
+QK scores move to the lower lane half at [256,384). FP8 probabilities are packed
+into [384,416), duplicated across both lane halves; each PV N tile reads the
+copy matching its output lane alignment. The shared P buffer and its stores
+are removed. Correction/epilogue use the corresponding interleaved output
+addresses. MMA order within each output element and softmax math are unchanged.
+
+[NVIDIA PTX data-path layout documentation](https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#tcgen05-data-path-layout)
+requires matching A/D lane alignment for Layout F. Therefore simply placing
+P in the previously unused opposite lane half would be invalid. This version
+explicitly reserves disjoint S/P/O storage within 512 allocated TMEM columns.
+Offline layout/compile checks and GPU numerical/memory/performance validation
+are pending; no speedup is claimed.
+
+### Iteration 035 compile and layout audit corrections
+
+The initial compile failed because slicing only B's N mode left A/B with
+different ranks. Indexing the singleton M modes explicitly fixes the call.
+The first successful compile used 126 registers, zero stack/local bytes, and
+its probability packing audit matched all 128 threads × 64 logical values.
+However, inspecting the emitted output layout revealed that TMEM-A mode's
+default C fragment is NON-interleaved (N-tile stride 256), unlike the SMEM-A
+fragment used earlier. That would overlap the planned S/P region. Before
+any GPU launch, set the N-tile stride explicitly to 16<<16 and assert the
+output's physical column footprint is 256. The audit now checks this bound
+in addition to every score/probability coordinate. Preserve the initial
+compiler error and initial successful compile/audit logs, distinguished from
+the corrected candidate; initial compilation was not runtime validation.
+
+### Explicit cross-thread tcgen05 ordering
+
+The installed CuTe `fence_view_async_tmem_load/store` emits tcgen05.wait,
+which tracks completion. It does not insert the before/after-thread-sync
+fences described in the [PTX synchronization patterns](https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#tcgen05-memory-consistency-model).
+The emitted prototype PTX confirmed those fences were absent. Add explicit
+before/after fences around compute named barriers and an after fence after
+MMA-completion mbarrier waits in pending v034/v035. This makes cross-thread
+TMEM dependencies explicit; both versions need fresh compile and runtime
+validation. Earlier sampled numerical passes remain historical evidence,
+not proof that missing ordering is safe for all schedules/compiler versions.
+
+### Corrected offline results and next GPU checks
+
+Corrected v034 SHA256:
+`3af357d415de853e5557de0833df313bdc5828e90efcd207e4030351c4a45f3e`.
+Corrected v035 SHA256:
+`92bc7ab5a0a8af6e806c09e2d60859ea711b1b1d3ebb80febc6ed5aba70fc2bd`.
+Both compile with GPU visibility disabled. Static resources remain 90 and 126
+registers respectively, with STACK0/LOCAL0. PTX extracts preserve the explicit
+fences and TMEM instructions. The corrected v035 audit passes 8192 element
+coordinate comparisons and the 256-column O bound; its printed N-tile stride
+is 1048576 (16<<16), as intended. These checks establish compiler/layout
+properties only. Full GPU validation is still pending because GPU1 remains
+occupied by an apparent external workload.
+
+After GPU1 is available, the next bounded sequence is: preflight; b2 smoke
+checks for v034/v035; full b8192 paired events plus NCU for numerical survivors;
+expanded 64-row warm/cold Graph checks and device memcheck for any candidate
+that improves latency. Preserve original FP32 tolerances and explicitly
+retain the existing short-sequence numerical limitation. Re-run v033 timing
+only if it becomes useful for comparison; its spilled correction path is not
+currently preferred.
