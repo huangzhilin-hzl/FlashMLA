@@ -15,6 +15,7 @@ import benchmark_source as source
 parser = argparse.ArgumentParser()
 parser.add_argument('--kernel-versions', nargs='+', required=True)
 parser.add_argument('--include-trtllm', action='store_true')
+parser.add_argument('--block-k', type=int, choices=(64, 128, 256), default=128)
 parser.add_argument('--local-tokens', type=int, default=8192)
 parser.add_argument('--chunk', type=int, default=3)
 parser.add_argument('--seed', type=int, default=1234)
@@ -36,7 +37,7 @@ with torch.inference_mode():
         runners['trtllm'] = source.make_trtllm_case(inputs).run
     for version in args.kernel_versions:
         module = importlib.import_module(f'kernel_{version}')
-        runners[version] = module.make_runner(inputs, 128)
+        runners[version] = module.make_runner(inputs, args.block_k)
         result['cases'][version] = {'kernel_sha256': hashlib.sha256(Path(module.__file__).read_bytes()).hexdigest()}
     outputs = {name: run().reshape(args.local_tokens, 64, 512) for name, run in runners.items()}
     for name, output in outputs.items():

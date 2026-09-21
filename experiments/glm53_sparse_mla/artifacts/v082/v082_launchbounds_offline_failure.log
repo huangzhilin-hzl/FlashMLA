@@ -1,0 +1,30 @@
+{"version": "v082", "device_launch": false, "sha256": "05cc8776b4bfce34621bff44b6118b76da24ebc39d2d2b758cc67f66bba293b5"}
+Traceback (most recent call last):
+  File "/tmp/glm53_sparse_mla_dev/compile_offline.py", line 35, in <module>
+    compiled = cute.compile(module.SparseMLA(args.block_k), *tensors, make_fake_stream(),
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/glm53_sparse_mla_dev/kernel_v082.py", line 131, in __call__
+    qlayout, klayout, playout, vlayout, qtail_layout, ktail_layout).launch(
+                                                                    ^^^^^^^
+  File "/opt/sglang/lib/python3.12/site-packages/nvidia_cutlass_dsl/dsl_packages/cutlass/base_dsl/runtime/cuda.py", line 364, in checkCudaErrors
+    raise DSLCudaRuntimeError(error_code, error_name)
+cutlass.base_dsl.common.DSLCudaRuntimeError: 
+[91m[1merror:[0m CUDA_ERROR_NOT_INITIALIZED (error code: 3) 
+[91m❌ CUDA context not initialized.[0m
+
+ 
+
+[0m
+  [94m= note:[0m error code 3
+  [94m= note:[0m 
+- [1mError name: CUDA_ERROR_NOT_INITIALIZED
+- Error code: 3
+- CUDA_TOOLKIT_PATH: not set
+- Target SM ARCH: sm_103a (from env manager)[0m
+
+[94m📊 GPU Information:[0m
+[1m- CUDA initialization failed[0m
+  [92msuggestion:[0m 1. Check CUDA driver installation
+  [92msuggestion:[0m 2. call `cuda.cuInit(0)` before any other CUDA operation
+  [92msuggestion:[0m 3. Run nvidia-smi to confirm GPU status
+

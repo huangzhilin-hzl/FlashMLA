@@ -27,12 +27,16 @@ for directory in sorted(root.glob("v[0-9][0-9][0-9]")):
     traffic = "unmeasured" if loads is None or stores is None else f"{loads/1e6:.2f} / {stores/1e6:.2f}"
     tensor = number("sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed")
     status = "unsafe; rejected" if version in ("v002", "v003") else "prototype"
-    if version in ("v053", "v077"):
+    if version in ("v053", "v077", "v084"):
         status = "all 8192 rows PASS, seed1234"
-    if version in ("v066", "v067", "v069", "v075"):
+    if version in ("v066", "v067", "v069", "v075", "v081"):
         status = "all8192 rows PASS, seeds1234/5678"
     if version in ("v054", "v063"):
         status = "same 9 all-row failures as TRT"
+    if version in ("v085", "v086"):
+        status = "same 9/6 all-row failures as TRT, seeds1234/5678"
+    if version == "v087":
+        status = "bitwise v085 on all8192 rows, seed1234"
     if version == "v065":
         status = "bitwise v053 on all8192 rows, seed1234"
     if version in ("v049", "v051"):
@@ -40,7 +44,7 @@ for directory in sorted(root.glob("v[0-9][0-9][0-9]")):
     if version == "v033":
         status = "non-isolated timing; do not rank"
     print(f"| {version} | {candidate['median_us']:.2f} | {baseline['median_us']:.2f} | {candidate['speedup_vs_trtllm']:.4f}x | {metrics['launch__registers_per_thread']} | {traffic} | {tensor:.2f}% | {status} |")
-print("\nRaw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. No fully validated implementation has yet established a speedup over TRTLLM.\n")
+print("\nRaw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. No implementation has established a consistent sustained warm speedup over TRTLLM; v086 is near parity warm with a cold advantage in its recorded Graph run, at baseline-level FP8 precision.\n")
 graph_paths = sorted(root.glob("v[0-9][0-9][0-9]_validation/*_graph.json"))
 if graph_paths:
     print("## CUDA Graph validation runs\n")

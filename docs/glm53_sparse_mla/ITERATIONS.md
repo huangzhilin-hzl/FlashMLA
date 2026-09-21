@@ -2338,3 +2338,255 @@ conversion/subtraction: inspect whether SASS uses half2 arithmetic and avoids
 the FP8-to-FP16-to-FP32 reconstruction present inv075. The extra rounding and
 double-rounding boundaries require independent full-reference audits on both
 seeds and short/masked inputs. No inherited numerical claim. Pending.
+
+### Iteration 081 result — packed half arithmetic is not faster
+
+Offline REG109,STACK0. SASS has packed FP16 conversion and HADD2 subtraction,
+confirming the intended intermediate precision. b2/eight-row checks pass.
+Warm2021.57us versusTRT1691.81us is slower thanv075. NCU:109 registers,203064
+shared bytes,occupancy23.310%,tensor38.015%,eligible0.530033,long-scoreboard
+6.715946,zero local sectors,aggregate shared conflicts3618296/2990988,
+diagnostic3.422016ms.
+
+Independent full8192 audits pass both seeds1234/5678, with max_abs
+0.005918741/0.004814863 and relative_RMSE0.001750538/0.001750498. Slightly
+higher error and no speed benefit: no promotion or further edge validation.
+
+## Iteration 082 — M32/N64 split-head CTAs targeting two-CTA residency
+
+Each query launches two CTAs, each owning32 heads and all512 output channels.
+Use64-key tiles,128 compute threads and128 producers, and256 TMEM columns.
+Q takes18KiB, double KV72KiB, and two P buffers4KiB, allowing two CTAs in the
+B300 shared-memory budget if register/TMEM limits also permit it. Explicit
+producer32/compute192 requests28672 registers per CTA; verify the compiled
+initial pool before launching. Occupancy must be measured, not assumed.
+
+Q TMA descriptors fetch32 rows atquery*64+head_tile*32. LayoutG scores use16
+physical columns across128 DP lanes; output uses128 columns across twoN256
+tiles. Each compute thread handles16 scores and four32-value output chunks.
+PV uses two high/residualK32 steps perN tile, with two B collectors. The final
+32KiB output staging buffer aliases one KV-main stage.
+
+This doubles gathered KV traffic per query and increases MMA instruction count
+at smallerM/N, but permits independently scheduled CTAs. The experiment tests
+whether concurrency can outweigh those costs. Probability math followsv075;
+smaller tiles change online reduction and accumulation order. Layout audit,
+offline resource inspection, bounded smoke and full-reference checks pending.
+
+The initialv082 offline build (SHA c923dc13...) had REG64/STACK64 and no actual
+USETMAXREG instructions. Before any GPU launch, add min_blocks_per_mp=2 to
+make the intended residency explicit. Retain initial compile/resource/SASS
+records with an initial suffix; only the subsequent source SHA can receive
+runtime results. The launch-parameter change needs a fresh resource inspection.
+
+The explicit launch-bound compile requires CUDA device-attribute queries in
+this DSL and fails with CUDA_ERROR_NOT_INITIALIZED in the fully offline setup.
+Preserve that failure, and add an opt-in --initialize-cuda flag to the fake-
+tensor compiler. It creates a context only on the selected authorized GPU and
+launches no candidate kernel. Default compilation remains fully offline.
+This is a compilation-environment requirement, not a kernel correctness result.
+
+With the authorized device context and explicit .minnctapersm2, v082 compiles
+as REG128/STACK0 and retains actual USETMAXREG32/192. The28672-register role
+sum fits its32768-register launch pool. Runtime source SHA is05cc8776..., and
+all future measurements must use that SHA. This confirms the static resource
+plan only; actual two-CTA residency and throughput remain to be profiled.
+
+### Iteration 082 result — two CTAs fit, but the smaller-tile work is slower
+
+b2/eight-row target checks pass. Warm2861.12us versusTRT1691.68us. NCU:128
+registers,97464 shared bytes,occupancy24.040%,tensor26.109%,eligible0.492241,
+long-scoreboard6.966612,zero local sectors,aggregate shared conflicts
+21527486/22240316,diagnostic4.964096ms. Eight warps per CTA and achieved
+occupancy near24% demonstrate more than one CTA resident (one CTA alone
+would peak at12.5%). Concurrency does not offset this design's extra gather/
+MMA/loop work. No promotion or expanded accuracy claim for the rejected branch.
+
+## Iteration 083 — explicit launch bound with role register redistribution
+
+Based onv075, request one CTA per SM and place producer32/compute192 register
+hints inside the persistent role branches. Total requested57344 registers fits
+a65536-register CTA pool if the final CUBIN allocates128 per512-thread launch.
+Earlier hints without explicit launch bounds sometimes disappeared in SASS;
+inspect both instructions and launch resources before testing. Arithmetic and
+memory layout remain unchanged. Full bitwise comparison can assess numerical
+equivalence if the candidate improves performance. Pending.
+
+## Iteration 084 — balanced denominator contribution tree
+
+Based onv075. Replace the sequential32-value probability sum with an explicit
+five-level balanced pairwise tree. Thev075 source SASS shows a long FADD chain,
+some of which the compiler overlaps with PV completion. A shorter dependency
+chain may improve latency, but its scheduling/register cost must be measured.
+Probability quantization and PV accumulation are unchanged; denominator rounding
+changes, requiring independent FP32-reference validation. Pending.
+
+## Iteration 085 — exp2 scale folding on the baseline-precision path
+
+Applyv075's scale-folding idea tov054's single-P scale448 path. Compute
+exp2(score+(log2(448)-max)), accumulate the scaled denominator, quantize P
+directly, and normalize by the scaled sum. This removes the explicit P multiply.
+It uses exact running maxima, with no residual or relaxed-anchor window.
+
+This targets comparison at TRTLLM's FP8 probability precision. It is not a
+higher-precision replacement forv075. Non-power-of-two448 and exp2 rounding
+can change P quantization; full audits must report every failure alongside
+TRTLLM, without assumingv054's identical nine failures or changing tolerances.
+Offline, smoke, paired performance and full-reference comparison pending.
+
+v083 preflight: REG128,STACK0, actual USETMAXREG32/192, .minnctapersm1.
+The57344 role budget fits65536 initial registers. v084 preflight: REG118,
+STACK0. Both are ready for bounded runtime evaluation; no timing claim yet.
+
+### Iteration 083 result — register redistribution regresses
+
+The explicit launch bound retains USETMAXREG32/192 and REG128/STACK0, but
+warm latency rises to 2027.90 us versus paired TRT 1693.70 us. Smoke and the
+eight-row target check pass. NCU: 203064 shared bytes, occupancy 23.256%,
+tensor active 37.622%, eligible 0.545481, long-scoreboard 6.428361, zero local
+sectors, aggregate shared conflicts 4153511/4262370, diagnostic 3.456352 ms.
+No expanded numerical validation or promotion for this slower candidate.
+
+### Iteration 084 result — balanced sum gives no measured benefit
+
+Warm 1995.17 us versus TRT 1692.06 us, close to v075's 1990.94 us. NCU:
+118 registers, 203064 shared bytes, occupancy 23.314%, tensor active 38.311%,
+eligible 0.553669, long-scoreboard 6.533945, zero local sectors, aggregate
+shared conflicts 3442682/4653482, diagnostic 3.395424 ms. Independent full
+8192-row seed1234 audit passes all 268435456 elements: max_abs 0.005918741,
+relative_RMSE 0.001735969251. No promotion or second-seed/edge claim.
+
+### Iteration 085 initial result — scale folding improves the fast path
+
+Offline REG119/STACK0. Smoke/eight-row checks pass. Warm 1878.05 us versus
+TRT 1691.97 us improves on v054's 1900.90 us short run. NCU: 119 registers,
+194872 shared bytes, occupancy 23.307%, tensor active 27.763%, eligible
+0.530916, long-scoreboard 5.727432, zero local sectors, aggregate shared
+conflicts 3542133/4154715, diagnostic 3.182944 ms.
+
+Full 8192-row seed1234 audit has exactly the same nine failing coordinates
+and actual values as paired TRT, with unchanged atol0.01/rtol0.05. Both have
+max_abs 0.019369811; relative_RMSE is 0.01497933784 versus TRT 0.01497933767.
+79767 out of 268435456 BF16 elements differ from TRT (99.9703% bitwise equal).
+This is baseline-level FP8 precision, not a strict full-reference pass.
+Sustained Graph, a second full seed, device memcheck and masks are pending.
+
+## Iteration 086 — raw-score maxima and fused exp2 input on v085
+
+Keep maxima in raw QK units, scale their difference for accumulator correction,
+and form each exp2 input as raw_score*log2_scale + (log2(448)-max*log2_scale).
+This applies v077's arithmetic reassociation to the single-P fast path and
+may generate packed FFMA2 instead of separate multiply/add instructions.
+Exact running maxima and all synchronization/layouts remain unchanged.
+Changed FP32 rounding can affect quantization; full independent audits against
+FP32 and paired TRT are required for any promotion. Compilation and tests pending.
+
+## Iteration 087 — one producer barrier on v085
+
+Combine index publication and transaction expectation before one producer
+barrier and remove the end-of-iteration producer barrier, following v063.
+The two stages have disjoint indices, and reuse is protected by PV completion.
+Probability arithmetic and MMA ordering remain as v085. This tests composition
+of two small improvements; full bitwise comparison with v085 and memcheck will
+be required if timing improves. Compilation and tests pending.
+
+### Iteration 085 sustained timing and explicit accuracy limits
+
+512-row Graph validation passes: warm 1888.18 us versus TRT 1877.54 us;
+cold 1887.87 us versus TRT 1928.16 us. These are paired measurements with
+unlocked clocks: approximately tied warm and 2.1% faster cold in this run,
+not proof of a consistent warm speedup. Qualified b512 device memcheck
+(--report-api-errors no, as documented for this CUDA-Python environment)
+reports zero errors; its two sampled numerical rows also pass.
+
+The second full 8192-row seed5678 audit records six failures for both v085 and
+TRT, again with identical failing coordinates/values. max_abs 0.018071592,
+relative_RMSE 0.01498275861 versus TRT 0.01498275871; 84654 BF16 outputs differ
+(99.9685% equal). Neither full audit is a strict tolerance pass.
+
+The extra internal-hole/partial-tile input fails: 86/65536 elements for v085
+and v054, versus 78/65536 for TRT. Their max_abs values are 0.021799020 and
+TRT 0.025040984. v075 passes this input with max_abs 0.004001856. The fast-path
+agreement on the target workload must not be extrapolated to this case.
+The original failed validate_masks log is retained; audit_mask_precision.py
+adds paired diagnostics without suppressing failures or changing tolerance.
+
+## Iteration 088 — queue next QK after current PV commit
+
+Based on v085. Issue QK0 in a prologue. In each subsequent iteration warp0
+issues current PV and commits its completion barrier, then immediately queues
+QK(i+1) once the next KV stage is ready, before the compute warps wait and
+reconverge after PV. QK and PV have separate alternating-phase barriers.
+The next QK reuses the score buffer only after all compute threads have
+completed its TMEM loads and synchronized before current PV.
+
+Unlike v043/v074's QK-before-PV lookahead, this preserves PV priority and the
+eight-producer-warp layout. It targets the gap around PV completion, producer
+stage release and next-loop QK issue. Waiting for next KV could instead delay
+warp0's reconvergence and hurt producer progress; this is an explicit risk to
+measure. Arithmetic and per-output MMA accumulation order are unchanged.
+Offline resources, bounded smoke, full bitwise comparison and device memcheck
+are required before any promotion. Pending.
+
+### Iteration 086 result — near parity with TRT and closer output agreement
+
+Offline REG119/STACK0, with 16 packed FFMA2 instructions in SASS. Smoke and
+eight-row checks pass. Warm short events 1870.05 us versus TRT 1691.68 us.
+NCU: 119 registers, 194872 shared bytes, occupancy 23.286%, tensor active
+27.894%, eligible 0.470247, long-scoreboard 6.020044, zero local sectors,
+aggregate shared conflicts 3537829/4511887, diagnostic 3.168512 ms.
+
+512-row Graph: warm 1873.54 us versus TRT 1869.82 us (0.9980x); cold 1880.13 us
+versus 1946.53 us (1.0353x). These runs establish near parity warm and a cold
+advantage in this measurement, not a consistent warm speedup. The event/Graph
+baseline difference remains visible; do not mix ratios across timing regimes.
+
+Both full 8192-row seeds have the same failures as TRT: nine for1234 and six
+for5678, including every failing coordinate and actual value. Relative_RMSE
+0.01497933883/0.01498275746; max_abs 0.019369811/0.018071592. Only2503/2672
+of268435456 BF16 outputs differ from TRT, over99.999% bitwise equal. This is
+a strong equivalence observation for these inputs, not a full FP32 tolerance pass.
+
+The full1024-row chunk0/seed5678 test has7650 tolerance failures for both,
+max_abs0.057887435, relative_RMSE0.01523154806 versusTRT0.01523154989; only300
+of33554432 outputs differ. The ten stored failure examples match; the audit
+does not store every failure coordinate in this case. The masked input still
+fails86 elements versus TRT78. Qualified b512 memcheck reports zero errors,
+with both sampled numerical rows passing.
+
+Promote v086 as the target-workload baseline-precision performance candidate,
+with these explicit numerical limits. v075 remains the independently audited
+higher-precision option. Neither candidate establishes a sustained warm win.
+
+### Iteration 087 result — small event gain does not improve sustained timing
+
+Offline REG119/STACK0. Warm1872.22 us versusTRT1693.86 us; NCU:119 registers,
+194872 shared bytes, occupancy23.284%, tensor27.850%, eligible0.528822,
+long-scoreboard5.896641, zero local sectors, aggregate shared conflicts
+3973729/3797282, diagnostic3.173920 ms. Full8192-row seed1234 output matches
+v085 bitwise in all three repeats. Graph warm1889.58 us versusTRT1867.81 us,
+cold1882.14 us versusTRT1923.95 us. This does not improve on v085's sustained
+warm result. No separate short/masked/memcheck or second-seed claim; no promotion.
+
+v088 preflight: offline REG112/STACK0. Bounded smoke and device memcheck are
+running before the full performance/NCU evaluation.
+
+### Iteration 088 result — improved low-clock profile, worse measured latency
+
+Smoke/eight-row checks and qualified b512 memcheck pass. Full8192-row seed1234
+outputs match v085 bitwise in three repeats. Warm events2037.79 us versus
+TRT1690.85 us regress. Graph confirms warm2037.95 us versusTRT1872.11 us,
+cold2045.87 us versusTRT1924.62 us. No promotion.
+
+NCU at its diagnostic clock regime gives3.078816 ms, lower than v085's3.182944 ms,
+with112 registers,194880 shared bytes, occupancy23.446%, tensor28.719%, eligible
+0.553978, long-scoreboard4.584788, zero local sectors and aggregate shared
+conflicts435266/2654711. Improved profiled duration/stall ratios do not establish
+an unprofiled speedup. A rotating-order same-process benchmark of v086/v088/TRT
+will check this discrepancy and the small v086/TRT gap without changing clocks.
+
+bench_round_robin.py reuses the original measure_case implementation, rotates
+backend order each round, checks512 rows before timing, and records raw samples
+plus GPU telemetry at measurement endpoints. Endpoint clocks do not reveal
+frequency throughout a kernel. This supplemental experiment must remain separate
+from the original paired results and cannot replace them selectively.

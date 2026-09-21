@@ -79,8 +79,16 @@ B300 physical GPU1; b8192, H64, D576/512, TopK2048, chunk3. Each row is a paired
 | v078 | 1988.64 | 1693.76 | 0.8517x | 118 | 0.00 / 0.00 | 38.61% | prototype |
 | v079 | 1992.90 | 1691.81 | 0.8489x | 118 | 0.00 / 0.00 | 38.53% | prototype |
 | v080 | 2064.54 | 1691.90 | 0.8195x | 110 | 0.00 / 0.00 | 37.22% | prototype |
+| v081 | 2021.57 | 1691.81 | 0.8369x | 109 | 0.00 / 0.00 | 38.02% | all8192 rows PASS, seeds1234/5678 |
+| v082 | 2861.12 | 1691.68 | 0.5913x | 128 | 0.00 / 0.00 | 26.11% | prototype |
+| v083 | 2027.90 | 1693.70 | 0.8352x | 128 | 0.00 / 0.00 | 37.62% | prototype |
+| v084 | 1995.17 | 1692.06 | 0.8481x | 118 | 0.00 / 0.00 | 38.31% | all 8192 rows PASS, seed1234 |
+| v085 | 1878.05 | 1691.97 | 0.9009x | 119 | 0.00 / 0.00 | 27.76% | same 9/6 all-row failures as TRT, seeds1234/5678 |
+| v086 | 1870.05 | 1691.68 | 0.9046x | 119 | 0.00 / 0.00 | 27.89% | same 9/6 all-row failures as TRT, seeds1234/5678 |
+| v087 | 1872.22 | 1693.86 | 0.9047x | 119 | 0.00 / 0.00 | 27.85% | bitwise v085 on all8192 rows, seed1234 |
+| v088 | 2037.79 | 1690.85 | 0.8297x | 112 | 0.00 / 0.00 | 28.72% | prototype |
 
-Raw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. No fully validated implementation has yet established a speedup over TRTLLM.
+Raw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. No implementation has established a consistent sustained warm speedup over TRTLLM; v086 is near parity warm with a cold advantage in its recorded Graph run, at baseline-level FP8 precision.
 
 ## CUDA Graph validation runs
 
@@ -116,5 +124,13 @@ These are separate warm/cold runs with 20 warmups and 100 repeats; sampled row c
 | v067 | 512 | cold | 2107.38 | 1926.99 | 0.9144x |
 | v075 | 512 | warm | 2097.22 | 1874.14 | 0.8936x |
 | v075 | 512 | cold | 2080.51 | 1925.12 | 0.9253x |
+| v085 | 512 | warm | 1888.18 | 1877.54 | 0.9944x |
+| v085 | 512 | cold | 1887.87 | 1928.16 | 1.0213x |
+| v086 | 512 | warm | 1873.54 | 1869.82 | 0.9980x |
+| v086 | 512 | cold | 1880.13 | 1946.53 | 1.0353x |
+| v087 | 512 | warm | 1889.58 | 1867.81 | 0.9885x |
+| v087 | 512 | cold | 1882.14 | 1923.95 | 1.0222x |
+| v088 | 512 | warm | 2037.95 | 1872.11 | 0.9186x |
+| v088 | 512 | cold | 2045.87 | 1924.62 | 0.9407x |
 
 See [ITERATIONS.md](ITERATIONS.md) for changes, failed hypotheses, correctness limits and source references.

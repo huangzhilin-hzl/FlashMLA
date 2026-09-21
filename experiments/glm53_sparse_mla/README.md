@@ -32,13 +32,13 @@ export CUTE_DSL_ARCH=sm_103a
 
 # Fast single-P path with closely matching TRTLLM precision; see all-row limits below.
 /opt/sglang/bin/python bench.py \
-  --kernel-version v054 --block-k 128 \
+  --kernel-version v086 --block-k 128 \
   --backends trtllm cute --scope native --check-rows 512 \
   --warmup-iters 20 --repeat-iters 100 --cache both --timing cuda-graph \
-  --output-json artifacts/v054_accuracy512_graph.json
+  --output-json artifacts/v086_accuracy512_graph.json
 
 # Short event-based tuning run, followed by one warmed NCU invocation.
-bash run_iteration.sh v054 128
+bash run_iteration.sh v086 128
 ```
 
 `run_iteration.sh` saves raw JSON, logs, NCU details/CSV and an immutable per-run
@@ -59,12 +59,21 @@ The full 8192-row/seed1234 audit checks all 268,435,456 output elements:
 | Candidate | Original-tolerance failures | Intended comparison |
 |---|---:|---|
 | TRTLLM | 9 | Baseline FP8 precision |
-| v054, P scale448 | 9, identical coordinates/values to TRTLLM | Fast baseline-precision path |
+| v054, P scale448 | 9, identical coordinates/values to TRTLLM | Earlier fast path |
+| v086, fused scaled exp2 input | 9 on seed1234 / 6 on seed5678, identical coordinates/values to TRTLLM | Current target-workload fast path |
 | v049, P scale256 | 11 | Earlier timing reference |
 | v053, residual FP8 | 0 | Original higher-precision path |
 | v065, residual FP8 with V collector reuse | 0 via full bitwise equivalence to v053 | Exact-equivalence optimization |
 | v067, residual FP8 with bounded scaling anchor | 0 on two independent full-reference seeds | Earlier validated higher-precision path |
 | v075, probability scale folded into exp2 | 0 on two independent full-reference seeds | Fastest validated higher-precision path |
+
+v086 matches more than 99.999% of TRTLLM BF16 outputs on both full target
+seeds. Graph warm/cold medians are 1873.54/1880.13 µs versus paired TRTLLM
+1869.82/1946.53 µs: near parity warm, faster cold in that run. Qualified b512
+device memcheck reports zero errors. The full b1024/chunk0 case has7650
+original-tolerance failures for both; the internal-hole/short case has86 for
+v086 versus78 for TRTLLM. Target-input agreement does not imply a tolerance
+pass or agreement on arbitrary masks. v075 passes these additional cases.
 
 v054 matches about 99.96% of TRTLLM BF16 outputs bitwise on this input.
 It passes 512 sampled rows for seeds1234/5678/42, but it does **not** pass the
@@ -92,14 +101,15 @@ To reproduce the full shared-reference audit (accuracy only):
 
 ```bash
 /opt/sglang/bin/python validate_full_accuracy.py \
-  --kernel-versions v049 v053 v054 --include-trtllm \
+  --kernel-versions v086 v075 --include-trtllm \
   --output-json artifacts/full_accuracy_seed1234.json
 ```
 
 This audit records every backend's failures before returning nonzero if any
 fails. For residual-P performance, use `--kernel-version v075` with `bench.py`;
 v053 remains the direct full-reference-audit baseline.
-No tolerance is relaxed to obtain a pass.
+No tolerance is relaxed to obtain a pass. `validate_full_accuracy.py --block-k`
+defaults to128; pass64 for the split-head/N64 experiment v082.
 
 Full-target iterations use the original FP32 reference and unchanged tolerances
 (`atol=0.01`, `rtol=0.05`). The usual tuning check samples 8 rows. v013, v016, v034, v037, v039, v044, v045 and v049 also
@@ -133,3 +143,9 @@ This emits PTX/CUBIN for inspection without allocating or launching GPU work.
 Compilation and static resource reports are not runtime validation. v034 and later candidates additionally make cross-thread TMEM ordering explicit with tcgen05
 fences. Earlier measured versions lack those explicit fences; their sampled
 passes do not establish safety for every compiler or execution schedule.
+
+Explicit `min_blocks_per_mp` launch bounds can require device-attribute queries
+in this DSL. For those fake-tensor compilations, select the authorized GPU1,
+run `check_gpu_idle.py`, and add `--initialize-cuda` to `compile_offline.py`.
+That opt-in creates a CUDA context but launches no candidate kernel; the JSON
+record distinguishes it from the default context-free compilation.
