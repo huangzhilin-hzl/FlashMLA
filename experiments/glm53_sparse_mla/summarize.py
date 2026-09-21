@@ -54,7 +54,13 @@ for directory in sorted(root.glob("v[0-9][0-9][0-9]")):
     if version == "v107":
         status = "bitwise v105 full seed1234/mask; not promoted"
     if version in ("v110", "v111"):
-        status = "bitwise v106 full seed1234/mask; sustained checks pending"
+        status = "bitwise v106 full seed1234/mask; no consistent gain"
+    if version == "v112":
+        status = "same9/6 full-seed failures asTRT; current fast path"
+    if version == "v113":
+        status = "smoke/eight-row and qualified sanitizers pass; slower; no full audit"
+    if version == "v114":
+        status = "full2seeds/short/masks PASS; current higher precision"
     if version == "v109":
         status = "bitwise v105 full seed1234; slower overlap control"
     if version == "v098":
@@ -76,7 +82,7 @@ for directory in sorted(root.glob("v[0-9][0-9][0-9]")):
     if version == "v033":
         status = "non-isolated timing; do not rank"
     print(f"| {version} | {candidate['median_us']:.2f} | {baseline['median_us']:.2f} | {candidate['speedup_vs_trtllm']:.4f}x | {metrics['launch__registers_per_thread']} | {traffic} | {tensor:.2f}% | {status} |")
-print("\nRaw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. v090/v091/v094/v096/v097/v105/v108 have an observed sustained warm advantage in the extended eager-event, Graph and rotating-order runs, at baseline-level FP8 precision; v108 is the current fast path. Short five-event v108 tuning has a small observed advantage; v105 is near parity. Use the matching execution regime and retained distributions. v086 is near parity warm and its initial cold advantage does not reproduce in its rotating-order audit.\n")
+print("\nRaw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. v090/v091/v094/v096/v097/v105/v108/v112 have an observed sustained warm advantage in the extended eager-event, Graph and rotating-order runs, at baseline-level FP8 precision; v112 is the current fast path. Short five-event v112 tuning has a small observed advantage; v105 is near parity. Use the matching execution regime and retained distributions. v086 is near parity warm and its initial cold advantage does not reproduce in its rotating-order audit.\n")
 graph_paths = sorted(root.glob("v[0-9][0-9][0-9]_validation*/*_graph*.json"))
 if graph_paths:
     print("## CUDA Graph validation runs\n")

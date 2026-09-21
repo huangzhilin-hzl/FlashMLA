@@ -32,13 +32,13 @@ export CUTE_DSL_ARCH=sm_103a
 
 # Fast single-P path with closely matching TRTLLM precision; see all-row limits below.
 /opt/sglang/bin/python bench.py \
-  --kernel-version v108 --block-k 128 \
+  --kernel-version v112 --block-k 128 \
   --backends trtllm cute --scope native --check-rows 512 \
   --warmup-iters 20 --repeat-iters 100 --cache both --timing cuda-graph \
-  --output-json artifacts/v108_accuracy512_graph.json
+  --output-json artifacts/v112_accuracy512_graph.json
 
 # Short event-based tuning run, followed by one warmed NCU invocation.
-bash run_iteration.sh v108 128
+bash run_iteration.sh v112 128
 ```
 
 `run_iteration.sh` saves raw JSON, logs, NCU details/CSV and an immutable per-run
@@ -67,16 +67,35 @@ The full 8192-row/seed1234 audit checks all 268,435,456 output elements:
 | v096, pre-wait index fetching | Same as v091 via full bitwise checks on both seeds | Earlier fast path |
 | v097, pre-wait index fetching with four producer warps | Same as v096 via full bitwise checks on both seeds | Earlier fast path |
 | v105, dedicated MMA issuer | Same as v097 via full bitwise checks on both seeds | Earlier fast path |
-| v108, per-thread P readiness | Same as v105 via full bitwise checks on both seeds | Current fast path |
+| v108, per-thread P readiness | Same as v105 via full bitwise checks on both seeds | Earlier fast path |
+| v112, balanced denominator reduction | 9 on seed1234 / 6 on seed5678, identical coordinates/values to TRTLLM | Current fast path |
 | v049, P scale256 | 11 | Earlier timing reference |
 | v053, residual FP8 | 0 | Original higher-precision path |
 | v065, residual FP8 with V collector reuse | 0 via full bitwise equivalence to v053 | Exact-equivalence optimization |
 | v067, residual FP8 with bounded scaling anchor | 0 on two independent full-reference seeds | Earlier validated higher-precision path |
 | v075, probability scale folded into exp2 | 0 on two independent full-reference seeds | Earlier higher-precision path |
 | v098, pre-wait index fetching | Full bitwise equality to v075 on both seeds, short case and masks | Earlier higher-precision path |
-| v106, dedicated MMA issuer | Full bitwise equality to v098 on both seeds, short case and masks | Current higher-precision path |
+| v106, dedicated MMA issuer | Full bitwise equality to v098 on both seeds, short case and masks | Earlier higher-precision path |
+| v114, balanced denominator reduction | 0 on two full target seeds, full short case and masks | Current higher-precision path |
 
-The current fast path v108 matches v105 bitwise on both full 8192-row seeds,
+The current fast path v112 independently retains the same 9/6 full-target
+failures as TRTLLM on seeds1234/5678. Only 2464/2601 of 268,435,456 BF16
+outputs differ from TRTLLM. The full short case retains 7650 failures for both;
+the mask case matches v108 bitwise and retains 86 failures versus TRT's 78.
+Qualified b512 memcheck reports zero errors. The denominator uses a balanced
+32-value sum tree, which changes rounding and requires these fresh audits.
+
+Its 20/100 eager warm/cold medians are 1716.51/1745.12 µs versus TRT
+1888.85/1915.10 µs; Graph medians are 1738.34/1722.18 µs versus
+1869.89/1919.95 µs. Three rotated orders give warm 1701.89–1712.13 µs
+versus v108 1712.34–1713.34 µs and TRT 1871.36–1876.06 µs; cold
+1697.63–1697.71 µs versus v108 1708.10–1719.46 µs and TRT
+1857.46–1859.60 µs. It improves on v108 in each recorded ordering, although
+one warm pair differs by less than 1 µs. These are observed ranges of round
+medians with unlocked clocks, not confidence intervals. The baseline FP8
+precision limits remain; v114 is the current higher-precision option.
+
+Earlier fast path v108 matches v105 bitwise on both full 8192-row seeds,
 all 1024 short-case rows and the masked input; qualified b2 synccheck/b512
 memcheck report zero errors. Its 20/100 eager warm/cold medians are
 1753.09/1766.93 µs versus TRT 1876.54/1915.55 µs, and Graph medians are
@@ -99,7 +118,22 @@ with independent completion and P-readiness barriers. The original FP8
 accuracy limits below still apply. Short five-event timing is near parity with
 TRT (1693.86 versus 1691.84 µs), not a demonstrated short-run win.
 
-The current higher-precision v106 path matches v098 bitwise on both full seeds,
+The current higher-precision v114 path independently passes the original
+atol0.01/rtol0.05 tolerance on all 268,435,456 output elements for each of
+two seeds, all 33,554,432 short-case elements and the masked input. Qualified
+b512 memcheck reports zero errors. Relative RMSE is about 0.001736 on both
+full target seeds, roughly 8.6 times lower than the baseline FP8 path.
+
+Eager20/100 warm/cold medians are 1955.95/1957.86 µs versus TRT
+1882.72/1915.01 µs; Graph medians are 1996.70/1968.24 µs versus
+1867.87/1918.93 µs. Three rotated orders give warm 1939.41–1939.73 µs
+versus v106 1951.84–1964.11 µs and TRT 1869.86–1880.32 µs; cold
+1927.15–1929.22 µs versus v106 1953.76–1960.18 µs and TRT
+1857.52–1867.60 µs. It improves on v106 in every recorded ordering and
+remains slower than TRT. Summation rounding changes, so these are independent
+accuracy audits rather than a claim of bitwise equality to v106.
+
+Earlier higher-precision v106 path matches v098 bitwise on both full seeds,
 all short-case rows and the masked input; qualified b2 synccheck/b512 memcheck
 report zero errors. Its 20/100 eager warm/cold medians are 1977.41/1981.01 µs
 versus TRT 1874.05/1918.05 µs; Graph medians are 1998.90/1972.21 µs versus
@@ -131,7 +165,7 @@ TRT 1886.18/1916.88 µs; Graph medians are 1806.54/1796.08 µs versus
 TRT 1869.81–1878.22 µs, improving on v094 in every ordering. It moves the
 read-only global index fetch before stage-reuse waiting while keeping shared
 publication after that wait. This preserves the documented FP8 precision limits;
-it does not establish an all-row FP32-reference pass. v106 is the current validated
+it does not establish an all-row FP32-reference pass. v114 is the current validated
 higher-precision option.
 
 v094 retains v091 output bits on both full8192-row seeds, the1024-row short
@@ -148,7 +182,7 @@ Eager-event warm/cold medians are1852.51/1851.06 µs versusTRT1886.94/1917.02 µ
 Graph medians1847.62/1832.43 µs versusTRT1863.94/1926.14 µs. Three rotated
 orders give warm v0911822.98–1824.83 µs versusTRT1869.98–1879.65 µs; it also
 improves on v090 in every ordering. These are the same baseline-precision
-outputs, including the failures documented below. v106 is the current higher-precision option on its audited inputs.
+outputs, including the failures documented below. v114 is the current higher-precision option on its audited inputs.
 
 v090 matches v086 bitwise on all8192 rows of both seeds and all1024 rows of
 the short case, in three repeats each. The mask case also matches v086 bitwise,
@@ -200,7 +234,7 @@ To reproduce the full shared-reference audit (accuracy only):
 
 ```bash
 /opt/sglang/bin/python validate_full_accuracy.py \
-  --kernel-versions v108 v106 --include-trtllm \
+  --kernel-versions v112 v114 --include-trtllm \
   --output-json artifacts/full_accuracy_seed1234.json
 ```
 

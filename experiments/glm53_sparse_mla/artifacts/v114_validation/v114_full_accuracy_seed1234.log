@@ -1,0 +1,41 @@
+{"checked_rows": 1024, "mismatches": {"v114": 0}}
+{"checked_rows": 2048, "mismatches": {"v114": 0}}
+{"checked_rows": 3072, "mismatches": {"v114": 0}}
+{"checked_rows": 4096, "mismatches": {"v114": 0}}
+{"checked_rows": 5120, "mismatches": {"v114": 0}}
+{"checked_rows": 6144, "mismatches": {"v114": 0}}
+{"checked_rows": 7168, "mismatches": {"v114": 0}}
+{"checked_rows": 8192, "mismatches": {"v114": 0}}
+{
+  "purpose": "accuracy only; no latency claim",
+  "args": {
+    "kernel_versions": [
+      "v114"
+    ],
+    "include_trtllm": false,
+    "block_k": 128,
+    "local_tokens": 8192,
+    "chunk": 3,
+    "seed": 1234,
+    "batch_rows": 256,
+    "output_json": "artifacts/v114_full_accuracy_seed1234.json"
+  },
+  "benchmark_sha256": "d843320fb5147a807135282a1b87bb4c247cdd7a6a16b9107d546c48c8a8fb66",
+  "atol": 0.01,
+  "rtol": 0.05,
+  "cases": {
+    "v114": {
+      "kernel_sha256": "56ac66b8ae449d29b8b7c2b8e5dc4af2888c1edefbda1815b10d0c2e83176704",
+      "finite": true,
+      "mismatches": 0,
+      "max_abs": 0.005918741226196289,
+      "squared_error_sum": 6.678226110492222,
+      "examples": [],
+      "checked_rows": 8192,
+      "checked_elements": 268435456,
+      "rmse": 0.0001577286623932116,
+      "relative_rmse": 0.0017359692514759277,
+      "pass": true
+    }
+  }
+}

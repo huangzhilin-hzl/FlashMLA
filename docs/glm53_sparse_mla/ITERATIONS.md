@@ -3410,3 +3410,156 @@ and masked equality/FP32 checks pass against v106. Warm1850.37 us versusTRT
 shared bytes, occupancy19.253%, tensor41.142%, eligible0.463759, long-scoreboard
 6.000689, zero local sectors, aggregate shared conflicts6360400/1427677,
 diagnostic3.162816 ms. No promotion until same-process timing establishes gain.
+
+## Iteration 113 — four smaller KV stages with N64 score tiles
+
+Based on v108. Change blockK128/two stages to blockK64/four stages, keeping
+416 threads, the dedicated MMA issuer and count256 P readiness. Total staged
+KV bytes remain147456; P shrinks from8192 to4096 bytes. This permits four
+independent gather tiles ahead of compute while doubling the number of tiles.
+Extra QK instructions/synchronizations and smaller MMA N may outweigh improved
+prefetch depth, so this is a measured hypothesis rather than an assumed gain.
+
+CUTLASS tmem_frg_ws in mma_traits_sm100.hpp (M_MMA64 branch) maps each logical
+N half onto a64-DP half, with N_MMA/2 physical columns. For N64, each of the
+two compute groups reads16 columns; logical key=(DP//64)*32+group*16+j. Two
+validity words per stage cover these64 keys. Each producer warp issues four
+gather4 groups, and each PV N tile uses two K32 steps. Stage phases advance
+every four blocks, independently of per-block QK/PV/P-ready phases.
+
+Retain the full512-column TMEM allocation. After final PV all KV transactions
+are drained; reuse the first two32KiB main-KV stages as the64KiB BF16 transpose
+buffer. The alias bound now covers the full four-stage main allocation. This
+changes reduction/quantization grouping, so bitwise equality is not assumed.
+Require offline compile, bounded reference smoke, synchronization/memory checks
+and independent precision audit if performance is promising. Use --block-k64.
+
+### Iteration 112 initial result — balanced sum improves short timing
+
+Offline REG85/STACK0; bounded smoke and eight-row FP32 checks pass. Warm
+1669.31 us versusTRT1693.76 us improves fromv1081680.42 us. NCU base/stable:
+85 registers,194920 shared bytes, occupancy19.218%, tensor30.989%, eligible
+0.395207, long-scoreboard5.910932, zero local sectors, aggregate shared
+conflicts6370234/1977881, diagnostic2.855360 ms. Independent full-reference
+and masked audits have been collected and are being inspected before sustained
+performance validation; numerical equivalence is not inferred from sampled rows.
+
+### Iteration 112 precision audit — retain baseline FP8 limits
+
+Independent full-reference audits check268435456 elements per target seed.
+v112 andTRT have the same9 failures onseed1234 and6 onseed5678, with all
+recorded failure coordinates/values matching (counts below the10-example cap).
+Only2464/2601 BF16 outputs differ fromTRT, respectively. RelativeRMSE is
+0.014979337847/0.014982757957; maximum absolute error0.019369811/0.018071592.
+The full1024-row short case has7650 failures for both, with matching first10
+examples (the cap prevents claiming all failing coordinates match), only275
+unequal outputs versusTRT, and maxabs0.057887435. Masked outputs match v108
+bitwise and retain86 failures versusTRT78. Qualified b512 memcheck reports
+zero errors. Summation rounding changes are therefore not promoted as a strict
+FP32 tolerance pass; extended performance validation is in progress.
+
+### Four-order higher-precision comparison of v106/v110/v111
+
+Warm per-round medians (us):v1061947.71/1949.22/1963.98/1964.19;
+v1101943.73/1960.00/1959.79/1960.03;
+v1111951.82/1962.94/1961.50/1964.10;
+TRT1861.74/1876.02/1879.98/1880.13. Cold v1061959.39/1957.82/1954.83/1959.81,
+v1101948.42/1949.76/1955.70/1949.70,v1111958.14/1957.78/1953.86/1959.71,
+TRT1859.76/1861.04/1859.60/1857.60. v110 improves in3/4 orders for both caches,
+with one warm regression; v111 has no consistent warm gain. Retain v106 while
+further optimization is prioritized; neither tiny short-run gain alone warrants
+promotion or inheriting unperformed second-seed/short full checks.
+
+## Iteration 114 — balanced denominator reduction for residual FP8
+
+Based on v106. Apply the five-level32-value sum tree from v112, keeping both
+FP8 probability terms, bounded softmax anchor, four B collectors and the
+original readiness/stage-release protocol. Earlier v084 did not improve the
+older pipeline, but v112 improves the dedicated fast pipeline, motivating an
+isolated retest here. Summation rounding changes; do not inherit bitwise or
+full-reference correctness. A performance gain requires fresh full-reference
+seeds, short and masked audits at unchanged tolerances. Offline/smoke pending.
+
+v113 offline compilation succeeds with REG92/STACK0, and bounded b2 reference
+smoke passes. Its N64 layout and four-stage phase protocol now proceed to
+qualified synchronization/memory checks before full-target timing. v112's
+extended512-row eager/Graph runs pass sampled tolerance; rotating-order evidence
+is being inspected before promotion.
+
+### Iteration 112 promotion — sustained balanced-sum improvement
+
+Eager20/100 warm/cold medians1716.51/1745.12 us versusTRT1888.85/1915.10 us;
+Graph1738.34/1722.18 us versusTRT1869.89/1919.95 us. Three-order warm medians
+(us):v1121701.94/1701.89/1712.13,v1081713.34/1712.34/1712.82,
+TRT1871.36/1874.05/1876.06. Cold v1121697.63/1697.66/1697.71 versus
+v1081708.10/1719.46/1716.08 andTRT1859.58/1857.46/1859.60. Each recorded
+ordering improves on v108, with one warm difference below1 us. Promote v112
+at baseline FP8 precision, retaining the independently audited9/6 target failures,
+short/mask limitations and qualified memcheck result documented above. Timing
+ranges are observed round medians, not confidence intervals; clocks are unlocked.
+
+### Iteration 113 result — four N64 stages regress
+
+Qualified b2 synccheck and b512 memcheck report zero errors; smoke/eight-row
+reference checks pass. Short warm2177.28 us versusTRT1691.65 us is substantially
+slower than v1081680.42 us. NCU base/stable:92 registers,190856 shared bytes,
+occupancy19.269%, tensor23.633%, eligible0.390847, long-scoreboard5.632356,
+zero local sectors, aggregate shared conflicts3437457/3782797, diagnostic
+3.736032 ms. Doubling the tile count also doubles QK MMA instruction count,
+softmax handshakes and per-tile work; the observed deeper prefetch does not
+compensate. Reject for this workload. No expanded full-reference or sustained
+performance audit is claimed, and aggregate conflicts are not source-level
+excessive-bank-conflict evidence.
+
+### Iteration 114 initial result — balanced sum improves the residual path
+
+Offline REG122/STACK0; bounded smoke/eight-row FP32 checks pass. Short warm
+1828.93 us versusTRT1691.78 us improves about23 us from v1061851.68 us.
+NCU base/stable:122 registers,203080 shared bytes, occupancy19.239%, tensor
+41.673%, eligible0.459962, long-scoreboard5.944802, zero local sectors,
+aggregate shared conflicts6474299/1451962, diagnostic3.121280 ms. Register
+allocation increases from100, with no measured local traffic. Fresh full-reference
+seeds/short/masked checks, qualified memcheck and sustained performance runs
+are in progress; no correctness inheritance or promotion yet.
+
+## Iterations 115/116 — balanced maximum reduction
+
+Based respectively on fast v112 and higher-precision v114. Replace each thread's
+32-score MAX reduction with a five-level fmax tree, then combine with the running
+maximum. Keep the subsequent four-way cross-thread maximum, probability sum,
+FP8 conversion and all pipeline synchronization unchanged. This tests the other
+per-thread reduction after the measured balanced-sum gains. The source expresses
+a shorter dependency tree; compiler reassociation may already remove the original
+chain, so a gain is not assumed. Finite fmax reassociation has no rounding, but
+full bitwise checks are still required on audited inputs before inheritance of
+precision claims. Offline resource inspection and bounded smoke are pending.
+
+
+### Iteration 114 promotion — independently validated higher precision
+
+All268435456 output elements pass on each target seed1234/5678, maxabs
+0.005918741226/0.005017399788, relativeRMSE0.001735969251/0.001735983890.
+All33554432 short-case elements pass, maxabs0.008034229279. The masked
+case passes with maxabs0.004001855850; one BF16 value differs fromv106,
+confirming rounding changes rather than bitwise inheritance. Qualified b512
+memcheck reports zero errors. No tolerance was changed.
+
+Eager20/100 warm/cold1955.95/1957.86 us versusTRT1882.72/1915.01 us;
+Graph1996.70/1968.24 us versusTRT1867.87/1918.93 us. Three rotated warm
+medians (us):v1141939.41/1939.73/1939.68,v1061962.24/1964.11/1951.84,
+TRT1869.86/1880.32/1880.13. Cold v1141927.17/1929.22/1927.15 versus
+v1061958.70/1960.18/1953.76 andTRT1857.52/1859.47/1867.60. Promote v114
+as the current higher-precision path for the repeated improvement in every
+ordering, while explicitly retaining its remaining performance gap toTRT.
+
+### Unlocked source profile after v112
+
+NCU clock-control none/pipeline-boost-state dynamic: shared wavefronts
+28663808 equal ideal, excessive0, instructions618706515. Long-scoreboard
+sampling64353, with compute PV wait17396, producer empty wait16994, and
+compute QK wait13562 (addresses and adjacent SASS retained in source CSV).
+These sample counts are not runtime percentages. The observed wait sites
+continue to motivate pipeline/granularity work rather than a bank-layout fix.
+SASS already lowers the per-thread MAX reduction into an FMNMX3.NAN tree,
+so v115/v116 are compiler-scheduling experiments; the original maximum is
+not a fully serial32-operation chain. Their gain is therefore uncertain.
