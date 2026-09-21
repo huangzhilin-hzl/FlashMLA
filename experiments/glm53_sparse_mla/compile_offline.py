@@ -17,6 +17,7 @@ from cutlass.cute.runtime import make_fake_stream, make_fake_tensor
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--kernel-version", required=True)
+parser.add_argument("--block-k", type=int, default=128)
 args = parser.parse_args()
 module = importlib.import_module(f"kernel_{args.kernel_version}")
 descriptors = [
@@ -31,6 +32,6 @@ tensors = [make_fake_tensor(dtype, shape, stride, assumed_align=16)
            for dtype, shape, stride in descriptors]
 print(json.dumps({"version": args.kernel_version, "device_launch": False,
                   "sha256": hashlib.sha256(Path(module.__file__).read_bytes()).hexdigest()}), flush=True)
-compiled = cute.compile(module.SparseMLA(128), *tensors, make_fake_stream(),
+compiled = cute.compile(module.SparseMLA(args.block_k), *tensors, make_fake_stream(),
                         options="--gpu-arch sm_103a --keep-cubin --keep-ptx --ptxas-options -v")
 print("OFFLINE COMPILE PASS", flush=True)

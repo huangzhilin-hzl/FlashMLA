@@ -1,0 +1,3 @@
+WS COPY AUDIT PASS: physical datapath = local thread id, column = element index
+WS LOGICAL COVERAGE PASS: every head/key element is covered exactly once
+FOUR-GROUP OUTPUT AUDIT PASS: exact N256 physical mapping and unique full coverage

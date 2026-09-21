@@ -5,7 +5,7 @@ cd "$(dirname "$0")"
 version="${1:?usage: bash run_iteration.sh vNNN}"
 [[ "$version" =~ ^v[0-9]{3}$ ]] || exit 2
 block_k="${2:-64}"
-[[ "$block_k" =~ ^(64|128)$ ]] || exit 2
+[[ "$block_k" =~ ^(64|128|256)$ ]] || exit 2
 export CUDA_VISIBLE_DEVICES=GPU-2dc4b50c-07a5-26d6-f5ce-54ef728d56b2
 export CUTE_DSL_ARCH=sm_103a
 python_bin=/opt/sglang/bin/python

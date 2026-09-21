@@ -1661,3 +1661,116 @@ This tests whether the v056 local traffic comes from the static per-thread
 budget and can be reduced by moving registers from its producer role. That
 cause is a hypothesis, not established solely by the 96-register metric.
 Compiler/runtime validation and measured local sectors are pending.
+
+### Iteration 057 failed runtime validation
+
+The b2 smoke test stopped at its bounded 90-second timeout before producing
+a numerical result. GPU1 returned to zero utilization/memory afterward; no
+reset was performed. No timing or NCU result is accepted for this version.
+
+The earlier budget argument was incomplete: setmaxnreg.inc draws from a
+**per-CTA register pool**, not all unused SM registers, and blocks until the
+requested registers are available. The 63488-register role total exceeds
+640*96=61440 if the CTA starts at v056's 96 registers/thread. This is a
+plausible deadlock mechanism; v057's own compiled resource usage is being
+checked before treating that initial allocation as established. See the
+[NVIDIA PTX setmaxnreg specification](https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#miscellaneous-instructions-setmaxnreg).
+
+## Iteration 058 — constrain redistribution to the CTA pool
+
+Based on v057, lower compute roles from112 to104 registers, retaining48 for
+producer threads. The role total is 512*104+128*48=59392 registers, within a
+61440-register CTA allocation. All arithmetic/layouts are unchanged. Check
+the actual compilation resource budget before a bounded smoke launch, then
+collect performance/NCU only if numerical validation completes. Pending.
+
+Offline v057 CUBIN resource inspection confirms REG96, STACK0, LOCAL0.
+Thus its initial CTA allocation is indeed 61440 registers, below its63488
+role request. This and PTX blocking semantics support the register-pool
+deadlock diagnosis; no debugger PC capture was taken during the timeout.
+
+## Iteration 059 — N256 scores with a single KV stage
+
+Based on v058, double keys per tile from128 to256, reducing the main loop
+from16 to8 iterations atTopK2048. Four compute groups process32 scores per
+thread; the score TMEM region grows from64 to128 physical columns while
+output remains in columns0..255. Each producer thread loads two indices,
+and each producer warp issues16 gather4 groups. PV has eight K32 steps.
+
+A single256-key KV stage keeps shared allocation below the hardware limit.
+The producer waits for the preceding tile's PV completion before overwriting
+the stage; full/empty barriers alternate parity every tile. This sacrifices
+KV prefetch overlap but halves score reductions and output-correction rounds.
+These competing effects and any register spills must be measured.
+
+The wider tile changes floating-point reduction/quantization order, so
+accuracy cannot be inferred from v054 even with the same448 probability
+scale. Coordinate audit, offline compile, bounded smoke, memory check and
+fresh reference tests are required before promotion. Pending.
+
+### Iteration 058 result
+
+Offline CUBIN REG96 confirms the initial61440-register pool. The corrected
+role total59392 completes smoke/full-target8-row numerical checks, supporting
+the v057 resource-deadlock diagnosis. Warm events1949.73us versusTRT1691.78us
+remain slower than v054. NCU:96 registers,195896 shared bytes,occupancy30.240%,
+tensor26.670%,eligible0.712712,long-scoreboard6.73514,local read/write sectors
+2097152/2131436,shared conflicts6032957/2653887,diagnostic3.312896ms.
+Redistribution reduces local traffic by about two thirds versusv056, but
+does not remove it or produce a competitive speedup.
+
+## Iteration 060 — finish the four-group register-budget experiment
+
+Based on v057, use112 compute registers and32 producer registers. The total
+512*112+128*32=61440 exactly fits the confirmed96-register initial CTA pool.
+This isolates whether eliminating the remaining compute-side local traffic
+is worth additional pressure on the producer role. Compile resource inspection
+and bounded smoke precede full profiling. All arithmetic/layouts unchanged.
+
+### Iteration 059 result — wider single-stage tile rejected
+
+Layout audit, offline compile, b2 and full-target8-row numerical checks pass.
+Full relative_RMSE0.015157504 differs from the N128 path as expected. Warm
+events2580.70us versusTRT1689.86us are substantially slower. NCU:96 registers,
+204072 shared bytes,occupancy30.341%,tensor21.474%,eligible0.417342,
+long-scoreboard14.96478,local read/write sectors18350080/29362272,shared
+conflicts984884/49579,diagnostic4.107456ms. Offline CUBIN reportsSTACK224.
+Although shared conflicts fall, local traffic and lost prefetch overlap
+outweigh fewer loop rounds. Do not promote this single-stage configuration;
+expanded accuracy/memory validation is not needed for the rejected candidate.
+
+## Iteration 061 — persistent query scheduling on the two-group path
+
+Based on v054, launch min(batch,148) CTAs, reflecting this B300's148SMs. Each
+CTA handles query rows separated by the grid size, retaining its512-column
+TMEM allocation and initialized barriers. All arithmetic and tile shapes
+remain unchanged. A full CTA barrier drains output staging and both producer
+and compute roles before the next query starts.
+
+Full/empty KV barrier generations use a cumulative tile count across queries;
+Q barrier parity alternates per query. The MMA barrier still completes two
+phases per key tile, so each query starts at phase0. First-tile output MMA
+continues to overwrite its accumulator. The change trades per-query launch
+and TMEM allocation overhead against a new full-CTA boundary and less flexible
+query scheduling. Validate multiple queries per CTA, varying sequence lengths,
+and exact v054 output equivalence before promotion. Pending.
+
+### Iteration 060 result — no local traffic, still slower
+
+Smoke/full-target8-row checks pass with unchanged v056 errors. CUBIN REG96,
+STACK0; NCU confirms zero local load/store sectors. Warm events1937.54us
+versusTRT1691.84us improve onv058 but remain slower than the two-group v054.
+NCU:195896 shared bytes,occupancy30.252%,tensor26.838%,eligible0.713861,
+long-scoreboard6.834383,shared conflicts4475404/2608651,diagnostic3.293888ms.
+This isolates local traffic as a real cost in the previous variants, while
+also showing that removing it does not justify the four-group design.
+
+## Iteration 062 — specialize persistent-CTA register budgets
+
+v061's offline CUBIN reports128 registers and144 stack bytes, suggesting
+that the outer query loop increased register pressure. Based onv061, release
+producer registers to48 and allow compute threads192 once before the outer
+query loop. Their total61440 fits a128-register512-thread CTA's65536-register
+pool; confirm v062's own allocation before runtime. No per-query repeated
+setmaxnreg operation is added. Numerical mapping and synchronization remain
+unchanged. This tests the spill hypothesis separately from scheduling. Pending.
