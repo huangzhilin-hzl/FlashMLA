@@ -174,3 +174,54 @@ at final normalization. Also release the TMEM allocation permit immediately
 after allocation, as in NVIDIA examples, instead of keeping it for the CTA
 lifetime. Smoke b2 passes with the same numeric errors. Full target and NCU
 measurements are pending.
+
+### Iteration 004 allocation bug found at full concurrency
+
+v004's b8192 run failed with an illegal memory access, despite b2 passing.
+Compile-time layout inspection showed M64 FP32 accumulators consume the full
+N columns: S needs 64 and O needs 256, starting at offset 64. The v002/v003
+256-column allocation was therefore undersized (320 required). Keeping the
+allocation permit until kernel exit happened to hide the overlap; releasing it
+made the error visible at concurrency. Their passing numerical checks do not
+establish memory safety, and those versions are rejected as unsafe, in addition
+to being slow. The failed v004 source is retained as `kernel_v004_unsafe.py`;
+its log is retained. v004 now allocates 512 columns, with compile-time column
+bounds assertions using NVIDIA's `find_tmem_tensor_col_offset`. Full checks
+are rerun before its performance is accepted. The earlier claim that 256
+columns could allow two resident CTAs was incorrect for these exact layouts.
+
+External Claude performance consultation retried with the functioning v003
+and the v004 failure evidence; again returned `Empty output from Claude CLI`.
+
+### Iteration 004 corrected result
+
+512-column version: full b8192 8-row correctness PASS, max_abs 0.00686455 and
+relative_RMSE 0.01479099. Paired warm event medians: TRTLLM 1691.78 us, v004
+15984.67 us; TRT/candidate=0.10584x. NCU: 253 registers/thread, 94.988 KB
+shared memory, achieved occupancy 12.431%, eligible warps/scheduler 0.26611,
+tensor active 10.223%, long scoreboard 0.82261. **Local load/store sectors
+are both zero**. Shared-load conflicts 205; shared-store conflicts 405680663.
+Keeping O in TMEM eliminated the measured register spilling. Occupancy counts
+resident warps, including any waiting for TMEM allocation; it does not prove
+two CTAs are computing concurrently. NCU diagnostic duration 26.3702 ms.
+
+## Iteration 005 — vectorize probability stores
+
+File: `experiments/glm53_sparse_mla/kernel_v005.py`.
+Why: v004 has no local-memory traffic but still 406 million shared-store
+conflicts. Scalar FP8 stores from one thread per head poorly match shared-memory
+banks. Convert probabilities into packed FP8 registers, then use 128-bit stores
+into the existing swizzled P layout. Same math and safe 512-column allocation.
+Smoke b2 passes; full target and NCU pending.
+
+## Iteration 006 — pack complementary TMEM datapath lanes
+
+File: `experiments/glm53_sparse_mla/kernel_v006.py`.
+Why: the M64 instruction uses only half of each 32-lane TMEM warp region.
+PTX Layout F explicitly supports lane alignment 0 or 16. Store O in lanes
+0–15 and S in lanes 16–31 within each warp region, using the same columns
+but disjoint cells. This can safely fit both into 256 columns and permit
+concurrent TMEM allocations. This is different from the invalid column packing
+in v002/v003. Compile-time column bounds are asserted. Validation pending.
+Primary ISA reference:
+https://docs.nvidia.com/cuda/parallel-thread-execution/#tcgen05-data-path-layout
