@@ -1,0 +1,51 @@
+[
+  {
+    "kernel": "kernel_cutlass_kernel_kernel_v096SparseMLA_object_at__tensorptrf8E4M3FNgmemalign16o819264576368645761_tensorptrf8E4M3FNgmemalign16o1310725765761_tensorptri32gmemalign16o8192204820481_tens_0",
+    "metrics": {
+      "gpu__time_duration.sum": {
+        "value": "3.019136",
+        "unit": "ms"
+      },
+      "launch__registers_per_thread": {
+        "value": "118",
+        "unit": "register/thread"
+      },
+      "launch__shared_mem_per_block_dynamic": {
+        "value": "194.904000",
+        "unit": "Kbyte/block"
+      },
+      "sm__warps_active.avg.pct_of_peak_sustained_active": {
+        "value": "23.133023",
+        "unit": "%"
+      },
+      "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed": {
+        "value": "29.314789",
+        "unit": "%"
+      },
+      "smsp__warps_eligible.avg.per_cycle_active": {
+        "value": "0.471978",
+        "unit": "warp"
+      },
+      "smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio": {
+        "value": "6.324691",
+        "unit": "inst"
+      },
+      "l1tex__t_sectors_pipe_lsu_mem_local_op_ld.sum": {
+        "value": "0",
+        "unit": "sector"
+      },
+      "l1tex__t_sectors_pipe_lsu_mem_local_op_st.sum": {
+        "value": "0",
+        "unit": "sector"
+      },
+      "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum": {
+        "value": "3,545,270",
+        "unit": ""
+      },
+      "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum": {
+        "value": "648,000",
+        "unit": ""
+      }
+    }
+  }
+]

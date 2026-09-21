@@ -2790,3 +2790,198 @@ audited higher-precision option. The five-event tuning run still favors TRT.
 
 v093 preflight: REG124/STACK0. Bounded runtime, masked comparison and memcheck
 are in progress before the full benchmark and equivalence check.
+
+### Iteration 093 result — all-valid branching regresses
+
+Smoke/eight-row checks and qualified b512 memcheck pass. The masked case matches
+v090 bitwise, as do all8192 seed1234 output elements in three repeats. Warm
+1876.19 us versusTRT1691.84 us is slower than v090's1828.80 us. NCU base/stable:
+124 registers,194904 shared bytes, occupancy23.289%, tensor27.792%, eligible
+0.514020, long-scoreboard5.818145, zero local sectors, aggregate shared conflicts
+3777818/3725962, diagnostic3.177664 ms. No promotion or expanded accuracy/Graph
+claim. Removing predicates through a branch does not preserve the original
+compiler schedule or guarantee lower latency.
+
+## Iteration 094 — four producer warps with eight compute warps
+
+Based on v091. Reduce the CTA from512 to384 threads, retaining256 compute threads
+and128 index/TMA producers. Four producer warps each issue eight gather4 row groups
+instead of eight warps issuing four groups. Every one of128 rows still receives
+four main-column transfers and one tail transfer; producer barriers count128.
+Compute synchronization, bitmap mapping, Q TMA, shared memory and all arithmetic
+remain unchanged. This tests the producer issue concurrency needed after the
+softmax-mask and stage-release optimizations. It also reduces resident warp count
+at the shared-memory-limited one-CTA occupancy, which may hurt latency hiding.
+Offline resources, bounded smoke, memcheck and full equivalence pending.
+
+## Iteration 095 — all CTA threads copy the final output
+
+Based on v091. After compute threads finish the final PV and fill the shared
+BF16 output transpose, join completed producer and compute roles with a full
+CTA barrier. All512 threads then copy eight128-bit vectors each to global
+memory, replacing256 compute threads copying16 vectors each. A second full
+barrier precedes TMEM deallocation. The arithmetic/normalization and shared
+transpose remain unchanged; no output is computed by producer threads.
+
+The output covers offset=(tid+v*512)*8 for tid0..511 and v0..7, exactly32768
+BF16 values. This trades broader store concurrency against full-CTA epilogue
+synchronization and altered register lifetimes. The final producer TMA has
+already completed before compute's final PV, so no stage can still be written
+when the shared output is read. Offline, bounded smoke, full bitwise and device
+memory checks are pending. This version is independent of v094's CTA-size change.
+
+### Iteration 094 initial result — near tie with fewer producer warps
+
+Offline REG120/STACK0. Smoke/eight-row checks and qualified b512 memcheck pass;
+all8192 seed1234 outputs match v091 bitwise in three repeats. Warm1816.99 us
+versusTRT1691.71 us is only about4 us below v091. NCU base/stable:120 registers,
+194904 shared bytes, occupancy17.846%, tensor28.744%, eligible0.398417,
+long-scoreboard5.452995, zero local sectors, aggregate shared conflicts
+4947972/4466142, diagnostic3.075072 ms. The expected occupancy reduction is
+measured; a sustained gain has not yet been established. No promotion yet.
+
+v095 preflight: REG118/STACK0. Runtime and equivalence tests are in progress.
+After it finishes, collect a fresh v091 source-level profile with clock-control
+none and pipeline-boost-state dynamic to guide subsequent optimization in the
+clock regime that reproduced unprofiled latency ordering.
+
+### Iteration 095 initial result — small output-copy gain
+
+Smoke/eight-row checks and qualified b512 memcheck pass. All8192 seed1234 output
+bits match v091 in three repeats. Warm1816.64 us versusTRT1691.84 us, only about
+4 us below v091. NCU base/stable:118 registers,194904 shared bytes, occupancy
+24.833%, tensor28.811%, eligible0.476426, long-scoreboard6.214066, zero local
+sectors, aggregate shared conflicts4145626/5649830, diagnostic3.069664 ms.
+Higher achieved occupancy partly reflects keeping producer warps alive through
+the epilogue and does not itself prove more useful work. A four-order comparison
+with v091/v094 is being inspected before any promotion.
+
+### v091 source profile at unlocked clocks
+
+With clock-control none / pipeline-boost-state dynamic, source counters report
+28655616 shared wavefronts, exactly28655616 ideal and zero excessive. The top
+three long-scoreboard sites account for41120/61115 samples (67.28%): producer
+stage-reuse wait17172, QK completion14190, and PV completion9758. These samples
+are attributed at consumer branches, not direct bandwidth or speedup estimates.
+
+The next site has7895 samples at the ISETP consuming a loaded global index.
+Global index fetch currently occurs only after the producer's stage-reuse wait.
+This suggests a bounded scheduling experiment: issue that independent load
+before waiting while delaying shared publication until the stage is free.
+Raw CSV, a reusable summary script, and the derived context excerpts are saved.
+Short-scoreboard hotspots also occur at accumulator-correction FMUL2 consumers
+of TMEM loads; MIO samples are mainly on gather4 instructions. No new address-
+bank-conflict hypothesis is supported by this profile.
+
+## Iteration 096 — overlap index fetching with stage-reuse waiting
+
+Based on v091. Load the current tile's global index into a private register
+before the empty-stage mbarrier wait. Publish the index and its validity ballot
+to shared memory only after the wait, preserving every stage-lifetime guarantee.
+The input index array is read-only throughout a kernel launch. Arithmetic,
+bitmaps, TMA issue count and compute synchronization are unchanged.
+
+Inspect generated SASS to verify the load remains before the phase check;
+the compiler may sink it back. Then run bounded smoke, memory/masked and full
+bitwise checks before evaluating the performance hypothesis. Pending.
+
+### Four-order comparison of v091/v094/v095
+
+All512 sampled rows pass. Warm per-round medians (us):
+TRT1867.98/1867.92/1870.10/1868.06;
+v0911823.14/1824.75/1824.99/1825.09;
+v0941819.04/1819.97/1819.52/1819.62;
+v0951820.80/1820.98/1821.02/1821.02.
+Cold v0911830.82–1831.01, v0941825.94–1826.90, v0951826.66–1826.86, versus
+TRT1855.39–1857.50. Both changes have small repeatable gains in this audit;
+v094 is slightly faster warm and uses the original compute-only epilogue.
+Complete its second full seed, short/masked equivalence and extended eager/
+Graph runs before promotion. Do not infer significance beyond these measurements.
+
+v096 compiles REG118/STACK0. Inspect the index load's placement relative to the
+producer phase check before interpreting the scheduling hypothesis as implemented.
+
+### Iteration 094 promotion — additional validation and original-regime timing
+
+All8192 seed5678 and all1024 short-case seed5678 output bits match v091 in
+three repeats each, in addition to the seed1234 full audit. The masked input
+also matches bitwise, retaining the known baseline-precision failures. Qualified
+b512 memcheck already reported zero errors.
+
+512-row20/100 eager events: warm1839.30 us versusTRT1874.00 us, cold1837.06 us
+versusTRT1923.28 us. Graph: warm1839.20 us versusTRT1865.82 us, cold1827.62 us
+versusTRT1927.14 us. Together with the four-order audit, the small gain over
+v091 repeats in the recorded regimes. Promote v094 as the current fast path,
+with all inherited FP8 precision limits explicit. v075 remains the higher-
+precision option. v095's gain is slightly smaller and its further validation
+is not needed for promotion while v094 is preferred.
+
+v096 SASS confirms the producer LDG at0x08a0 precedes its stage-reuse phase
+check at0x0920; the compiler did not sink it back. Offline REG118/STACK0.
+Runtime and equivalence validation is in progress.
+
+### Iteration 096 initial result — overlapping index latency improves throughput
+
+Smoke/eight-row checks and qualified b512 memcheck pass. All8192 seed1234 output
+bits match v091 in three repeats; the masked case also matches bitwise. Warm
+1761.38 us versusTRT1691.74 us improves about3.3% from v091's1820.90 us short run.
+NCU base/stable:118 registers,194904 shared bytes, occupancy23.133%, tensor29.315%,
+eligible0.471978, long-scoreboard6.324691, zero local sectors, aggregate shared
+conflicts3545270/648000, diagnostic3.019136 ms. The higher normalized stall ratio
+does not negate lower total latency. Sustained original-regime/Graph/rotating-order
+and second-seed/short equivalence validation are running.
+
+## Iteration 097 — pre-wait index fetching with four producer warps
+
+Compose v096's independent global-index fetch scheduling with v094's384-thread
+CTA and four producer warps. Preserve all index publication, validity bitmap,
+TMA transaction and compute-lifetime rules. Each producer warp handles eight
+gather4 groups. This tests whether the small producer-count gain survives the
+larger scheduling improvement. Offline resources, bounded smoke, memory checks
+and full equivalence are pending; no timing or safety claim is inherited.
+
+## Iteration 098 — pre-wait index fetching on the higher-precision path
+
+Based on v075, move only the read-only global index load before the producer
+stage-reuse wait, retaining shared publication after it. Keep the original
+per-score masks, residual FP8 math, all compute synchronization and eight
+producer warps. This isolates v096's producer scheduling change from bitmap
+and compute-barrier changes that did not improve v075. Require generated-load
+placement evidence and full output equivalence before inheriting any numerical
+claim. Offline, memory and runtime checks are pending.
+
+### Iteration 096 promotion — sustained gain and full equivalence
+
+All 8192-row output bits match v091 on seeds 1234 and 5678, as do all 1024 rows
+of the short chunk0/seed5678 case, with three repeats each. Masked output bits
+also match, and qualified b512 memcheck reports zero errors. The fast path retains
+the documented baseline FP8 precision failures; no tolerance was changed.
+
+512-row 20/100 eager events: warm 1806.46 us versus TRT 1886.18 us, cold
+1795.95 us versus TRT 1916.88 us. Graph: warm 1806.54 us versus TRT 1880.22 us,
+cold 1796.08 us versus TRT 1920.86 us. Rotating orders give warm v096
+1771.66/1771.74/1769.98 us, v094 1820.78/1820.96/1820.93 us, and TRT
+1869.81/1878.22/1872.14 us. Cold v096 1767.50/1767.63/1769.44 us, v094
+1826.99/1827.06/1826.93 us, and TRT 1857.25/1864.61/1857.49 us. The gain
+survives every ordering and both extended execution regimes. Promote v096 as
+the current baseline-precision path; v075 remains the higher-precision option.
+Short five-event tuning still favors TRT, so retain the regime distinction.
+
+v097/v098 offline compilation: REG120/STACK0 and REG118/STACK0 respectively.
+v097 bounded smoke, memory and equivalence checks precede its paired event/NCU
+run. v098 runtime validation follows sequentially on physical GPU1.
+
+### Iteration 097 initial result — producer-count gain composes
+
+Smoke/eight-row checks and qualified b512 memcheck pass. All 8192 seed1234
+output bits and the masked case match v096; the full-target comparison uses
+three repeats. Warm 1749.06 us versus TRT 1691.90 us is about 12 us below v096.
+NCU base/stable: 120 registers, 194904 shared bytes, occupancy 17.764%, tensor
+29.515%, eligible 0.362764, long-scoreboard 5.447457, zero local sectors,
+aggregate shared conflicts 4063389/682505, diagnostic 2.997440 ms. Extended
+validation and rotating-order comparisons are pending before promotion.
+
+The v098 masked audit exits nonzero because it includes the known 78 TRT
+failures. Preserve its complete report and inspect candidate-specific pass and
+bitwise-equivalence fields before resuming; do not treat that wrapper exit as
+a new kernel failure or ignore unexpected candidate errors.

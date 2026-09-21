@@ -32,13 +32,13 @@ export CUTE_DSL_ARCH=sm_103a
 
 # Fast single-P path with closely matching TRTLLM precision; see all-row limits below.
 /opt/sglang/bin/python bench.py \
-  --kernel-version v091 --block-k 128 \
+  --kernel-version v096 --block-k 128 \
   --backends trtllm cute --scope native --check-rows 512 \
   --warmup-iters 20 --repeat-iters 100 --cache both --timing cuda-graph \
-  --output-json artifacts/v091_accuracy512_graph.json
+  --output-json artifacts/v096_accuracy512_graph.json
 
 # Short event-based tuning run, followed by one warmed NCU invocation.
-bash run_iteration.sh v091 128
+bash run_iteration.sh v096 128
 ```
 
 `run_iteration.sh` saves raw JSON, logs, NCU details/CSV and an immutable per-run
@@ -62,12 +62,33 @@ The full 8192-row/seed1234 audit checks all 268,435,456 output elements:
 | v054, P scale448 | 9, identical coordinates/values to TRTLLM | Earlier fast path |
 | v086, fused scaled exp2 input | 9 on seed1234 / 6 on seed5678, identical coordinates/values to TRTLLM | Earlier target-workload fast path |
 | v090, validity bitmaps | Same as v086 via full bitwise checks on both seeds | Earlier fast path with observed sustained speedup |
-| v091, bitmaps plus early stage release | Same as v090 via full bitwise checks on both seeds | Current fast path |
+| v091, bitmaps plus early stage release | Same as v090 via full bitwise checks on both seeds | Earlier fast path |
+| v094, four producer warps | Same as v091 via full bitwise checks on both seeds | Earlier fast path |
+| v096, pre-wait index fetching | Same as v091 via full bitwise checks on both seeds | Current fast path |
 | v049, P scale256 | 11 | Earlier timing reference |
 | v053, residual FP8 | 0 | Original higher-precision path |
 | v065, residual FP8 with V collector reuse | 0 via full bitwise equivalence to v053 | Exact-equivalence optimization |
 | v067, residual FP8 with bounded scaling anchor | 0 on two independent full-reference seeds | Earlier validated higher-precision path |
 | v075, probability scale folded into exp2 | 0 on two independent full-reference seeds | Fastest validated higher-precision path |
+
+v096 retains v091 output bits on both full 8192-row seeds, all 1024 rows of the
+short case and the masked input; qualified b512 memcheck reports zero errors.
+Its 20/100 eager-event warm/cold medians are 1806.46/1795.95 µs versus paired
+TRT 1886.18/1916.88 µs; Graph medians are 1806.54/1796.08 µs versus
+1880.22/1920.86 µs. Three rotated orders give warm 1769.98–1771.74 µs versus
+TRT 1869.81–1878.22 µs, improving on v094 in every ordering. It moves the
+read-only global index fetch before stage-reuse waiting while keeping shared
+publication after that wait. This preserves the documented FP8 precision limits;
+it does not establish an all-row FP32-reference pass. v075 remains the validated
+higher-precision option.
+
+v094 retains v091 output bits on both full8192-row seeds, the1024-row short
+case and the masked input; qualified b512 memcheck reports zero errors. Its
+20/100 eager-event warm/cold medians are1839.30/1837.06 µs versus paired TRT
+1874.00/1923.28 µs, and Graph medians1839.20/1827.62 µs versus1865.82/1927.14 µs.
+A four-order audit gives warm1819.04–1819.97 µs versusTRT1867.92–1870.10 µs,
+and improves on v091 in every ordering. It uses384 threads with four producer
+warps, keeping the256-thread compute path. The same precision limits below apply.
 
 v091 matches v090 bitwise on both full8192-row seeds, the1024-row short case
 and the masked input, with qualified b512 memcheck reporting zero errors.
@@ -128,7 +149,7 @@ To reproduce the full shared-reference audit (accuracy only):
 
 ```bash
 /opt/sglang/bin/python validate_full_accuracy.py \
-  --kernel-versions v091 v075 --include-trtllm \
+  --kernel-versions v096 v075 --include-trtllm \
   --output-json artifacts/full_accuracy_seed1234.json
 ```
 
