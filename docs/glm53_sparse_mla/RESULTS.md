@@ -69,6 +69,8 @@ B300 physical GPU1; b8192, H64, D576/512, TopK2048, chunk3. Each row is a paired
 | v067 | 2048.38 | 1693.86 | 0.8269x | 102 | 0.00 / 0.00 | 37.47% | all8192 rows PASS, seeds1234/5678 |
 | v068 | 2820.26 | 1691.87 | 0.5999x | 128 | 28.05 / 11.54 | 28.35% | prototype |
 | v069 | 2043.84 | 1693.66 | 0.8287x | 102 | 0.00 / 0.00 | 37.65% | all8192 rows PASS, seeds1234/5678 |
+| v071 | 2228.32 | 1691.90 | 0.7593x | 128 | 20.19 / 2.39 | 23.34% | prototype |
+| v072 | 2218.21 | 1691.55 | 0.7626x | 128 | 11.01 / 1.86 | 23.40% | prototype |
 
 Raw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. No fully validated implementation has yet established a speedup over TRTLLM.
 

@@ -2053,3 +2053,71 @@ seed5678. Their max_abs errors rise to0.011162430/0.010025859 and relative_RMSE
 to0.001953739/0.001952327. A max absolute error over0.01 can still pass the
 unchanged atol+rtol criterion; no threshold was altered. Prefer v067's
 better precision and already completed stable/edge validation.
+
+### Iteration 070 smoke rejection
+
+Original tolerance fails on1/65536 elements in b2 smoke:row0/head1/channel486,
+absolute error0.011013217,relative error1.646965. The runner stops before
+benchmark/NCU; no speed is claimed and no tolerance is relaxed. The planned
+full performance run is not executed. Wide anchors need the residual term.
+
+## Iteration 071 — M32 head tiles with weight-stationary B reuse
+
+Based onv054, keep exact running maxima and P scale448, but use two M32 head
+tiles instead of one M64 tile. Each compute group owns32 heads and all128
+keys. PTX Layout G maps key quarters across four32-DP regions. Output uses
+two N256 tiles per head group, still256 physical TMEM columns. Probability
+stores, partial reductions, denominator ownership and output staging are
+remapped explicitly.
+
+For each QK/PV K32 step, fill B collector0 for the first head tile and reuse
+it for the second. This doubles MMA instruction count at halfM, keeping
+useful arithmetic unchanged; savings may not offset issue overhead. Each
+output retains MMA accumulation order, while denominator sum order changes.
+Coordinate audit, offline compile, bounded smoke and NCU precede promotion.
+The retained M64 CuTe MMA objects are unused wrapper scaffolding; actual
+inline idesc encodesM32. Source:[NVIDIA Layout G](https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#tcgen05-data-path-layout-g).
+
+### Iteration 071 result — spills obscure the M32 reuse hypothesis
+
+Coordinate audit, offline compile, b2 smoke and target eight-row checks pass.
+Warm events2228.32us versusTRT1691.90us regress fromv054. NCU:128 registers,
+194872 shared bytes,occupancy23.258%,tensor23.336%,eligible0.457546,
+long-scoreboard7.073924,local read/write sectors20185088/2391696,shared
+conflicts5955718/852765,diagnostic3.786240ms. CUBIN STACK40 agrees with the
+large local traffic. No expanded accuracy or promotion for this experiment.
+
+## Iteration 072 — isolate M32 performance with explicit role registers
+
+Based onv071, add producer32/compute208 register limits inside the long-lived
+role branches. The total requested budget is61440 registers for512 threads;
+inspect the actual CUBIN pool and USETMAXREG instructions before launching.
+This tests whether removing local traffic can make the M32 B-collector design
+competitive. Arithmetic, tile layout and synchronization are unchanged.
+Offline resource inspection, bounded smoke, paired events and NCU pending.
+
+### Iteration 072 result — hints removed; M32 remains slower
+
+PTX contains32/208 setmaxnreg but SASS contains no USETMAXREG. CUBIN REG128,
+STACK32: this is a static code-generation change, not verified dynamic role
+allocation. Smoke/eight-row checks pass. Warm2218.21us versusTRT1691.55us.
+NCU:128 registers,194872 shared bytes,occupancy23.265%,tensor23.405%,eligible
+0.471148,long-scoreboard6.935508,local sectors11010048/1861796,shared
+conflicts6187629/928314,diagnostic3.774368ms. Local loads fall but speed barely
+changes. The experiment does not establish spill-free M32 performance.
+
+## Iteration 073 — revisit normal MMA and TMEM probabilities
+
+Composev036's normal-MMA Layout F/TMEM-P implementation with later changes:
+Q TMA concurrent with KV gathering, eight producer warps, deferred cross-group
+denominator summation, one shared reciprocal per head, packed correction with
+one store wait per four fragments, and shared-memory output staging followed
+by128-bit global stores. Use single-P scale448 as in the baseline-precision
+path. Producer32/compute208 hints are included but require SASS verification.
+
+Packed probabilities retainv036's audited duplication into both16-lane DP
+halves. The epilogue uses the one-head correction copy layout and separately
+audits contiguous8-element BF16 vectors. Denominator accumulation order changes;
+no bitwise or full-accuracy claim is inherited. This tests whether the old
+TMEM-P result was dominated by its old scalar epilogue and spill behavior.
+Coordinate audit, offline inspection, bounded smoke, events and NCU pending.

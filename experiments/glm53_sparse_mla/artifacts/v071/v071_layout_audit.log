@@ -1,0 +1,2 @@
+WS COPY AUDIT PASS: physical datapath = local thread id, column = element index
+LAYOUT G SCORE/OUTPUT AUDIT PASS: unique full coverage and physical mapping
