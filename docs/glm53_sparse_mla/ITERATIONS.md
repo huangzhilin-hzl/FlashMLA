@@ -506,3 +506,15 @@ conflicts 2548516 / 262695. Diagnostic duration 5.15706 ms.
 The paired baseline's tensor activity is 62.491%. The next target is to
 overlap QK for tile i+1 with softmax/correction for tile i, and PV for tile i
 with softmax for tile i+1, rather than serially waiting after both MMAs.
+
+## Iteration 017 — overlap adjacent attention tiles
+
+File: `experiments/glm53_sparse_mla/kernel_v017.py`, based on v016.
+Allocate two S regions in the unused TMEM lane half and two shared P buffers.
+Prime QK for tile 0, then issue QK for tile i+1 before computing tile i's
+softmax. Signal the KV/P stage's empty barrier directly from PV completion,
+rather than making compute warps wait immediately after PV. Wait for previous
+PV only before updating the running O accumulator; wait for the last PV before
+epilogue. This removes some serialized QK/PV waits, within the two-KV-stage
+capacity constraint. Producer/consumer phase arithmetic and resource pressure
+require fresh smoke, full-target, and memory validation. Measurements pending.
