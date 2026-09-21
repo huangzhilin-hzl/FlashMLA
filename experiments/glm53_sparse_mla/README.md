@@ -32,13 +32,13 @@ export CUTE_DSL_ARCH=sm_103a
 
 # Full target, paired comparison, expanded sampled correctness, stable timing.
 /opt/sglang/bin/python bench.py \
-  --kernel-version v039 --block-k 128 \
+  --kernel-version v044 --block-k 128 \
   --backends trtllm cute --scope native --check-rows 64 \
   --warmup-iters 20 --repeat-iters 100 --cache both --timing cuda-graph \
-  --output-json artifacts/v039_full_graph.json
+  --output-json artifacts/v044_full_graph.json
 
 # Short event-based tuning run, followed by one warmed NCU invocation.
-bash run_iteration.sh v039 128
+bash run_iteration.sh v044 128
 ```
 
 `run_iteration.sh` saves raw JSON, logs, NCU details/CSV and an immutable per-run
@@ -55,7 +55,7 @@ python3 experiments/glm53_sparse_mla/summarize.py > docs/glm53_sparse_mla/RESULT
 ## Validation limits
 
 Full-target iterations use the original FP32 reference and unchanged tolerances
-(`atol=0.01`, `rtol=0.05`). The usual tuning check samples 8 rows. v013, v016, v034, v037 and v039 also
+(`atol=0.01`, `rtol=0.05`). The usual tuning check samples 8 rows. v013, v016, v034, v037, v039 and v044 also
 passed 64 sampled rows on the target chunk3, with graph warm/cold measurements.
 That is not exhaustive validation of all rows, shapes or quantization scales.
 

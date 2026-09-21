@@ -1,0 +1,5 @@
+usage: profile_ncu.py [-h] --backend {trtllm,cute}
+                      [--kernel-version KERNEL_VERSION] [--block-k BLOCK_K]
+                      [--local-tokens LOCAL_TOKENS]
+profile_ncu.py: error: the following arguments are required: --backend
+==ERROR== The application returned an error code (2).

@@ -1155,3 +1155,138 @@ keeps each element's FP32 rounding; this introduces no approximation threshold.
 The aim is fewer CUDA-core instructions while retaining the same TMEM
 load/store sizes and synchronization. Numerical checks, code-generation
 inspection and performance profiling are pending.
+
+### Iteration 040 result
+
+Smoke and full-target 8-row checks pass with unchanged numerical errors.
+Paired events: candidate 2326.69 us versus TRTLLM 1691.78 us. NCU reports
+118 registers, shared 194864 bytes, occupancy 17.066%, tensor active 22.305%,
+eligible 0.43163, long scoreboard 4.52265, local sectors 0/0, shared conflicts
+4418255/1801227, diagnostic 3.964032 ms. This is effectively tied with v039;
+explicit packed multiplication alone has no demonstrated meaningful gain.
+
+## Iteration 041 — one store-completion wait per correction phase
+
+Based on v040, move tcgen05.wait::st from every disjoint output correction
+chunk to the end of that correction loop. The consumer PV MMA still follows
+the completion wait, before-thread-sync fence, full compute barrier and
+after-thread-sync fence. Every TMEM load remains followed by wait::ld before
+its registers are consumed. FlashInfer's correction loops also batch stores
+with one completion wait at the end. No matrix layout or softmax math changes.
+This tests whether four serialized store waits contribute to latency; checks
+and NCU are pending.
+
+## Iteration 042 — widen one-head correction fragments
+
+Based on v041, use Ld/St32x32b Rep64 for output correction: each thread handles
+64 contiguous values per load instead of 32, and each group makes two chunks
+instead of four. The score loader, P stores and coalesced output epilogue are
+unchanged. The previous non-.ws v032/v033 attempt needed 128 correction values
+per thread and incurred heavy local traffic; this version needs only 64, but
+register/local-traffic checks remain essential. Goal: amortize TMEM load waits
+without repeating that register-pressure regression. Validation pending.
+
+### Iteration 041 result
+
+Smoke/full-target 8-row checks pass with unchanged errors. Paired warm median
+2316.58 us versus TRTLLM 1691.84 us: a small approximately 0.4% improvement,
+not yet an independently established stable gain. NCU: 118 registers, 194864
+shared bytes, occupancy 17.066%, tensor 22.411%, eligible 0.43267, long
+scoreboard 4.52469, local sectors 0/0, shared conflicts 4429451/1812978,
+diagnostic 3.947232 ms.
+
+## Iteration 043 — overlap next softmax with current PV
+
+Based on v041, retain two compute groups and the one-head .ws layout, but
+prime QK0 and submit QK(next) before PV(current). Separate QK/PV completion
+barriers allow the next softmax to execute while the preceding PV finishes.
+Wait for that preceding PV before correcting its O accumulator. Two shared
+P buffers protect outstanding PV reads; a single TMEM S buffer remains safe
+because all score readers have passed the pre-PV compute barrier before the
+next QK overwrites it. The producer's empty-stage release is now a tcgen05
+completion commit after PV, rather than a manual arrival after an all-thread
+PV wait. The final PV is explicitly drained before epilogue.
+
+This revisits v028's overlap hypothesis with the faster .ws data path and
+without adding an independent MMA warp. Required before/after-thread-sync
+fences remain, and QK/PV phases now each advance once per tile. This is a
+synchronization change requiring smoke, full-target, expanded and device
+memory validation before promotion. Compile/runtime/profiling pending.
+
+### Iteration 042 result
+
+Smoke/full-target 8-row checks pass, but latency regresses to 2367.33 us versus
+TRTLLM 1689.82 us. NCU: 168 registers, 194864 shared bytes, occupancy 17.011%,
+tensor 21.980%, eligible 0.41415, long scoreboard 4.59918, local sectors
+6291456/1583320, shared conflicts 5314480/1549018, diagnostic 4.024064 ms.
+The wider fragment introduces local traffic and is not promoted.
+
+### Iteration 043 result
+
+Smoke/full-target checks pass with unchanged errors, but paired warm latency
+2712.74 us versus TRTLLM 1691.68 us regresses substantially. NCU: 110 registers,
+203064 shared bytes, occupancy 17.244%, tensor 20.817%, eligible 0.38426, long
+scoreboard 5.09995, zero local sectors, shared conflicts 8530638/980345,
+diagnostic 4.244512 ms. The intended overlap is insufficient to offset its
+changed scheduling/wait behavior. Retain the evidence, return to v041.
+
+### v039 instruction-level sampling findings
+
+NCU SourceCounters plus WarpStateStats were collected separately, preserving
+the SASS/source CSV. The first command omitted profile_ncu.py's required
+--backend argument and exited before profiling; both the command-error log
+and the corrected run are retained. The largest long-scoreboard samples
+occur at branches consuming SYNCS.PHASECHK.TRYWAIT results, including the
+QK-completion wait and producer empty-stage wait. This metric must not be
+interpreted simply as HBM load latency. v039 already emits FMUL2 in correction
+(for example CSV lines 1003/1023/1043/1063), explaining why explicitly requesting
+packed multiplies in v040 has little effect. Its epilogue also expands into
+many scalar division/refinement and STG.E.U16 instructions.
+
+## Iteration 044 — compute normalization reciprocal once per head
+
+Based on v041, store 1/(256*total_sum) in the final shared denominator slot
+once per head, then normalize all output values with a multiplication.
+Previously every output value used a division by the same head denominator;
+the emitted SASS contains repeated reciprocal refinement sequences. This
+reduces 512 divisions per head to one without changing the attention formula.
+FP32 evaluation order changes slightly, so unchanged-tolerance numerical
+validation is required. No approximate reciprocal intrinsic is introduced.
+Validation/profiling pending.
+
+### Iteration 044 result and expanded validation
+
+Smoke/full-target 8-row checks pass: max_abs 0.006737709, relative_RMSE
+0.014866707. Paired warm events 2277.73 us versus TRTLLM 1691.84 us.
+NCU: 120 registers, 194864 shared bytes, occupancy 17.152%, tensor 22.839%,
+eligible 0.39933, long scoreboard 5.17866, local sectors 0/0, shared conflicts
+4439682/1780919, diagnostic 3.875360 ms.
+
+64-row Graph validation passes with max_abs 0.009754896 and relative_RMSE
+0.014703941. Warm: 2283.34 us versus TRTLLM 1844.90 us; cold: 2289.49 us versus
+TRTLLM 1896.56 us. The candidate is about 2.1% faster than v039's Graph run;
+the paired TRT result and its quantiles are preserved because clocks are not
+locked. Qualified b512/chunk0 device memcheck reports zero device errors and
+rows 0/511 pass at max_abs 0.006182492. v044 is the new best validated version.
+
+The offline epilogue-coordinate inspection shows each thread owns two heads
+and strided columns (e.g. thread0: (head0,col0), (head8,col0), (head0,col4),
+(head8,col4), ...). Therefore simply replacing scalar output stores with a
+contiguous vector store would be incorrect; a real layout redistribution
+is required.
+
+## Iteration 045 — stage BF16 output for vectorized global writes
+
+Based on v044, after the final PV and compute barrier, reinterpret the first
+64 KiB KV-main stage as a SW128 BF16 [64,512] output buffer. All KV reads have
+completed and the producer has no further payload writes. Load TMEM output
+using the already validated one-head physical [128,32] copy, normalize and
+convert groups of 32 values, and write 128-bit BF16 vectors to shared memory.
+After a compute barrier, redistribute contiguous groups of eight BF16 values
+across threads and issue 128-bit global stores. This avoids pretending the
+old epilogue's per-thread strided coordinates are contiguous.
+
+The alias footprint is statically checked against the old KV stage. No
+additional shared allocation is introduced. The extra shared round trip and
+barrier may offset the better global transaction pattern; this is a measured
+hypothesis, not a claimed gain. Numerical/memory validation and NCU pending.
