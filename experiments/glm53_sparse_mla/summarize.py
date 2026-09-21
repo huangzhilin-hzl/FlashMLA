@@ -82,7 +82,13 @@ for directory in sorted(root.glob("v[0-9][0-9][0-9]")):
     if version == "v128":
         status = "bitwise v114 full2seeds/short/masks; current higher precision"
     if version == "v129":
-        status = "bitwise v125 full seed1234/mask; cache-policy validation pending"
+        status = "bitwise v125 full2seeds/short/masks; cold gain, mixed warm; not promoted"
+    if version == "v130":
+        status = "bitwise v125 full seed1234/mask; mixed cache-policy gain"
+    if version == "v131":
+        status = "bitwise v125 full seed1234/mask; mandatory lookahead slower"
+    if version == "v132":
+        status = "bitwise v125 full seed1234/mask; conditional lookahead, no net gain"
     if version == "v109":
         status = "bitwise v105 full seed1234; slower overlap control"
     if version == "v098":
@@ -105,7 +111,7 @@ for directory in sorted(root.glob("v[0-9][0-9][0-9]")):
         status = "non-isolated timing; do not rank"
     print(f"| {version} | {candidate['median_us']:.2f} | {baseline['median_us']:.2f} | {candidate['speedup_vs_trtllm']:.4f}x | {metrics['launch__registers_per_thread']} | {traffic} | {tensor:.2f}% | {status} |")
 print("\nRaw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. v090/v091/v094/v096/v097/v105/v108/v112/v125 have an observed sustained warm advantage in the extended eager-event, Graph and rotating-order runs, at baseline-level FP8 precision; v125 is the current fast path. Short five-event v125 tuning has a small observed advantage; v105 is near parity. Use the matching execution regime and retained distributions. v086 is near parity warm and its initial cold advantage does not reproduce in its rotating-order audit.\n")
-graph_paths = sorted(root.glob("v[0-9][0-9][0-9]_validation*/*_graph*.json"))
+graph_paths = sorted(root.glob("v[0-9][0-9][0-9]_validation*/*graph*.json"))
 if graph_paths:
     print("## CUDA Graph validation runs\n")
     print("These are separate warm/cold runs with 20 warmups and 100 repeats; sampled row counts are shown explicitly.\n")
@@ -121,7 +127,7 @@ if graph_paths:
             checked_rows = len(result["correctness"][candidate["case"]]["rows"])
             print(f"| {version} | {checked_rows} | {candidate['cache']} | {candidate['median_us']:.2f} | {baseline['median_us']:.2f} | {candidate['speedup_vs_trtllm']:.4f}x |")
     print()
-event_paths = sorted(root.glob("v[0-9][0-9][0-9]_validation*/*_event100.json"))
+event_paths = sorted(p for p in root.glob("v[0-9][0-9][0-9]_validation*/*_event100.json") if "graph" not in p.name)
 if event_paths:
     print("## Extended eager CUDA-event runs\n")
     print("20 warmups and 100 repeats; the unchanged original timing function.\n")

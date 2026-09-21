@@ -3969,3 +3969,146 @@ occupancy19.311%, tensor31.398%, eligible0.388990, long-scoreboard6.191804,
 zero local sectors, aggregate shared conflicts6372695/1916474, diagnostic
 2.815552 ms. No sustained-gain claim until rotating orders and hardware memory
 counters assess the cache policy. Extra seed/short audits are not yet performed.
+
+### Iteration 130 result — KV retention hint does not provide a consistent gain
+
+Offline REG85/STACK0. Full8192 seed1234 matches v125 bitwise in three repeats;
+masked bits also match, preserving the86 FP32-tolerance failures versus TRT's78.
+Qualified b512 memcheck reports zero errors. Short warm1646.94 us versusTRT
+1689.95 us nearly tiesv1251648.86 us. NCU base/stable:85 registers,194920 shared
+bytes, occupancy19.344%, tensor31.448%, eligible0.411345, long-scoreboard5.988450,
+zero local sectors, aggregate shared conflicts5819901/4345382, diagnostic
+2.811104 ms. No second-seed/short/synccheck expansion yet.
+
+Four rotating warm medians (us):v1251690.18/1678.74/1689.74/1689.76,
+v1291687.68/1681.30/1679.41/1688.54,v1301687.57/1688.78/1689.86/1687.76,
+TRT1874.05/1869.79/1871.98/1869.79. Cold:v1251687.41/1688.66/1680.96/1687.58,
+v1291677.09/1679.54/1676.22/1675.33,v1301691.57/1685.50/1691.60/1681.30,
+TRT1851.55/1853.41/1853.36/1853.34. KV evict-last has mixed changes in both
+cache modes and is not promoted. Output evict-first wins all four cold orderings
+by4.74–12.26 us, but one warm ordering loses2.56 us; keepv125 as current fast
+path while extendingv129 validation. These are observed round medians, not CIs.
+
+Hardware memory profiling uses clock-control none, pipeline-boost dynamic and
+cache-control none, after ten warmups. Each version is a separate invocation;
+NCU reports three replay passes. Diagnostic readings:
+
+| Version | DRAM read GB | DRAM write MB | Global store sectors | L2 hit % | L2 read sectors | L2 write sectors | GPC GHz | Profile ms |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| v125 | 1.567498 | 526.662656 | 16777216 | 75.269081 | 378242863 | 25169201 | 1.897222 | 1.647648 |
+| v129 | 1.429414 | 526.148608 | 16777216 | 76.827832 | 372228707 | 25169083 | 1.900051 | 1.644608 |
+| v130 | 1.563670 | 527.449344 | 16777216 | 75.269356 | 378339460 | 25180534 | 1.899039 | 1.642880 |
+
+The hardware store count equals512MiB/32B for every version, resolving the
+SourceCounters theoretical-sector anomaly without claiming less output traffic.
+v129 lowers observed DRAM reads about8.81% and raises aggregate L2 hit rate
+1.56 percentage points; this supports the cache-policy hypothesis but is not
+alone proof of a stable latency gain. v130 scarcely changes either quantity.
+Counter replay and separate runs limit causal interpretation of small differences.
+
+## Iteration 131 — early score-consumption publication for QK lookahead
+
+Based on v125. Add a count256 score-consumed mbarrier. Every compute thread drains
+its score TMEM load and emits a before-thread-sync fence before arriving. The
+independent MMA warp acquires this barrier before reusing the same score buffer
+for the next QK. It waits for that next KV stage and submits QK before waiting for
+current P/correction readiness and submitting current PV. Bootstrap QK0 and
+handle the final tile without a future QK. Keep current KV release after PV and
+retain all original arithmetic, masks and256-bit output stores.
+
+This tests whether next QK overlaps softmax/correction enough to repay the extra
+barrier. It can instead delay PV while waiting for future KV. Unlike older v074,
+it uses a single score buffer with explicit read completion, the current four
+producer warps, bitmap masks and optimized arithmetic/output; v074's failure is
+a warning, not evidence that the new schedule wins. Compilation, bounded smoke,
+qualified sync/memory checks and full equivalence must precede promotion.
+
+## Iteration 132 — opportunistic QK lookahead
+
+Based on v131, isolate the cost of blocking future-KV readiness ahead of current
+PV. After acquiring score-consumed, test the next full-stage mbarrier once with
+CuTeDSL mbarrier_test_wait and make the result warp-uniform with vote_all_sync.
+If ready, issue next QK before current PV; otherwise issue current PV first and
+then wait/issue next QK, following v125's relative MMA ordering. Retain the new
+score-consumed barrier in both paths to isolate the issue-order decision. Both
+paths keep an acquiring full wait, TC/shared fences and one QK commit; no tile
+is omitted. This adds control/instruction footprint and may still lose even if
+it removes the mandatory future-copy stall. No performance claim before tests.
+
+The installed cutlass-dsl4.6.2 implementation maps mbarrier_test_wait to NVVM
+MBarrierWaitKind.TEST (versus TRY for mbarrier_try_wait). Official semantics:
+https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#parallel-synchronization-and-communication-instructions-mbarrier-test-wait-mbarrier-try-wait
+
+### Iteration 129 expanded validation — cache hint retains numerical behavior
+
+Full8192 seeds1234/5678 and full1024 short/chunk0 seed5678 now all matchv125
+bitwise in three repeats. Masked bits match, and qualified b2 synccheck/b512
+memcheck report zero errors. All inherited fast-path tolerance limitations remain.
+Eager20/100 warm/cold1718.29/1720.53 us versusTRT1877.76/1911.38 us; Graph
+1714.40/1697.74 us versusTRT1865.87/1915.04 us. These separately run medians
+improve over recordedv125 results, but the first rotation included a warm loss;
+a new six-roundv125/v129 rotation tests reproducibility before changing defaults.
+
+### Iteration 131 result — lookahead transfers stalls to current PV
+
+Offline REG84/STACK0; full8192 seed1234 and masked outputs matchv125 bitwise,
+qualified b2 synccheck/b512 memcheck report zero errors. Short warm2037.98 us
+versusTRT1691.87 us is389 us slower thanv125; reject this mandatory-lookahead
+schedule. NCU base/stable:84 registers,194928 shared bytes, occupancy19.467%,
+tensor27.329%, eligible0.412530, long-scoreboard7.175538, zero local sectors,
+aggregate shared conflicts65339/7385278, diagnostic3.233280 ms. No expanded
+second-seed/short audit or sustained timing is warranted for this slower version.
+
+Unlocked SourceCounters:615714951 instructions, shared wavefronts20275200 equal
+ideal with zero excessive. Long-scoreboard samples86701, including45441 at PV
+wait (barrier offset0x2f928),22256 at producer-empty (0x2f960),3321 at issuer
+future-full wait (0x2f950) and1142 at score-consumed (0x2f938). v125 PV-wait
+samples were17445. This is consistent with delayed PV in the reordered schedule;
+sampling alone does not isolate the exact causal latency of future-copy waits
+versus extra synchronization or TC arbitration. v132 is the conditional-order
+control. The sampled totals are not percentages of execution time.
+
+## Iteration 133 — output evict-first on the higher-precision path
+
+Based on v128, change only the32-byte output store's L2 eviction priority to
+evict-first, as in v129. Preserve residual FP8 arithmetic, barriers, layouts,
+vector width and alignment. The fast-path memory counters suggest less KV
+competition, but the higher-precision kernel may have a different bottleneck;
+measure it independently and compare output bits to v128 before any promotion.
+
+## Iteration 134 — reuse max-reduction synchronization for score publication
+
+Based on v132's opportunistic schedule. Replace the256-arrival score-consumed
+barrier with count1, published by tid0 after the existing256-thread max-reduction
+barrier and its TC fences. All score loads were drained and fenced before that
+barrier, so its representative can publish their collective completion before
+issuer reuse. Remove the earlier extra per-thread arrival/fence. Arithmetic and
+QK/PV readiness decisions remain unchanged, but publication happens later;
+it may reduce synchronization overhead at the expense of a shorter overlap
+window. Validate phase reuse and all-row equivalence before ranking.
+
+### Iteration 132 result — avoid future-copy blocking, still no net gain
+
+Offline REG84/STACK0. Full8192 seed1234 and masked output bits matchv125;
+qualified b2 synccheck/b512 memcheck report zero errors. Short warm1661.15 us
+versusTRT1689.86 us recovers376.83 us fromv131 but remains12.29 us slower than
+recordedv125. NCU base/stable:84 registers,194928 shared bytes, occupancy19.316%,
+tensor31.127%, eligible0.397529, long-scoreboard6.005708, zero local sectors,
+aggregate shared conflicts6271507/1832194, diagnostic2.838240 ms. Retain as an
+issue-order diagnostic; no promotion or second-seed/short expansion. v134 tests
+whether cheaper score publication removes the remaining overhead.
+
+### Iteration 129 repeat rotation — small average benefit, not every ordering
+
+A second same-process six-round rotation (20warm/100Graph repeats) gives warm
+medians (us):v1251689.74/1690.53/1689.82/1690.82/1691.74/1681.02,
+v1291683.17/1681.39/1686.72/1688.30/1687.71/1689.60,
+TRT1867.76/1876.11/1876.14/1880.34/1878.18/1880.22. Cold:v1251686.64/1683.52/
+1683.38/1684.51/1693.65/1683.46,v1291681.34/1677.20/1677.09/1675.39/1683.34/
+1683.58,TRT1857.50/1865.71/1865.70/1859.52/1856.96/1859.70. v129 wins five
+of six rounds in each cache mode, with a warm loss8.58 us and a cold near-tie
+loss0.13 us. Combined with the first rotation, it wins8/10 warm and9/10 cold
+round medians. This is a small empirical/cache-counter-supported improvement,
+not a universal guarantee; keepv125 as the established default and retainv129 as
+a fully bitwise-validated cache-policy alternative. No further repeated timing
+solely to obtain a favorable ordering is needed.

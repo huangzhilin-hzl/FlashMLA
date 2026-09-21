@@ -309,3 +309,15 @@ in this DSL. For those fake-tensor compilations, select the authorized GPU1,
 run `check_gpu_idle.py`, and add `--initialize-cuda` to `compile_offline.py`.
 That opt-in creates a CUDA context but launches no candidate kernel; the JSON
 record distinguishes it from the default context-free compilation.
+
+
+Cache-policy follow-up: `v129` changes only v125's output L2 priority to
+evict-first. Full2seeds/short/mask bitwise equivalence and qualified sanitizers
+pass. Two rotating-order audits favor it in8/10 warm and9/10 cold round medians,
+but the gain is small and includes regressions in individual orders. Hardware
+counters show about8.8% less DRAM read traffic in the recorded warmed profile.
+It is a validated experimental alternative; v125 remains the established default.
+KV evict-last (`v130`) has no consistent gain. Mandatory future-QK lookahead
+(`v131`) delays PV and regresses to2.038ms; readiness-conditional lookahead
+(`v132`) recovers to1.661ms but still does not improvev125. See the iteration log
+for the complete sampled accuracy, timing and profiling limits.

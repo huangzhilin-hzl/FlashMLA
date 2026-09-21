@@ -125,7 +125,10 @@ B300 physical GPU1; b8192, H64, D576/512, TopK2048, chunk3. Each row is a paired
 | v126 | 2152.67 | 1691.78 | 0.7859x | 128 | 193.31 / 154.47 | 24.01% | bitwise v112 full seed1234/mask; more spills; slower |
 | v127 | 1786.05 | 1689.98 | 0.9462x | 128 | 71.67 / 41.20 | 28.95% | bitwise v112 full seed1234/mask; spills unchanged; slower |
 | v128 | 1802.37 | 1691.71 | 0.9386x | 122 | 0.00 / 0.00 | 42.19% | bitwise v114 full2seeds/short/masks; current higher precision |
-| v129 | 1646.72 | 1693.63 | 1.0285x | 85 | 0.00 / 0.00 | 31.40% | bitwise v125 full seed1234/mask; cache-policy validation pending |
+| v129 | 1646.72 | 1693.63 | 1.0285x | 85 | 0.00 / 0.00 | 31.40% | bitwise v125 full2seeds/short/masks; cold gain, mixed warm; not promoted |
+| v130 | 1646.94 | 1689.95 | 1.0261x | 85 | 0.00 / 0.00 | 31.45% | bitwise v125 full seed1234/mask; mixed cache-policy gain |
+| v131 | 2037.98 | 1691.87 | 0.8302x | 84 | 0.00 / 0.00 | 27.33% | bitwise v125 full seed1234/mask; mandatory lookahead slower |
+| v132 | 1661.15 | 1689.86 | 1.0173x | 84 | 0.00 / 0.00 | 31.13% | bitwise v125 full seed1234/mask; conditional lookahead, no net gain |
 
 Raw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. v090/v091/v094/v096/v097/v105/v108/v112/v125 have an observed sustained warm advantage in the extended eager-event, Graph and rotating-order runs, at baseline-level FP8 precision; v125 is the current fast path. Short five-event v125 tuning has a small observed advantage; v105 is near parity. Use the matching execution regime and retained distributions. v086 is near parity warm and its initial cold advantage does not reproduce in its rotating-order audit.
 
@@ -199,6 +202,8 @@ These are separate warm/cold runs with 20 warmups and 100 repeats; sampled row c
 | v125 | 512 | cold | 1720.40 | 1914.78 | 1.1130x |
 | v128 | 512 | warm | 1970.22 | 1871.52 | 0.9499x |
 | v128 | 512 | cold | 1945.54 | 1916.35 | 0.9850x |
+| v129 | 512 | warm | 1714.40 | 1865.87 | 1.0884x |
+| v129 | 512 | cold | 1697.74 | 1915.04 | 1.1280x |
 
 ## Extended eager CUDA-event runs
 
@@ -232,6 +237,8 @@ These are separate warm/cold runs with 20 warmups and 100 repeats; sampled row c
 | v125 | 512 | cold | 1733.12 | 1911.52 | 1.1029x |
 | v128 | 512 | warm | 1941.71 | 1880.22 | 0.9683x |
 | v128 | 512 | cold | 1945.70 | 1916.98 | 0.9852x |
+| v129 | 512 | warm | 1718.29 | 1877.76 | 1.0928x |
+| v129 | 512 | cold | 1720.53 | 1911.38 | 1.1109x |
 
 ## Same-process rotating-order audits
 
@@ -305,5 +312,15 @@ Ranges below are the minimum and maximum per-round medians or paired ratios, not
 | v114_v128_round_robin | cute-v114/native | cold | 3 | 1927.20–1929.12 | 0.9629–0.9681x |
 | v114_v128_round_robin | cute-v128/native | warm | 3 | 1922.99–1925.22 | 0.9721–0.9787x |
 | v114_v128_round_robin | cute-v128/native | cold | 3 | 1916.85–1917.02 | 0.9689–0.9733x |
+| v125_v129_repeat_round_robin | cute-v125/native | warm | 6 | 1681.02–1691.74 | 1.1054–1.1185x |
+| v125_v129_repeat_round_robin | cute-v125/native | cold | 6 | 1683.38–1693.65 | 1.0964–1.1083x |
+| v125_v129_repeat_round_robin | cute-v129/native | warm | 6 | 1681.39–1689.60 | 1.1097–1.1158x |
+| v125_v129_repeat_round_robin | cute-v129/native | cold | 6 | 1675.39–1683.58 | 1.1031–1.1125x |
+| v125_v129_v130_round_robin | cute-v125/native | warm | 4 | 1678.74–1690.18 | 1.1065–1.1138x |
+| v125_v129_v130_round_robin | cute-v125/native | cold | 4 | 1680.96–1688.66 | 1.0973–1.1026x |
+| v125_v129_v130_round_robin | cute-v129/native | warm | 4 | 1679.41–1688.54 | 1.1073–1.1147x |
+| v125_v129_v130_round_robin | cute-v129/native | cold | 4 | 1675.33–1679.54 | 1.1035–1.1063x |
+| v125_v129_v130_round_robin | cute-v130/native | warm | 4 | 1687.57–1689.86 | 1.1072–1.1105x |
+| v125_v129_v130_round_robin | cute-v130/native | cold | 4 | 1681.30–1691.60 | 1.0946–1.1023x |
 
 See [ITERATIONS.md](ITERATIONS.md) for changes, failed hypotheses, correctness limits and source references.
