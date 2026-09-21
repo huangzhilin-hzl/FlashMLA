@@ -2686,3 +2686,107 @@ index, so bitmap index is stage*4+(ctid//64)*2+cgroup and bit index is j.
 Unlike v080 there is no all-valid branch or cross-warp flag reduction. Internal
 holes and partial tiles follow the same per-element predicate as v086. Compile,
 bounded smoke, masked comparison, full equivalence and profiling are pending.
+
+### Iteration 090 initial result — validity bitmaps improve the fast path
+
+Offline REG118/STACK0. Smoke/eight-row checks and qualified b512 memcheck pass.
+Warm events1828.80 us versusTRT1691.49 us. NCU base/stable:118 registers,
+194904 shared bytes, occupancy23.269%, tensor28.584%, eligible0.475524,
+long-scoreboard6.176494, zero local sectors, aggregate shared conflicts
+4152780/5476619, diagnostic3.092896 ms. The hardware conflict totals increase
+while latency decreases; they remain inappropriate as isolated address-layout
+or performance rankings.
+
+All8192 rows match v086 bitwise in three repeats at each of seeds1234 and5678;
+all1024 short-case rows match at seed5678 in three repeats. The explicit masked
+input also matches every v086 output bit, retaining its86 reference failures
+versusTRT78. Thus the audited baseline-precision limits transfer exactly for
+these inputs; no strict all-row FP32 pass is claimed.
+
+512-row Graph: warm1853.31 us versusTRT1867.95 us, cold1839.36 us versusTRT1931.57 us.
+The rotating-order audit gives warm v0901831.18/1831.63/1831.07 us versus paired
+TRT1867.86/1876.34/1878.13 us, and cold1838.98/1837.39/1838.82 us versusTRT
+1857.84/1855.66/1859.52 us. Each of the three orderings preserves an advantage.
+This supports an observed sustained Graph warm speedup of about0.8–2.6%, with
+baseline-level FP8 precision. The short five-event tuning run remains slower
+than its exceptionally fast paired TRT measurement; do not mix timing regimes.
+A20-warmup/100-repeat eager-event run will additionally match the original
+benchmark execution regime before updating the fast-path recommendation.
+
+## Iteration 091 — combine bitmaps and early stage release
+
+Based on v090, apply v089's removal of the post-PV compute rendezvous while
+retaining all PV waits and required tcgen05 fences. Probability arithmetic
+and bitmap semantics are unchanged. Test whether stage-release latency now
+composes with reduced mask-load overhead. Full bitwise/memory checks are
+required for any promotion. Compilation and measurement pending.
+
+## Iteration 092 — validity bitmaps on the higher-precision path
+
+Based on v075, publish and consume the same per32-key validity bitmaps as v090.
+Keep v075's score scaling, bounded anchor, residual FP8 probabilities, denominator
+order and all MMAs unchanged. This isolates the memory-access optimization from
+v086's raw-score reassociation. Require full output equivalence to v075 on both
+seeds, short and masked cases, plus device memcheck before promotion. Pending.
+
+### Iteration 090 promotion — original eager-event regime also improves
+
+With20 warmups/100 repeats and512 reference rows, eager CUDA events measure
+warm1859.63 us versusTRT1882.35 us (1.0122x) and cold1845.01 us versus
+TRT1919.04 us (1.0401x). This complements the Graph and rotating-order results;
+none replaces the preserved short-run result. Promote v090 as the current
+baseline-precision fast path for the specified workload. v075 remains the
+higher-precision option. Original tolerance is unchanged; shared FP8 accuracy
+failures and the more difficult masked/short cases remain explicit.
+
+v091/v092 preflight: REG118/STACK0 and REG96/STACK0 respectively. Their source
+SHAs and compiled resources are saved. Runtime validation is in progress.
+
+### Iteration 091 initial result — small compositional gain
+
+Smoke/eight-row checks and qualified b512 memcheck pass. Full8192-row seed1234
+outputs match v090 bitwise in three repeats. Warm events1820.90 us versus
+TRT1691.81 us, about8 us below v090. NCU base/stable:118 registers,194904 shared
+bytes, occupancy23.274%, tensor28.731%, eligible0.477240, long-scoreboard6.175109,
+zero local sectors, aggregate shared conflicts4147358/5428684, diagnostic3.077440 ms.
+Further full-seed/short/masked and sustained/order-rotation checks are pending.
+
+### Iteration 092 result — bitmaps do not improve the residual path
+
+REG96/STACK0. Smoke/eight-row checks and qualified b512 memcheck pass; all8192
+seed1234 output bits match v075 in three repeats. Warm events2005.18 us versus
+TRT1691.81 us, slower than v075's1990.94 us. NCU base/stable:96 registers,
+203096 shared bytes, occupancy23.305%, tensor38.146%, eligible0.541818,
+long-scoreboard6.816829, zero local sectors, aggregate shared conflicts
+3732829/3215774, diagnostic3.410016 ms. No promotion or expanded-seed/edge claim.
+Reducing mask loads and register count is insufficient to predict end-to-end
+performance when the residual-probability schedule is different.
+
+## Iteration 093 — all-valid fragment bypass using the existing bitmap
+
+Based on v090. If a compute warp's32-key bitmap is all ones, keep its raw
+score fragment without per-element predicates/stores. Otherwise execute the
+identical bit-test mask loop. Each warp shares the same fragment bitmap, so
+this branch is uniform. No extra producer votes, flag reduction or barrier is
+added, unlike v080's CTA-wide all-valid test. Interior holes and partial tiles
+still take the precise mask path. Compile, masked/bitwise/memcheck and timing
+validation are pending; no assumption about contiguous valid endpoints is used.
+
+### Iteration 091 promotion — compositional gain repeats across backend orders
+
+All8192-row seed5678 outputs and all1024-row short-case seed5678 outputs match
+v090 bitwise in three repeats each. Combined with the seed1234 full audit,
+masked bitwise equality and qualified memcheck, this transfers v090's documented
+accuracy limits on the audited inputs without altering tolerances.
+
+512-row extended eager events: warm1852.51 us versusTRT1886.94 us, cold1851.06 us
+versusTRT1917.02 us. Graph: warm1847.62 us versusTRT1863.94 us, cold1832.43 us
+versusTRT1926.14 us. Rotation warm medians are v0911822.98/1824.50/1824.83 us,
+v0901832.45/1832.91/1833.10 us, TRT1869.98/1875.98/1879.65 us. Cold medians
+v0911830.98/1830.94/1830.98 us, v0901838.37/1838.14/1839.01 us, TRT1855.63/
+1857.44/1861.79 us. v091 improves on v090 in every recorded ordering. Promote
+v091 as the current baseline-precision fast path; keep v075 for the separately
+audited higher-precision option. The five-event tuning run still favors TRT.
+
+v093 preflight: REG124/STACK0. Bounded runtime, masked comparison and memcheck
+are in progress before the full benchmark and equivalence check.

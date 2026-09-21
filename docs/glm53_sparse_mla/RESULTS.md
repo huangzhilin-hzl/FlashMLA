@@ -88,8 +88,11 @@ B300 physical GPU1; b8192, H64, D576/512, TopK2048, chunk3. Each row is a paired
 | v087 | 1872.22 | 1693.86 | 0.9047x | 119 | 0.00 / 0.00 | 27.85% | bitwise v085 on all8192 rows, seed1234 |
 | v088 | 2037.79 | 1690.85 | 0.8297x | 112 | 0.00 / 0.00 | 28.72% | bitwise v085 on all8192 rows, seed1234 |
 | v089 | 1861.44 | 1691.74 | 0.9088x | 119 | 0.00 / 0.00 | 28.07% | bitwise v086 on full/short audited inputs |
+| v090 | 1828.80 | 1691.49 | 0.9249x | 118 | 0.00 / 0.00 | 28.58% | bitwise v086, full2seeds/short/masks; FP8 limits retained |
+| v091 | 1820.90 | 1691.81 | 0.9291x | 118 | 0.00 / 0.00 | 28.73% | bitwise v090, full2seeds/short/masks; FP8 limits retained |
+| v092 | 2005.18 | 1691.81 | 0.8437x | 96 | 0.00 / 0.00 | 38.15% | bitwise v075 on all8192 rows, seed1234 |
 
-Raw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. No implementation has established a consistent sustained warm speedup over TRTLLM; v086 is near parity warm at baseline-level FP8 precision; its initial cold advantage does not reproduce in the recorded rotating-order audit.
+Raw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. v090/v091 have an observed sustained warm advantage in the extended eager-event, Graph and rotating-order runs, at baseline-level FP8 precision; v091 is the current fast path. Short five-event tuning still favors TRT; use the matching execution regime. v086 is near parity warm and its initial cold advantage does not reproduce in its rotating-order audit.
 
 ## CUDA Graph validation runs
 
@@ -135,5 +138,37 @@ These are separate warm/cold runs with 20 warmups and 100 repeats; sampled row c
 | v088 | 512 | cold | 2045.87 | 1924.62 | 0.9407x |
 | v089 | 512 | warm | 1882.21 | 1871.89 | 0.9945x |
 | v089 | 512 | cold | 1871.87 | 1927.14 | 1.0295x |
+| v090 | 512 | warm | 1853.31 | 1867.95 | 1.0079x |
+| v090 | 512 | cold | 1839.36 | 1931.57 | 1.0501x |
+
+## Extended eager CUDA-event runs
+
+20 warmups and 100 repeats; the unchanged original timing function.
+
+| Version | Checked rows | Cache | Candidate µs | Paired TRT µs | TRT/candidate |
+|---|---:|---|---:|---:|---:|
+| v090 | 512 | warm | 1859.63 | 1882.35 | 1.0122x |
+| v090 | 512 | cold | 1845.01 | 1919.04 | 1.0401x |
+| v091 | 512 | warm | 1852.51 | 1886.94 | 1.0186x |
+| v091 | 512 | cold | 1851.06 | 1917.02 | 1.0356x |
+
+## Same-process rotating-order audits
+
+Ranges below are the minimum and maximum per-round medians or paired ratios, not confidence intervals.
+
+| Audit | Candidate | Cache | Rounds | Candidate median range µs | Paired TRT/candidate range |
+|---|---|---|---:|---:|---:|
+| v086_v088_round_robin | cute-v086/native | warm | 3 | 1871.92–1872.16 | 0.9998–1.0000x |
+| v086_v088_round_robin | cute-v086/native | cold | 3 | 1878.13–1878.30 | 0.9881–0.9891x |
+| v086_v088_round_robin | cute-v088/native | warm | 3 | 2037.79–2037.89 | 0.9185–0.9186x |
+| v086_v088_round_robin | cute-v088/native | cold | 3 | 2045.86–2045.90 | 0.9071–0.9080x |
+| v086_v090_round_robin | cute-v086/native | warm | 3 | 1872.03–1872.06 | 0.9978–1.0032x |
+| v086_v090_round_robin | cute-v086/native | cold | 3 | 1878.19–1879.44 | 0.9880–0.9901x |
+| v086_v090_round_robin | cute-v090/native | warm | 3 | 1831.07–1831.63 | 1.0200–1.0257x |
+| v086_v090_round_robin | cute-v090/native | cold | 3 | 1837.39–1838.98 | 1.0099–1.0113x |
+| v090_v091_round_robin | cute-v090/native | warm | 3 | 1832.45–1833.10 | 1.0205–1.0254x |
+| v090_v091_round_robin | cute-v090/native | cold | 3 | 1838.14–1839.01 | 1.0094–1.0124x |
+| v090_v091_round_robin | cute-v091/native | warm | 3 | 1822.98–1824.83 | 1.0258–1.0300x |
+| v090_v091_round_robin | cute-v091/native | cold | 3 | 1830.94–1830.98 | 1.0135–1.0168x |
 
 See [ITERATIONS.md](ITERATIONS.md) for changes, failed hypotheses, correctness limits and source references.

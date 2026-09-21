@@ -37,6 +37,12 @@ for directory in sorted(root.glob("v[0-9][0-9][0-9]")):
         status = "same 9/6 all-row failures as TRT, seeds1234/5678"
     if version == "v088":
         status = "bitwise v085 on all8192 rows, seed1234"
+    if version == "v092":
+        status = "bitwise v075 on all8192 rows, seed1234"
+    if version == "v091":
+        status = "bitwise v090, full2seeds/short/masks; FP8 limits retained"
+    if version == "v090":
+        status = "bitwise v086, full2seeds/short/masks; FP8 limits retained"
     if version == "v089":
         status = "bitwise v086 on full/short audited inputs"
     if version == "v087":
@@ -48,7 +54,7 @@ for directory in sorted(root.glob("v[0-9][0-9][0-9]")):
     if version == "v033":
         status = "non-isolated timing; do not rank"
     print(f"| {version} | {candidate['median_us']:.2f} | {baseline['median_us']:.2f} | {candidate['speedup_vs_trtllm']:.4f}x | {metrics['launch__registers_per_thread']} | {traffic} | {tensor:.2f}% | {status} |")
-print("\nRaw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. No implementation has established a consistent sustained warm speedup over TRTLLM; v086 is near parity warm at baseline-level FP8 precision; its initial cold advantage does not reproduce in the recorded rotating-order audit.\n")
+print("\nRaw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. v090/v091 have an observed sustained warm advantage in the extended eager-event, Graph and rotating-order runs, at baseline-level FP8 precision; v091 is the current fast path. Short five-event tuning still favors TRT; use the matching execution regime. v086 is near parity warm and its initial cold advantage does not reproduce in its rotating-order audit.\n")
 graph_paths = sorted(root.glob("v[0-9][0-9][0-9]_validation/*_graph.json"))
 if graph_paths:
     print("## CUDA Graph validation runs\n")
@@ -64,5 +70,35 @@ if graph_paths:
             baseline = next(x for x in result["benchmarks"] if x["case"] == "trtllm/native" and x["cache"] == candidate["cache"])
             checked_rows = len(result["correctness"][candidate["case"]]["rows"])
             print(f"| {version} | {checked_rows} | {candidate['cache']} | {candidate['median_us']:.2f} | {baseline['median_us']:.2f} | {candidate['speedup_vs_trtllm']:.4f}x |")
+    print()
+event_paths = sorted(root.glob("v[0-9][0-9][0-9]_validation/*_event100.json"))
+if event_paths:
+    print("## Extended eager CUDA-event runs\n")
+    print("20 warmups and 100 repeats; the unchanged original timing function.\n")
+    print("| Version | Checked rows | Cache | Candidate µs | Paired TRT µs | TRT/candidate |")
+    print("|---|---:|---|---:|---:|---:|")
+    for path in event_paths:
+        result = json.loads(path.read_text())
+        for candidate in result["benchmarks"]:
+            if not candidate["case"].startswith("cute-"):
+                continue
+            baseline = next(x for x in result["benchmarks"] if x["case"] == "trtllm/native" and x["cache"] == candidate["cache"])
+            rows = len(result["correctness"][candidate["case"]]["rows"])
+            print(f"| {path.name.split('_',1)[0]} | {rows} | {candidate['cache']} | {candidate['median_us']:.2f} | {baseline['median_us']:.2f} | {candidate['speedup_vs_trtllm']:.4f}x |")
+    print()
+round_paths = sorted(root.glob("*_round_robin/*_round_robin.json"))
+if round_paths:
+    print("## Same-process rotating-order audits\n")
+    print("Ranges below are the minimum and maximum per-round medians or paired ratios, not confidence intervals.\n")
+    print("| Audit | Candidate | Cache | Rounds | Candidate median range µs | Paired TRT/candidate range |")
+    print("|---|---|---|---:|---:|---:|")
+    for path in round_paths:
+        records = json.loads(path.read_text())["benchmarks"]
+        for name in sorted({r["case"] for r in records if r["case"].startswith("cute-")}):
+            for cache in ("warm", "cold"):
+                selected = [r for r in records if r["case"] == name and r["cache"] == cache]
+                values = [r["median_us"] for r in selected]
+                ratios = [next(b["median_us"] for b in records if b["case"] == "trtllm/native" and b["cache"] == cache and b["round"] == r["round"])/r["median_us"] for r in selected]
+                print(f"| {path.stem} | {name} | {cache} | {len(values)} | {min(values):.2f}–{max(values):.2f} | {min(ratios):.4f}–{max(ratios):.4f}x |")
     print()
 print("See [ITERATIONS.md](ITERATIONS.md) for changes, failed hypotheses, correctness limits and source references.")
