@@ -312,3 +312,36 @@ Smaller O fragments reduce spilling but do not eliminate it; the original
 hypothesis was incomplete. The next register analysis must inspect generated
 code and compiler liveness rather than assuming O alone causes the pressure.
 NCU diagnostic duration 11.4620 ms.
+
+### Iteration 009 bring-up and result
+
+First full-output smoke failed: the default CuTe M64 fragment packs the second
+256-column MMA N tile into the other TMEM lane half (stride 1048576), which
+was reserved for S. Set the MMA N-tile stride explicitly to 256 columns. The
+failing diagnostic layout and log are retained. Corrected b2 and full b8192
+8-row checks PASS with the same error as v008.
+
+Paired warm medians: TRTLLM 1691.78 us, v009 7310.24 us; ratio 0.23143x.
+This is slower than v008's 7083.84 us: removing duplicate work did not overcome
+reduced concurrency. NCU: 255 registers/thread, 78.604 KB shared memory;
+occupancy 12.372%, tensor active 14.813%, eligible warps 0.21598, long scoreboard
+1.40750. Local-load/store sectors 205651968 / 6627664; shared-load/store conflicts
+530 / 172505. Diagnostic duration 11.9067 ms.
+
+## Iteration 010 — vectorize the masked KV zero fill
+
+File: `experiments/glm53_sparse_mla/kernel_v010.py`, based on v008.
+Why: a b2 diagnostic PTX/SASS build reveals no explicit PTX local arrays, but
+90 static LDL/STL instructions after register allocation. The invalid-slot
+branch expands to 18 x 16 scalar byte stores with separate swizzled addresses;
+these addresses can be hoisted and remain live even when runtime slots are
+valid. Replace each 16-byte zero fill with one vector store, retaining all
+masking semantics. Full-target NCU will decide whether this removes spilling.
+Text codegen and analysis are retained under `artifacts/v008_codegen`.
+
+## Iteration 011 — full output with vectorized zero fill
+
+File: `experiments/glm53_sparse_mla/kernel_v011.py`, based on corrected v009.
+Apply the same zero-fill change to the full-output CTA design, to reassess the
+QK-duplication versus concurrency tradeoff after register pressure is reduced.
+Validation pending for v010/v011.

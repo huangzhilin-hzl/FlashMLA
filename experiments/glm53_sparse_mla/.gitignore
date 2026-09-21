@@ -2,3 +2,4 @@ __pycache__/
 *.pyc
 *.ncu-rep
 *.nsys-rep
+*.cubin
