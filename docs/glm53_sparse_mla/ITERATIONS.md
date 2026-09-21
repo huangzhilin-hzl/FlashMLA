@@ -555,3 +555,48 @@ use a warp-wide all vote. A warp whose factors are exactly 1 skips its eight
 TMEM load/multiply/store sequences. No approximation threshold is introduced;
 TMEM instructions remain warp-converged. This tests unnecessary correction
 traffic as a bottleneck without changing the QK/PV scheduling. Pending checks.
+
+### Iteration 019 result
+
+Full-target 8-row check PASS, same errors as v016. Paired warm medians:
+TRTLLM 1691.87 us, v019 3022.98 us (0.55967x). There is no measured benefit
+from the exact-skip test alone. NCU: 207 registers, 193840 shared bytes,
+occupancy 11.013%, tensor active 34.009%, eligible warps 0.25488, long
+scoreboard 3.81900. Local sectors zero; shared-load/store conflicts
+2557275 / 305320. Diagnostic duration 5.19382 ms.
+
+## Iteration 020 — align correction and softmax head ownership
+
+File: `experiments/glm53_sparse_mla/kernel_v020.py`, based on v019.
+Use Ld/St16x32bx2 for the correction fragments so each thread owns the same
+head as its softmax fragment. Multiply by the thread-local correction value;
+remove shared alpha stores, reads, and their named barrier. Keep the original
+Ld16x128b layout in the epilogue for coalesced global output stores. Exact
+warp-uniform identity skipping remains; no numerical approximation was added.
+
+Full-target 8-row check PASS, same errors as v016. Paired warm medians:
+TRTLLM 1691.87 us, v020 3011.68 us (0.56177x). Registers drop from 207 to 130,
+but runtime is essentially unchanged relative to v016. NCU: shared 193840
+bytes, occupancy 10.953%, tensor active 34.196%, eligible warps 0.23839,
+long scoreboard 4.27853. Local sectors zero; shared-load/store conflicts
+2501426 / 185423. Diagnostic duration 5.16640 ms. With shared memory and TMEM
+still restricting computing CTAs, register reduction alone does not increase
+residency or explain the remaining performance gap.
+
+## Iteration 021 — weight-stationary M64 MMA and Layout E
+
+File: `experiments/glm53_sparse_mla/kernel_v021.py`, based on v020.
+Test tcgen05.mma.ws for FP8 QK and PV. This is the hardware weight-stationary
+instruction form, separate from software loader/compute warp specialization.
+The PTX documentation and CUTLASS tmem_frg_ws implementation specify a 2x2
+layout for M64: N halves occupy DP[0:64] and DP[64:128]. O occupies 256 columns
+and S occupies another 64, within a 512-column allocation. Emit the installed
+CuTeDSL NVVM operation using CuTe-generated SMEM descriptors; retain FP32
+accumulation and FP8 P. Rewrite TMEM fragment layouts and output column offsets
+accordingly. This is a new layout hypothesis requiring smoke, full numerical,
+and memory checks; no performance claim is made before measurements.
+
+References for this experiment:
+- https://docs.nvidia.com/cuda/parallel-thread-execution/#tcgen05-data-path-layout
+- https://docs.nvidia.com/cuda/parallel-thread-execution/#tcgen05-instructions-tcgen05-mma-ws
+- CUTLASS include/cute/atom/mma_traits_sm100.hpp, tmem_frg_ws<M_MMA=64>.
