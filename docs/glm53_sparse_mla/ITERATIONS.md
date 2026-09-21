@@ -636,3 +636,44 @@ concrete loading difference from the candidate's 16-byte cp.async instructions.
 The latter mnemonic alone does not establish whether the baseline uses PTX
 weight-stationary mode; no such claim is made. Full export is retained under
 `artifacts/baseline_codegen`.
+
+### Iteration 022 rejected
+
+The new pointer arithmetic first required explicit alignment hints. After that
+fix it compiled, but b2 attention still FAILED (90.4% mismatch). A QK-only dump
+showed exactly 75% mismatch: warp 0 read correctly, the other three did not.
+The explicit pointer offsets do not override the warp's TMEM datapath ownership;
+this approach cannot simply move each warp to 16 contiguous Layout-E rows.
+No full performance run or NCU result is reported for this rejected version.
+`diagnose_v022.py` preserves this finding. The one-block attention diagnostic
+was prepared but not executed because QK alone already disproved the mapping.
+
+## Iteration 023 — respect Layout E and reduce across warp pairs
+
+File: `experiments/glm53_sparse_mla/kernel_v023.py`, based on v021.
+Keep the automatically partitioned, independently verified QK read layout.
+Each thread processes two heads separately. XOR16 merges lanes within a warp;
+shared max/sum arrays then merge the two warps owning different N halves.
+Maintain two running max/sum values per thread. O correction and epilogue use
+128-channel views spanning all 128 datapaths, with Layout-E channel mapping.
+This corrects both single-head reduction and partial-datapath copy assumptions.
+
+Smoke and full-target 8-row numerical checks PASS. Paired warm events: TRTLLM
+1691.94 us, v023 3019.84 us (0.56027x). NCU: 121 registers, 194864 shared bytes,
+occupancy 10.966%, tensor active 17.043%, eligible warps 0.28044, long scoreboard
+3.11800. Local sectors zero; shared-load/store conflicts 1708850 / 468982.
+Diagnostic duration 5.18675 ms. Tensor-active cycles approximately halve versus
+v020 while overall runtime remains similar. This is consistent with faster MMA
+execution being offset by other critical-path work, including loading and the
+additional softmax synchronization; it is not a demonstrated runtime gain.
+
+## Iteration 024 — TMA gather4 into SW64 KV buffers
+
+File: `experiments/glm53_sparse_mla/kernel_v024.py`, based on v020 to isolate
+the loading change from the weight-stationary layout experiment. Encode a
+2D UINT8 tensor map over the existing FP8 KV storage, with 64-byte SW64 tiles.
+A producer warp issues 32 gather4 groups for each of nine column tiles; TMA
+completion bytes signal the existing full barrier. Invalid row indices use
+hardware out-of-bounds zero fill and retain the softmax mask. Q loading remains
+unchanged. Descriptor preparation and storage allocation occur outside timing;
+the kernel still gathers only the supplied sparse indices. Validation pending.
