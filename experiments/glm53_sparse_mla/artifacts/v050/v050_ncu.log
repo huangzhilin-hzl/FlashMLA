@@ -1,0 +1,4 @@
+==PROF== Connected to process 163785 (/usr/bin/python3.12)
+==PROF== Profiling "kernel_cutlass_kernel_kernel_..." - 0: 0%....50%....100% - 15 passes
+==PROF== Disconnected from process 163785
+==PROF== Report: /tmp/glm53_sparse_mla_dev/artifacts/v050_ncu.ncu-rep

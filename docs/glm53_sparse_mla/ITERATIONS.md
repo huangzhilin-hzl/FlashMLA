@@ -1377,3 +1377,126 @@ barrier following mbarrier initialization and TMEM allocation remains. This
 allows the independent Q/KV transfers to overlap at startup, with unchanged
 mainloop/softmax/epilogue behavior. Correctness and memory checks are required
 for this synchronization change; no performance claim yet.
+
+### Iteration 048/049 short-run results
+
+Both pass smoke and full-target 8-row checks with unchanged v045 errors.
+v048 paired warm median 1951.87 us versus TRTLLM 1691.78 us. NCU: 126 registers,
+194872 shared bytes, occupancy 23.328%, tensor 26.882%, eligible 0.50284,
+long scoreboard 5.99545, zero local sectors, shared conflicts 3529134/2546646,
+diagnostic 3.285472 ms. The two small improvements compose.
+
+v049 paired warm median 1902.72 us versus TRTLLM 1689.82 us. NCU: 126 registers,
+194872 shared bytes, occupancy 23.272%, tensor 27.436%, eligible 0.51447,
+long scoreboard 5.72411, zero local sectors, shared conflicts 3662030/2344613,
+diagnostic 3.219232 ms. Initial Q/KV overlap reduces a further approximately
+2.5%. Expanded Graph and qualified device-memory checks are running.
+
+## Iteration 050 — TMA stores from the shared output buffer
+
+Based on v049, replace the shared-to-register-to-global vector-store loop
+with eight 64x64-element BF16 TMA stores directly from the same SW128 shared
+output buffer. Each writer fences generic shared stores to the async proxy
+before the compute barrier. An elected thread then submits the eight tiles,
+commits the bulk group and waits for full completion before the final barrier
+and exit. The new UINT16 output tensor map preserves BF16 bits and is created
+once in runner setup; total map storage is 640 bytes.
+
+Instruction syntax follows CUTLASS SM90_TMA_STORE_2D in
+cute/arch/copy_sm90_tma.hpp. Use full wait_group 0 (not only the .read variant)
+for this initial candidate. The goal is to remove the extra shared loads and
+warp global-store instructions while retaining the validated output layout.
+Compilation, numerical checks, device memory checks and NCU are pending.
+
+### Iteration 049 expanded validation
+
+64-row numerical checks pass with max_abs 0.009754896 and relative_RMSE
+0.014703941. Graph warm: candidate 1911.01 us versus TRTLLM 1875.97 us; cold:
+candidate 1911.07 us versus TRTLLM 1923.18 us. Warm is about 1.9% slower and
+cold is approximately tied; the short-event regime still shows about a 13%
+latency gap, so no blanket speedup claim is made. Qualified b512/chunk0
+device memcheck reports zero errors and rows 0/511 pass unchanged tolerances.
+v049 is the current best expanded-validated candidate.
+
+## Iteration 051 — bounded softmax scaling anchor
+
+Based on v049, retain the old exponential scaling anchor when the current
+tile maximum is at most 0.75 above it in log2 units. Otherwise update the
+anchor and rescale O/denominator exactly as before. The anchor need not be
+the exact running maximum for the real-arithmetic softmax identity: both
+numerator and denominator use the same exponential shift. The chosen bound
+ensures P*256 <= 256*2^0.75, approximately 430.54, below E4M3FN's finite 448
+limit. No probability is discarded and no tolerance is loosened.
+
+This may let more warps skip output correction with the existing exact
+correction==1 check. It changes FP8 quantization and FP32 accumulation order,
+so it is an accuracy experiment as well as a performance experiment. First
+run the original smoke/full-target checks; reject failures, and require
+expanded validation before promotion. Numerical/NCU results pending.
+
+### Iteration 050 result
+
+Smoke/full-target 8-row checks pass with unchanged v049 errors. Paired warm
+median 1908.67 us versus TRTLLM 1691.49 us: no improvement over v049. NCU:
+126 registers, 194872 shared bytes, occupancy 23.263%, tensor 27.380%,
+eligible 0.50750, long scoreboard 5.83432, zero local sectors, shared conflicts
+3611791/2408662, diagnostic 3.228352 ms. TMA output stores are not promoted.
+
+### Iteration 051 initial accuracy/performance tradeoff
+
+Smoke/full-target 8-row checks pass unchanged tolerances, but errors increase:
+full max_abs 0.011151507 and relative_RMSE 0.016216585 versus v049's
+0.006737709 / 0.014866707. Paired warm 1892.42 us versus TRTLLM 1691.74 us is
+only about 0.5% faster than v049. NCU: 126 registers, 194872 shared bytes,
+occupancy 23.297%, tensor 27.589%, eligible 0.51497, long scoreboard 5.78050,
+zero local sectors, shared conflicts 3521720/2365347, diagnostic 3.202656 ms.
+Do not promote this small gain with increased quantization error; expand
+numerical checking to characterize the tradeoff and continue from v049.
+
+## Iteration 052 — one warp waits for MMA completion
+
+Based on v049, only warp0 performs the QK/PV completion mbarrier waits. It
+propagates completion to all compute threads through a named barrier with
+explicit tcgen05 before/after-thread-sync fences. PV reuses the existing
+post-PV compute barrier; QK adds a compute barrier before score reads. This
+changes scheduling of waits, not arithmetic or layouts. It tests whether
+reducing the number of mbarrier waiters helps the sampled wait bottleneck
+enough to offset the extra QK barrier. Validation and profiling pending.
+
+### Expanded 512-row accuracy failure: v049 and v051
+
+Full-target seed1234, original tolerances, 512 selected rows: v051 FAILS
+2/16777216 elements, greatest failing absolute difference 0.013399132 at
+selected-row index354/head15/channel293. The v049 control also FAILS
+1/16777216 elements, difference 0.012872629 at selected-row index112/head33/
+channel458. TRTLLM PASSES the identical 512-row check (overall max_abs
+0.014106080, relative_RMSE 0.015002753; tolerance is combined absolute/relative).
+Do not mislabel these failures as passes or broaden the earlier 64-row claims.
+The known full-target precision limitation now takes priority over further
+small timing gains. v051 is rejected; v049 remains a timing reference with
+a documented 512-row numerical failure, not a generally validated solution.
+
+## Iteration 053 — residual FP8 probabilities for a second PV term
+
+Based on v049, represent each scaled probability x as hi=FP8(x) and
+lo=FP8(x-FP32(hi)). Store both FP8 matrices and accumulate their two PV
+products into the same FP32 output. Q/K/V and both tensor-core PV inputs
+remain FP8; no reference/dense fallback or higher-precision KV expansion is
+used. The denominator and original tolerance remain unchanged.
+
+The second FP8 term recovers most probability-rounding error instead of
+tuning a scale to one observed outlier. It costs 8 KiB shared memory and a
+second set of PV MMAs; register use, latency, and 512-row/multiple-seed
+accuracy must be measured. The priority is a robust numerical candidate;
+subsequent work can reduce this added cost. Validation pending.
+
+### Iteration 052 scheduling result
+
+Smoke/full-target 8-row checks pass with unchanged v049 errors. Paired warm
+median 1894.46 us versus TRTLLM 1691.90 us, a small approximately 0.4% gain.
+NCU: 112 registers, 194872 shared bytes, occupancy 23.293%, tensor 27.579%,
+eligible 0.52178, long scoreboard 3.49455, zero local sectors, shared conflicts
+3126336/2487041, diagnostic 3.204992 ms. Reducing the number of waiters shifts
+stall accounting substantially without a comparable latency gain. This
+does not address the probability-quantization failure found in v049; keep
+it only as a scheduling building block for the accuracy repair.

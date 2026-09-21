@@ -48,28 +48,35 @@ B300 physical GPU1; b8192, H64, D576/512, TopK2048, chunk3. Each row is a paired
 | v045 | 1988.80 | 1691.94 | 0.8507x | 122 | 0.00 / 0.00 | 26.33% | prototype |
 | v046 | 1976.22 | 1691.87 | 0.8561x | 120 | 0.00 / 0.00 | 26.57% | prototype |
 | v047 | 1972.42 | 1691.81 | 0.8577x | 122 | 0.00 / 0.00 | 26.51% | prototype |
+| v048 | 1951.87 | 1691.78 | 0.8667x | 126 | 0.00 / 0.00 | 26.88% | prototype |
+| v049 | 1902.72 | 1689.82 | 0.8881x | 126 | 0.00 / 0.00 | 27.44% | fails expanded 512-row check |
+| v050 | 1908.67 | 1691.49 | 0.8862x | 126 | 0.00 / 0.00 | 27.38% | prototype |
+| v051 | 1892.42 | 1691.74 | 0.8940x | 126 | 0.00 / 0.00 | 27.59% | fails expanded 512-row check |
+| v052 | 1894.46 | 1691.90 | 0.8931x | 112 | 0.00 / 0.00 | 27.58% | prototype |
 
-Raw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. No iteration has yet matched TRTLLM.
+Raw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. No fully validated implementation has yet established a speedup over TRTLLM.
 
 ## CUDA Graph validation runs
 
-These are separate warm/cold runs with 20 warmups, 100 repeats and 64 checked rows.
+These are separate warm/cold runs with 20 warmups and 100 repeats; sampled row counts are shown explicitly.
 
-| Version | Cache | Candidate µs | Paired TRT µs | TRT/candidate |
-|---|---|---:|---:|---:|
-| v013 | warm | 4482.27 | 1879.84 | 0.4194x |
-| v013 | cold | 4485.31 | 1896.74 | 0.4229x |
-| v016 | warm | 2997.23 | 1873.92 | 0.6252x |
-| v016 | cold | 3000.50 | 1876.53 | 0.6254x |
-| v034 | warm | 2879.57 | 1878.14 | 0.6522x |
-| v034 | cold | 2883.65 | 1870.34 | 0.6486x |
-| v037 | warm | 2777.20 | 1879.97 | 0.6769x |
-| v037 | cold | 2781.15 | 1874.18 | 0.6739x |
-| v039 | warm | 2332.50 | 1872.05 | 0.8026x |
-| v039 | cold | 2338.51 | 1912.77 | 0.8179x |
-| v044 | warm | 2283.34 | 1844.90 | 0.8080x |
-| v044 | cold | 2289.49 | 1896.56 | 0.8284x |
-| v045 | warm | 1992.83 | 1874.18 | 0.9405x |
-| v045 | cold | 1998.91 | 1927.30 | 0.9642x |
+| Version | Checked rows | Cache | Candidate µs | Paired TRT µs | TRT/candidate |
+|---|---:|---|---:|---:|---:|
+| v013 | 64 | warm | 4482.27 | 1879.84 | 0.4194x |
+| v013 | 64 | cold | 4485.31 | 1896.74 | 0.4229x |
+| v016 | 64 | warm | 2997.23 | 1873.92 | 0.6252x |
+| v016 | 64 | cold | 3000.50 | 1876.53 | 0.6254x |
+| v034 | 64 | warm | 2879.57 | 1878.14 | 0.6522x |
+| v034 | 64 | cold | 2883.65 | 1870.34 | 0.6486x |
+| v037 | 64 | warm | 2777.20 | 1879.97 | 0.6769x |
+| v037 | 64 | cold | 2781.15 | 1874.18 | 0.6739x |
+| v039 | 64 | warm | 2332.50 | 1872.05 | 0.8026x |
+| v039 | 64 | cold | 2338.51 | 1912.77 | 0.8179x |
+| v044 | 64 | warm | 2283.34 | 1844.90 | 0.8080x |
+| v044 | 64 | cold | 2289.49 | 1896.56 | 0.8284x |
+| v045 | 64 | warm | 1992.83 | 1874.18 | 0.9405x |
+| v045 | 64 | cold | 1998.91 | 1927.30 | 0.9642x |
+| v049 | 64 | warm | 1911.01 | 1875.97 | 0.9817x |
+| v049 | 64 | cold | 1911.07 | 1923.18 | 1.0063x |
 
 See [ITERATIONS.md](ITERATIONS.md) for changes, failed hypotheses, correctness limits and source references.
