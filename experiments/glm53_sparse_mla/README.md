@@ -63,7 +63,8 @@ The full 8192-row/seed1234 audit checks all 268,435,456 output elements:
 | v049, P scale256 | 11 | Earlier timing reference |
 | v053, residual FP8 | 0 | Original higher-precision path |
 | v065, residual FP8 with V collector reuse | 0 via full bitwise equivalence to v053 | Exact-equivalence optimization |
-| v067, residual FP8 with bounded scaling anchor | 0 on two independent full-reference seeds | Fastest validated higher-precision path |
+| v067, residual FP8 with bounded scaling anchor | 0 on two independent full-reference seeds | Earlier validated higher-precision path |
+| v075, probability scale folded into exp2 | 0 on two independent full-reference seeds | Fastest validated higher-precision path |
 
 v054 matches about 99.96% of TRTLLM BF16 outputs bitwise on this input.
 It passes 512 sampled rows for seeds1234/5678/42, but it does **not** pass the
@@ -81,6 +82,12 @@ Graph warm/cold medians are 2134.14/2107.38 µs versus paired TRTLLM
 error while passing these original-tolerance audits. None of these tests
 proves every possible input or scale.
 
+v075 repeats the two full8192-row audits, full1024-row short case, masked case
+and qualified b512 memcheck with zero failures. Graph warm/cold medians are
+2097.22/2080.51 µs versus paired TRTLLM1874.14/1925.12 µs. It remains slower
+than TRTLLM, while preserving the audited higher precision. Folding the scale
+into exp2 changes rounding; no bitwise equivalence to v067 is claimed.
+
 To reproduce the full shared-reference audit (accuracy only):
 
 ```bash
@@ -90,7 +97,7 @@ To reproduce the full shared-reference audit (accuracy only):
 ```
 
 This audit records every backend's failures before returning nonzero if any
-fails. For residual-P performance, use `--kernel-version v067` with `bench.py`;
+fails. For residual-P performance, use `--kernel-version v075` with `bench.py`;
 v053 remains the direct full-reference-audit baseline.
 No tolerance is relaxed to obtain a pass.
 

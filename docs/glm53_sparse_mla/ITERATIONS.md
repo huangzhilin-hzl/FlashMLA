@@ -2121,3 +2121,94 @@ audits contiguous8-element BF16 vectors. Denominator accumulation order changes;
 no bitwise or full-accuracy claim is inherited. This tests whether the old
 TMEM-P result was dominated by its old scalar epilogue and spill behavior.
 Coordinate audit, offline inspection, bounded smoke, events and NCU pending.
+
+### Iteration 073 result — no spills, but normal MMA remains slower
+
+Layout/compile/smoke/eight-row checks pass. CUBIN REG104,STACK0; setmax hints
+again disappear from SASS. Warm2326.69us versusTRT1691.74us. NCU:104 registers,
+186168 shared bytes,occupancy23.264%,tensor44.488%,eligible0.416636,
+long-scoreboard7.806350,zero local sectors,shared conflicts4739152/623184,
+diagnostic3.967360ms. This is faster than oldv036 but slower thanv054; higher
+tensor-active percentage across different MMA modes does not imply better
+useful throughput. No promotion or expanded numerical claim.
+
+## Iteration 074 — dedicated MMA warp with QK lookahead
+
+Based onv054. Keep256 compute threads, dedicate warp8 to MMA issue, and use
+seven producer warps for32 gather4 tasks (round-robin, five groups with a
+bound check). Total512 threads. Two score buffers occupy TMEM columns256–383;
+output remains0–255 and probabilities stay in shared memory.
+
+MMA prologue issuesQK0; each iteration issuesQK(i+1) before waiting for the
+current probability/correction-ready barrier and issuingPVi. QK completion
+has two stage barriers; PV has one alternating-phase barrier. Compute waits
+for QKi, preparesPi and rescalesO, then signals readiness and waits forPVi.
+MMA releases the KV stage only afterPV completes. This keeps O correction
+ordered while overlapping nextQK with currentsoftmax. Additional score buffers
+are disjoint; no early overwrite of probability or KV buffers is permitted.
+
+TRT SASS shows a distinct warp8 path issuing QK/PV (trtllm_sass.txt:3430,3562,
+3974) while softmax occurs earlier in different branches. The exact TRT schedule
+is not inferred from names alone; this experiment independently measures one
+concrete overlap schedule. Bounded smoke, memcheck, numerical equivalence and
+performance profiling are required before promotion. Pending.
+
+### Iteration 074 result — explicit lookahead did not improve throughput
+
+Offline REG93,STACK0. b2/eight-row target checks pass, but warm2371.71us
+versusTRT1689.98us regresses. NCU:93 registers,194904 shared bytes,occupancy
+23.616%,tensor24.414%,eligible0.404843,long-scoreboard8.743213,zero local
+sectors,shared conflicts77320/2409117,diagnostic3.613792ms. Lower shared-load
+conflict count does not compensate for the scheduling cost. No promotion;
+expanded equivalence/memcheck deferred for this rejected performance branch.
+The measured result does not disprove other overlap schedules or TRT's finer
+pipeline organization.
+
+## Iteration 075 — incorporate P scale into exp2 and denominator
+
+Based onv067's fully audited residual path. Compute exp2(score + (4-anchor))
+directly, quantize that scaled value into high/residual terms, and accumulate
+the denominator at the same scale. Final reciprocal removes the extra16
+factor. This removes explicit per-element probability multiplication and
+keeps the bounded-anchor finite-range argument unchanged. The reassociation
+changes FP32 rounding and requires independent reference audits; it does not
+inheritv067's accuracy results. Offline codegen, bounded smoke, paired events,
+NCU and full-reference checks pending.
+
+## Iteration 076 — one compute warpgroup with a larger register budget
+
+Based onv067. One128-thread compute group reads64 scores per thread, with
+256 producer threads retained (384 total). Two partial maxima/sums per head
+replace four. Output correction/epilogue cover eight32-column chunks per
+thread instead of four; the shared output buffer still enables128-bit stores.
+Producer32/compute240 hints request38912 registers, subject to actual CUBIN
+pool and instruction inspection. No block size, probability scale or residual
+PV changes. The reduction tree changes, requiring independent accuracy checks.
+
+This tests less synchronization and fewer resident threads against more
+per-thread softmax work and register pressure. Layout audit, offline resources,
+bounded smoke and profiling pending. It is independent ofv075's exp2 change.
+
+### Iteration 075 measured result and expanded validation
+
+Offline REG118,STACK0. Smoke/eight-row checks pass. Warm events1990.94us
+versusTRT1691.81us, about2.8% belowv067's2048.38us short run. NCU:118 registers,
+203064 shared bytes,occupancy23.324%,tensor38.514%,eligible0.546450,
+long-scoreboard6.370164,zero local sectors,shared conflicts3534521/4216127,
+diagnostic3.374176ms. The extra register count causes no measured spills.
+
+Independent full8192 audits pass all268435456 elements for seeds1234/5678:
+max_abs0.005918741/0.005017400,relative_RMSE0.001735970/0.001735984. Full1024
+chunk0/seed5678 passes all33554432 elements,max_abs0.008034229,relative_RMSE
+0.001678574. Internal-hole/partial test passes,max_abs0.004001856. Qualified
+b512 memcheck (--report-api-errors no) reports zero device errors and passes
+its two numerical rows. No tolerance changes or inherited bitwise claim.
+
+512-row Graph validation: warm2097.22us versusTRT1874.14us,cold2080.51us
+versus1925.12us. This improves the sustained v067 result by about1.7% warm and
+1.3% cold, smaller than the short-event improvement. v075 becomes the current
+validated higher-precision performance candidate; it still trails TRTLLM.
+
+v076 offline audit passes. CUBIN REG168,STACK0; SASS retains real USETMAXREG
+32/240. The38912-register requested role sum fits the64512-register launch
+pool. Runtime validation remains pending.
