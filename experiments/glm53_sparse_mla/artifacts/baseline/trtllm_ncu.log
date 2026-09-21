@@ -1,0 +1,4 @@
+==PROF== Connected to process 6557 (/usr/bin/python3.12)
+==PROF== Profiling "fmhaSm100fKernel_QkvE4m3OBflo..." - 0: 0%....50%....100% - 15 passes
+==PROF== Disconnected from process 6557
+==PROF== Report: /tmp/glm53_sparse_mla_dev/artifacts/baseline/trtllm_ncu.ncu-rep

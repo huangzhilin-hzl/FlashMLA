@@ -1,0 +1,191 @@
+{
+  "configuration": {
+    "gpu": "NVIDIA B300 SXM6 AC",
+    "capability": [
+      10,
+      3
+    ],
+    "versions": {
+      "torch": "2.13.0+cu130",
+      "cuda": "13.0",
+      "flashinfer-python": "0.6.18",
+      "flash-mla": "not installed as a distribution",
+      "flashmla_source_revision": "unreported"
+    },
+    "args": {
+      "mode": "bench",
+      "backends": [
+        "trtllm",
+        "cute"
+      ],
+      "scope": "native",
+      "chunk": 3,
+      "rank": 0,
+      "seed": 1234,
+      "warmup_iters": 3,
+      "repeat_iters": 5,
+      "profile_iters": 20,
+      "timing": "cuda-event",
+      "cache": "warm",
+      "check_rows": 8,
+      "check_atol": 0.01,
+      "check_rtol": 0.05,
+      "trace_path": null,
+      "output_json": "artifacts/v001_full_event.json",
+      "with_stack": false
+    },
+    "workload": {
+      "local_tokens": 8192,
+      "cp": 4,
+      "context_len": 131072,
+      "heads": 64,
+      "qk_dim": 576,
+      "v_dim": 512,
+      "topk": 2048,
+      "page_size": 64,
+      "softmax_scale": 0.0625,
+      "bmm2_scale": 1.0,
+      "synthetic": true,
+      "enable_dcp": false
+    },
+    "tensors": {
+      "query": {
+        "shape": [
+          8192,
+          1,
+          64,
+          576
+        ],
+        "dtype": "torch.float8_e4m3fn",
+        "stride": [
+          36864,
+          36864,
+          576,
+          1
+        ]
+      },
+      "kv_cache": {
+        "shape": [
+          2048,
+          1,
+          64,
+          576
+        ],
+        "dtype": "torch.float8_e4m3fn",
+        "stride": [
+          36864,
+          36864,
+          576,
+          1
+        ]
+      },
+      "block_tables": {
+        "shape": [
+          8192,
+          1,
+          2048
+        ],
+        "dtype": "torch.int32",
+        "stride": [
+          2048,
+          2048,
+          1
+        ]
+      },
+      "seq_lens": {
+        "shape": [
+          8192
+        ],
+        "dtype": "torch.int32",
+        "stride": [
+          1
+        ]
+      }
+    },
+    "cases": {
+      "trtllm/native": "Q FP8 [4096,1,64,576]; KV FP8 [pages,1,64,576]; preallocated output",
+      "cute-v001/native": "FP8 Q/KV; preallocated BF16 output; block_k=64"
+    },
+    "candidate": {
+      "version": "v001",
+      "block_k": 64,
+      "file_sha256": "c60bf3aab70a48f7fb437ab96296d1dbecb7a996c3a5cb0be590896ee4520884",
+      "cutlass_dsl": "4.6.2",
+      "original_benchmark_sha256": "d843320fb5147a807135282a1b87bb4c247cdd7a6a16b9107d546c48c8a8fb66"
+    }
+  },
+  "correctness": {
+    "trtllm/native": {
+      "rows": [
+        0,
+        8191,
+        511,
+        512,
+        1170,
+        2340,
+        3510,
+        4680
+      ],
+      "max_abs": 0.00764106959104538,
+      "rmse": 0.0013537678169086576,
+      "relative_rmse": 0.015046226091400083,
+      "atol": 0.01,
+      "rtol": 0.05
+    },
+    "cute-v001/native": {
+      "rows": [
+        0,
+        8191,
+        511,
+        512,
+        1170,
+        2340,
+        3510,
+        4680
+      ],
+      "max_abs": 0.0068645477294921875,
+      "rmse": 0.0013308057095855474,
+      "relative_rmse": 0.014791017588137357,
+      "atol": 0.01,
+      "rtol": 0.05
+    }
+  },
+  "benchmarks": [
+    {
+      "case": "trtllm/native",
+      "cache": "warm",
+      "timing": "cuda-event",
+      "mean_us": 1707.2767972946167,
+      "median_us": 1691.7760372161865,
+      "p05_us": 1689.7023677825928,
+      "p95_us": 1756.9664001464844,
+      "samples_us": [
+        1773.2160091400146,
+        1691.9679641723633,
+        1689.695954322815,
+        1689.728021621704,
+        1691.7760372161865
+      ],
+      "l2_flush_bytes": 0,
+      "speedup_vs_trtllm": 1.0
+    },
+    {
+      "case": "cute-v001/native",
+      "cache": "warm",
+      "timing": "cuda-event",
+      "mean_us": 268825.25634765625,
+      "median_us": 268827.57568359375,
+      "p05_us": 268801.74560546875,
+      "p95_us": 268847.5158691406,
+      "samples_us": [
+        268800.84228515625,
+        268827.57568359375,
+        268805.35888671875,
+        268844.1467285156,
+        268848.3581542969
+      ],
+      "l2_flush_bytes": 0,
+      "speedup_vs_trtllm": 0.006293164058464683
+    }
+  ]
+}
