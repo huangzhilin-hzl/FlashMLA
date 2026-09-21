@@ -1,4 +1,4 @@
-"""Iteration 123: 16-DP correction with fewer heads per warp; based on v112.
+"""Iteration 127: drain each Rep64 correction store before the next chunk; based on v121.
 
 One CTA owns one query and all 512 output channels. Both PV N tiles reuse
 one QK/softmax computation and one gathered KV tile. No input expansion,
@@ -106,7 +106,7 @@ def mma_ws(d, a, b, n, b_transpose, accumulate, *, loc=None, ip=None):
 
 class SparseMLA:
     def __init__(self, block_k=128):
-        assert block_k == 128, "v123 requires --block-k 128"
+        assert block_k == 128, "v127 requires --block-k 128"
         self.block_k = block_k
 
     @cute.jit
@@ -281,18 +281,15 @@ class SparseMLA:
             src_s = st.partition_S(score_half)
             coords_s = st.partition_D(cute.make_identity_tensor((128, 32)))
             rs = cute.make_fragment_like(coords_s, cutlass.Float32)
-            # Each correction warp owns 16 heads, two lanes per head.
-            # Groups select the lower/upper 16 datapaths of each 32-DP region.
-            cchunk_shape = ((16, 4), 64)
-            cchunk_layout = cute.make_layout(cchunk_shape,
-                stride=((1 << 16, 32 << 16), 1))
-            cchunk = cute.make_tensor(tp + cute.assume(cgroup * (16 << 16), divby=64), cchunk_layout)
+            # Correction follows the same one-head datapath mapping.
+            cchunk_layout = cute.make_layout((128, 64), stride=(1 << 16, 1))
+            cchunk = cute.make_tensor(tp, cchunk_layout)
             ccopy = tcgen05.make_tmem_copy(cute.make_copy_atom(
-                tcgen05.copy.Ld16x64bOp(tcgen05.copy.Repetition(32)), cutlass.Float32), cchunk)
+                tcgen05.copy.Ld32x32bOp(tcgen05.copy.Repetition(64)), cutlass.Float32), cchunk)
             cstore = tcgen05.make_tmem_copy(cute.make_copy_atom(
-                tcgen05.copy.St16x64bOp(tcgen05.copy.Repetition(32)), cutlass.Float32), cchunk)
+                tcgen05.copy.St32x32bOp(tcgen05.copy.Repetition(64)), cutlass.Float32), cchunk)
             ct = ccopy.get_slice(ctid)
-            rc = cute.make_fragment_like(ct.partition_D(cute.make_identity_tensor(cchunk_shape)), cutlass.Float32)
+            rc = cute.make_fragment_like(ct.partition_D(cute.make_identity_tensor((128, 64))), cutlass.Float32)
             rowmax = cutlass.Float32(-1.0e30)
             rowsum = cutlass.Float32(0.0)
             nvalid = lens[qi]
@@ -345,22 +342,20 @@ class SparseMLA:
                     svec = cute.make_tensor(sp.iterator + cute.assume(sp.layout((h, col)), divby=16),
                                             cute.make_layout(16))
                     cute.copy(store128, rvec, svec)
-                lane = tid % 32
-                correction_lane = cgroup * 16 + (lane % 2) * 8 + lane // 4
-                correction_o = cute.arch.shuffle_sync(correction, correction_lane)
-                skip_correction = cute.arch.vote_all_sync(correction_o == 1.0)
+                skip_correction = cute.arch.vote_all_sync(correction == 1.0)
                 if (block > 0) & (not skip_correction):
-                    for tile in cutlass.range(4, unroll_full=True):
-                        otile = cute.make_tensor(tp + cute.assume(cgroup * (16 << 16) + tile * 64, divby=64), cchunk_layout)
+                    for tile in cutlass.range(2, unroll_full=True):
+                        otile = cute.make_tensor(tp + cute.assume(cgroup * 128 + tile * 64, divby=64), cchunk_layout)
                         src_o = ct.partition_S(otile)
                         dst_o = cstore.get_slice(ctid).partition_D(otile)
                         cute.copy(ccopy, src_o, rc)
                         cute.arch.fence_view_async_tmem_load()
                         for j in cutlass.range(0, cute.size(rc), 2, unroll_full=True):
                             rc[j], rc[j + 1] = cute.arch.mul_packed_f32x2(
-                                (rc[j], rc[j + 1]), (correction_o, correction_o))
+                                (rc[j], rc[j + 1]), (correction, correction))
                         cute.copy(cstore, rc, dst_o)
-                    cute.arch.fence_view_async_tmem_store()
+                        # Bound the lifetime of each wide source fragment before reuse.
+                        cute.arch.fence_view_async_tmem_store()
                 tmem_before_sync()
                 cute.arch.fence_view_async_shared()
                 # Every compute thread releases its own P/correction writes.

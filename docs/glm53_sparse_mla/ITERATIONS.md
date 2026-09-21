@@ -3779,3 +3779,143 @@ The required budget is256*192+256*32=57344 registers; initial allocation and
 SASS must still be inspected before any launch. Additional setup/idle warps
 are a changed resource cost, so this is not a perfectly isolated spill control.
 Offline compilation is pending; no safety or performance claim yet.
+
+### Iteration 123 compile correction and measured result
+
+The initial compile lacked a proven two-column alignment for the dynamic DP
+base and failed IR verification before any device launch. Add explicit alignment
+facts for cgroup*(16<<16)+tile*64, always a multiple of64 columns. Preserve the
+initial compiler log. Corrected offline REG85/STACK0; full8192 seed1234 output
+bits match v112 in three repeats and masked bits match. Qualified b2 synccheck/
+b512 memcheck report zero errors. Short warm1718.46 us versusTRT1691.74 us
+regresses from v1121669.31 us. NCU base/stable:85 registers,194920 shared bytes,
+occupancy19.220%, tensor30.062%, eligible0.388394, long-scoreboard6.152233,
+zero local sectors, aggregate shared conflicts6335643/1948370, diagnostic
+2.940992 ms. A narrower head set per correction warp does not produce an
+end-to-end gain; no expanded precision/performance audit or promotion.
+
+### Iteration 124 compile result
+
+The padded full-warpgroup variant also fails NVVM compilation with the same
+generic backend error; no candidate device launch occurs. This further prevents
+attributing v122's compile failure specifically to its partial warpgroup. Retain
+both logs, stop the redistribution variant, and test a launch-bound-only control
+as v126. No runtime or safety claim is made for v122/v124.
+
+## Iteration 125 — direct256-bit output stores
+
+Based on v112. Keep all attention arithmetic, denominator sharing and TMEM
+reads unchanged. Replace the final shared64KiB transpose and cooperative128-bit
+writeback with each thread directly writing its head's values using two naturally
+aligned256-bit stores per32-BF16 fragment. Each store covers a full32-byte sector;
+the runner verifies the newly allocated output's32-byte base alignment and every
+computed offset is a multiple of16 BF16 elements. Retain the final compute barrier
+before TMEM deallocation. The sparse warp-wide address pattern can still cost
+throughput even with complete sectors, so a gain is not assumed.
+
+PTX st.global.v8.b32 is supported on SM100+, and CUTLASS copy_sm100.hpp provides
+a256-bit no-allocation store. Use equivalent st.global.L1::no_allocate.v8.b32
+inline PTX, with eight packed32-bit BF16 registers and no omitted output values.
+SASS must confirm STG256; bounded checks, full bitwise comparison and qualified
+memcheck precede performance claims. Source:
+https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#data-movement-and-conversion-instructions-st
+
+## Iteration 126 — launch bound without register redistribution
+
+Based on v121. Add only min_blocks_per_mp=1 to the416-thread launch, without
+setmaxnreg. This tests whether the backend can allocate more registers for Rep64
+correction while avoiding the compile failures of v122/v124. All code paths and
+work are otherwise unchanged. Compile with an initialized GPU1 context for
+attribute queries; inspect actual registers, stack and NCU local traffic. No
+performance or spill-elimination claim until measured.
+
+## Iteration 127 — bound each wide correction fragment's lifetime
+
+Based on v121. Move the TMEM store wait into the two-chunk Rep64 correction
+loop, draining each chunk before the next chunk reuses its registers. This
+increases the number of store waits from one to two but may reduce simultaneous
+live fragments and ptxas scheduling pressure responsible for spills. No launch
+bounds or register redistribution are requested, so the experiment isolates the
+wait placement. Existing TC thread-sync fences, P-ready and MMA waits remain.
+Offline registers/SASS and NCU local traffic must determine whether live-range
+pressure actually changes; arithmetic equivalence and any gain require tests.
+
+## Iteration 128 — direct output stores on the higher-precision path
+
+Based on v114. Apply only v125's direct256-bit output epilogue and verified
+32-byte output alignment, retaining both probability terms, the balanced sum,
+bounded anchor, collector reuse and v114's synchronization protocol. Short v125
+shows an approximately20 us gain without spills, motivating this independent
+higher-precision adaptation. Full bitwise equivalence and sanitizers must
+validate the unchanged attention arithmetic; sustained timing is required
+before any promotion.
+
+## Iteration 129 — evict-first output cache priority
+
+Based on v125. Add only .L2::evict_first to the aligned256-bit output stores,
+keeping .L1::no_allocate and all arithmetic/synchronization unchanged. Output
+writes stream through512MiB per target invocation, while the gathered KV backing
+store is72MiB and reused across queries. The hypothesis is that lower output
+retention priority reduces competition with KV in L2; the cache hint is not a
+guarantee of retention or reduced DRAM traffic. PTX explicitly permits L2
+priority on .v8.b32 stores on SM100+. Inspect SASS, full bitwise validation and
+measured latency before claiming any effect; collect memory counters if promising.
+
+### Iteration 125 result and promotion — direct sector stores improve writeback
+
+Offline REG85/STACK0; SASS confirms eight STG.E.NA.ENL2.256 instructions in the
+unrolled output path. Full8192 seeds1234/5678 and full1024 short/chunk0 seed5678
+outputs match v112 bitwise in three repeats each. Masked bits match; qualified
+b2 synccheck/b512 memcheck report zero errors. All inherited FP8 reference
+limits remain explicit. Short warm1648.86 us versusTRT1690.75 us improves
+about20 us fromv112. NCU base/stable:85 registers,194920 shared bytes,
+occupancy19.306%, tensor31.390%, eligible0.389172, long-scoreboard6.192877,
+zero local sectors, aggregate shared conflicts6377112/1977739, diagnostic
+2.818880 ms.
+
+Eager20/100 warm/cold1720.98/1733.12 us versusTRT1890.26/1911.52 us;
+Graph1736.62/1720.40 us versusTRT1871.82/1914.78 us. Three rotated warm
+medians (us):v1251689.74/1688.99/1691.26,v1121700.98/1712.13/1701.02,
+TRT1871.82/1873.95/1878.10. Cold v1251690.90/1693.62/1687.54 versus
+v1121695.87/1699.86/1697.65 andTRT1859.52/1858.26/1859.55. Promote v125
+for improvement in every recorded ordering and complete bitwise validation.
+Separate-run eager/Graph differences are smaller and variable; preserve those
+results rather than presenting only the largest observed gain.
+
+Unlocked source profiling: shared wavefronts20275200 equal ideal, excessive0,
+down8388608 (29.27%) from v112's28663808 after removing transpose traffic.
+Instructions605733244 versus618706515; long-scoreboard samples66604 with PV
+wait17445, producer-empty17107 and QK13342. Sampling totals are not latency
+percentages and do not isolate the cycle cost of the removed epilogue.
+
+### Iteration 126 result — one-block bound increases spills
+
+Offline REG128/STACK176; full8192 seed1234 and masked bits match v112, with
+qualified b512 memcheck reporting zero errors. Short warm2152.67 us versus
+TRT1691.78 us is worse thanv1211784.00 us. NCU base/stable:128 registers,
+194920 shared bytes, occupancy19.245%, tensor24.007%, eligible0.370749,
+long-scoreboard6.481138, local sectors193305800 loads /154471792 stores,
+aggregate shared conflicts5670394/1317087, diagnostic3.684576 ms. The launch
+bound did not increase allocated registers or eliminate spills. Reject; no
+second-seed/short/extended expansion.
+
+### Iteration 127 result — per-chunk store wait does not remove spills
+
+Offline REG128/STACK64, unchanged fromv121. Full8192 seed1234 and masked bits
+match v112; qualified b512 memcheck reports zero errors. Short warm1786.05 us
+versusTRT1689.98 us does not improve v121. NCU base/stable:128 registers,
+194920 shared bytes, occupancy19.189%, tensor28.946%, eligible0.390310,
+long-scoreboard5.858970, local sectors71670504 loads /41198200 stores,
+aggregate shared conflicts7045151/1854044, diagnostic3.057440 ms. Reject;
+the proposed live-range benefit is not supported by allocated resources/traffic.
+
+### Iteration 128 initial result — direct stores also help higher precision
+
+Offline REG122/STACK0. Full8192 seed1234 output bits match v114 in three repeats;
+masked bits match and retain a reference tolerance pass, and qualified b512
+memcheck reports zero errors. Short warm1802.37 us versusTRT1691.71 us improves
+about27 us fromv1141828.93 us. NCU base/stable:122 registers,203080 shared bytes,
+occupancy19.327%, tensor42.186%, eligible0.455513, long-scoreboard6.168872,
+zero local sectors, aggregate shared conflicts6480575/1448818, diagnostic
+3.083040 ms. Second-seed/short/synccheck and sustained performance validation
+are in progress before promotion.

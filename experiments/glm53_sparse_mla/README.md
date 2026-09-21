@@ -32,13 +32,13 @@ export CUTE_DSL_ARCH=sm_103a
 
 # Fast single-P path with closely matching TRTLLM precision; see all-row limits below.
 /opt/sglang/bin/python bench.py \
-  --kernel-version v112 --block-k 128 \
+  --kernel-version v125 --block-k 128 \
   --backends trtllm cute --scope native --check-rows 512 \
   --warmup-iters 20 --repeat-iters 100 --cache both --timing cuda-graph \
-  --output-json artifacts/v112_accuracy512_graph.json
+  --output-json artifacts/v125_accuracy512_graph.json
 
 # Short event-based tuning run, followed by one warmed NCU invocation.
-bash run_iteration.sh v112 128
+bash run_iteration.sh v125 128
 ```
 
 `run_iteration.sh` saves raw JSON, logs, NCU details/CSV and an immutable per-run
@@ -68,7 +68,8 @@ The full 8192-row/seed1234 audit checks all 268,435,456 output elements:
 | v097, pre-wait index fetching with four producer warps | Same as v096 via full bitwise checks on both seeds | Earlier fast path |
 | v105, dedicated MMA issuer | Same as v097 via full bitwise checks on both seeds | Earlier fast path |
 | v108, per-thread P readiness | Same as v105 via full bitwise checks on both seeds | Earlier fast path |
-| v112, balanced denominator reduction | 9 on seed1234 / 6 on seed5678, identical coordinates/values to TRTLLM | Current fast path |
+| v112, balanced denominator reduction | 9 on seed1234 / 6 on seed5678, identical coordinates/values to TRTLLM | Earlier fast path |
+| v125, direct256-bit output stores | Full bitwise equality to v112 on both seeds, short case and masks | Current fast path |
 | v049, P scale256 | 11 | Earlier timing reference |
 | v053, residual FP8 | 0 | Original higher-precision path |
 | v065, residual FP8 with V collector reuse | 0 via full bitwise equivalence to v053 | Exact-equivalence optimization |
@@ -78,7 +79,22 @@ The full 8192-row/seed1234 audit checks all 268,435,456 output elements:
 | v106, dedicated MMA issuer | Full bitwise equality to v098 on both seeds, short case and masks | Earlier higher-precision path |
 | v114, balanced denominator reduction | 0 on two full target seeds, full short case and masks | Current higher-precision path |
 
-The current fast path v112 independently retains the same 9/6 full-target
+The current fast path v125 matches v112 bitwise on both full8192-row seeds,
+all1024 short-case rows and masked inputs, retaining the FP8 limits below.
+Qualified b2 synccheck and b512 memcheck report zero errors. Direct256-bit
+output stores replace the shared transpose, with verified32-byte alignment.
+
+Eager20/100 warm/cold medians are 1720.98/1733.12 µs versus TRT
+1890.26/1911.52 µs; Graph medians are 1736.62/1720.40 µs versus
+1871.82/1914.78 µs. Three rotated orders give warm1688.99–1691.26 µs
+versus v1121700.98–1712.13 µs and TRT1871.82–1878.10 µs; cold
+1687.54–1693.62 µs versus v1121695.87–1699.86 µs and TRT
+1858.26–1859.55 µs. It improves on v112 in each recorded ordering, while
+separate-run eager/Graph differences are smaller and variable. Short tuning is
+1648.86 µs versus TRT1690.75 µs. These observations use unlocked clocks and
+do not establish all-input accuracy or a universal speedup.
+
+Earlier fast path v112 independently retains the same 9/6 full-target
 failures as TRTLLM on seeds1234/5678. Only 2464/2601 of 268,435,456 BF16
 outputs differ from TRTLLM. The full short case retains 7650 failures for both;
 the mask case matches v108 bitwise and retains 86 failures versus TRT's 78.
@@ -234,7 +250,7 @@ To reproduce the full shared-reference audit (accuracy only):
 
 ```bash
 /opt/sglang/bin/python validate_full_accuracy.py \
-  --kernel-versions v112 v114 --include-trtllm \
+  --kernel-versions v125 v114 --include-trtllm \
   --output-json artifacts/full_accuracy_seed1234.json
 ```
 
