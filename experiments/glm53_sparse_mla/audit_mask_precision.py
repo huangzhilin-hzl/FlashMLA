@@ -58,5 +58,13 @@ for name, actual in outputs.items():
         stats['same_failures_as_trtllm'] = stats['failures'] == report['cases']['trtllm']['failures']
     report['cases'][name] = stats
     print(name, {k:v for k,v in stats.items() if k != 'failures'}, flush=True)
+report['pairwise_bitwise_mismatches'] = {}
+names = list(outputs)
+for i, left in enumerate(names):
+    for right in names[i+1:]:
+        # Exact BF16-to-FP32 conversion preserves every BF16 bit, including -0.
+        unequal = (outputs[left].view(torch.int32) != outputs[right].view(torch.int32)).sum().item()
+        report['pairwise_bitwise_mismatches'][f'{left}/{right}'] = unequal
+print('pairwise_bitwise_mismatches', report['pairwise_bitwise_mismatches'], flush=True)
 Path(args.output_json).write_text(json.dumps(report, indent=2)+'\n')
 raise SystemExit(0 if all(case['pass'] for case in report['cases'].values()) else 1)

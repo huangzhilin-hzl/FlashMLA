@@ -1,0 +1,5 @@
+==WARNING== Note: Running with unmodified GPU clocks. If not controlled otherwise, profiling results may be inconsistent.
+==PROF== Connected to process 435811 (/usr/bin/python3.12)
+==PROF== Profiling "kernel_cutlass_kernel_kernel_..." - 0: 0%....50%....100% - 15 passes
+==PROF== Disconnected from process 435811
+==PROF== Report: /tmp/glm53_sparse_mla_dev/artifacts/v088_none_dynamic.ncu-rep

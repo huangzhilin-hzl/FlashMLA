@@ -1,0 +1,164 @@
+[
+  {
+    "case": "v086_base_dynamic",
+    "gpu__time_duration.sum": {
+      "value": "3.165664",
+      "unit": "ms"
+    },
+    "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed": {
+      "value": "27.913162",
+      "unit": "%"
+    },
+    "smsp__warps_eligible.avg.per_cycle_active": {
+      "value": "0.470551",
+      "unit": "warp"
+    },
+    "smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio": {
+      "value": "6.017838",
+      "unit": "inst"
+    },
+    "gpc__cycles_elapsed.avg.per_second": {
+      "value": "1.090328",
+      "unit": "Ghz"
+    },
+    "dram__cycles_elapsed.avg.per_second": {
+      "value": "3.995919",
+      "unit": "Ghz"
+    }
+  },
+  {
+    "case": "v086_none_dynamic",
+    "gpu__time_duration.sum": {
+      "value": "1.869984",
+      "unit": "ms"
+    },
+    "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed": {
+      "value": "27.075844",
+      "unit": "%"
+    },
+    "smsp__warps_eligible.avg.per_cycle_active": {
+      "value": "0.493968",
+      "unit": "warp"
+    },
+    "smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio": {
+      "value": "5.935144",
+      "unit": "inst"
+    },
+    "gpc__cycles_elapsed.avg.per_second": {
+      "value": "1.901656",
+      "unit": "Ghz"
+    },
+    "dram__cycles_elapsed.avg.per_second": {
+      "value": "3.995876",
+      "unit": "Ghz"
+    }
+  },
+  {
+    "case": "v086_none_stable",
+    "gpu__time_duration.sum": {
+      "value": "1.870112",
+      "unit": "ms"
+    },
+    "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed": {
+      "value": "27.113477",
+      "unit": "%"
+    },
+    "smsp__warps_eligible.avg.per_cycle_active": {
+      "value": "0.493742",
+      "unit": "warp"
+    },
+    "smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio": {
+      "value": "5.941897",
+      "unit": "inst"
+    },
+    "gpc__cycles_elapsed.avg.per_second": {
+      "value": "1.901857",
+      "unit": "Ghz"
+    },
+    "dram__cycles_elapsed.avg.per_second": {
+      "value": "3.995942",
+      "unit": "Ghz"
+    }
+  },
+  {
+    "case": "v088_base_dynamic",
+    "gpu__time_duration.sum": {
+      "value": "3.074496",
+      "unit": "ms"
+    },
+    "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed": {
+      "value": "28.726273",
+      "unit": "%"
+    },
+    "smsp__warps_eligible.avg.per_cycle_active": {
+      "value": "0.553957",
+      "unit": "warp"
+    },
+    "smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio": {
+      "value": "4.578863",
+      "unit": "inst"
+    },
+    "gpc__cycles_elapsed.avg.per_second": {
+      "value": "1.090015",
+      "unit": "Ghz"
+    },
+    "dram__cycles_elapsed.avg.per_second": {
+      "value": "3.995920",
+      "unit": "Ghz"
+    }
+  },
+  {
+    "case": "v088_none_dynamic",
+    "gpu__time_duration.sum": {
+      "value": "2.039232",
+      "unit": "ms"
+    },
+    "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed": {
+      "value": "24.809582",
+      "unit": "%"
+    },
+    "smsp__warps_eligible.avg.per_cycle_active": {
+      "value": "0.446367",
+      "unit": "warp"
+    },
+    "smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio": {
+      "value": "5.448281",
+      "unit": "inst"
+    },
+    "gpc__cycles_elapsed.avg.per_second": {
+      "value": "1.902972",
+      "unit": "Ghz"
+    },
+    "dram__cycles_elapsed.avg.per_second": {
+      "value": "3.995873",
+      "unit": "Ghz"
+    }
+  },
+  {
+    "case": "v088_none_stable",
+    "gpu__time_duration.sum": {
+      "value": "2.039680",
+      "unit": "ms"
+    },
+    "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed": {
+      "value": "24.812469",
+      "unit": "%"
+    },
+    "smsp__warps_eligible.avg.per_cycle_active": {
+      "value": "0.446087",
+      "unit": "warp"
+    },
+    "smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio": {
+      "value": "5.447345",
+      "unit": "inst"
+    },
+    "gpc__cycles_elapsed.avg.per_second": {
+      "value": "1.902486",
+      "unit": "Ghz"
+    },
+    "dram__cycles_elapsed.avg.per_second": {
+      "value": "3.995909",
+      "unit": "Ghz"
+    }
+  }
+]

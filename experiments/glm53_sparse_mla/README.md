@@ -69,7 +69,9 @@ The full 8192-row/seed1234 audit checks all 268,435,456 output elements:
 
 v086 matches more than 99.999% of TRTLLM BF16 outputs on both full target
 seeds. Graph warm/cold medians are 1873.54/1880.13 µs versus paired TRTLLM
-1869.82/1946.53 µs: near parity warm, faster cold in that run. Qualified b512
+1869.82/1946.53 µs. A subsequent three-round order-rotation audit confirms
+warm parity (~1872 µs each), but has v086 ~1878 µs versus TRT ~1857 µs cold;
+the earlier cold advantage is not robust. Qualified b512
 device memcheck reports zero errors. The full b1024/chunk0 case has7650
 original-tolerance failures for both; the internal-hole/short case has86 for
 v086 versus78 for TRTLLM. Target-input agreement does not imply a tolerance

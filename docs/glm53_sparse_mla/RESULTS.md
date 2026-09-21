@@ -86,9 +86,10 @@ B300 physical GPU1; b8192, H64, D576/512, TopK2048, chunk3. Each row is a paired
 | v085 | 1878.05 | 1691.97 | 0.9009x | 119 | 0.00 / 0.00 | 27.76% | same 9/6 all-row failures as TRT, seeds1234/5678 |
 | v086 | 1870.05 | 1691.68 | 0.9046x | 119 | 0.00 / 0.00 | 27.89% | same 9/6 all-row failures as TRT, seeds1234/5678 |
 | v087 | 1872.22 | 1693.86 | 0.9047x | 119 | 0.00 / 0.00 | 27.85% | bitwise v085 on all8192 rows, seed1234 |
-| v088 | 2037.79 | 1690.85 | 0.8297x | 112 | 0.00 / 0.00 | 28.72% | prototype |
+| v088 | 2037.79 | 1690.85 | 0.8297x | 112 | 0.00 / 0.00 | 28.72% | bitwise v085 on all8192 rows, seed1234 |
+| v089 | 1861.44 | 1691.74 | 0.9088x | 119 | 0.00 / 0.00 | 28.07% | bitwise v086 on full/short audited inputs |
 
-Raw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. No implementation has established a consistent sustained warm speedup over TRTLLM; v086 is near parity warm with a cold advantage in its recorded Graph run, at baseline-level FP8 precision.
+Raw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. No implementation has established a consistent sustained warm speedup over TRTLLM; v086 is near parity warm at baseline-level FP8 precision; its initial cold advantage does not reproduce in the recorded rotating-order audit.
 
 ## CUDA Graph validation runs
 
@@ -132,5 +133,7 @@ These are separate warm/cold runs with 20 warmups and 100 repeats; sampled row c
 | v087 | 512 | cold | 1882.14 | 1923.95 | 1.0222x |
 | v088 | 512 | warm | 2037.95 | 1872.11 | 0.9186x |
 | v088 | 512 | cold | 2045.87 | 1924.62 | 0.9407x |
+| v089 | 512 | warm | 1882.21 | 1871.89 | 0.9945x |
+| v089 | 512 | cold | 1871.87 | 1927.14 | 1.0295x |
 
 See [ITERATIONS.md](ITERATIONS.md) for changes, failed hypotheses, correctness limits and source references.

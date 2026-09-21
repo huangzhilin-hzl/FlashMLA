@@ -2590,3 +2590,99 @@ backend order each round, checks512 rows before timing, and records raw samples
 plus GPU telemetry at measurement endpoints. Endpoint clocks do not reveal
 frequency throughout a kernel. This supplemental experiment must remain separate
 from the original paired results and cannot replace them selectively.
+
+### Rotating-order audit — v086 ties warm; cold advantage does not reproduce
+
+Three rounds in one process rotate all three backends through each position.
+All512 sampled rows pass. Warm medians: TRT1872.00/1871.82/1871.87 us;
+v0861871.92/1872.00/1872.16 us; v0882037.79/2037.89/2037.84 us. This supports
+warm parity for v086 and confirms v088's regression independently of order.
+Cold medians: TRT1857.04/1857.66/1855.78 us; v0861878.30/1878.19/1878.13 us;
+v0882045.86/2045.89/2045.90 us. Earlier cold advantages do not reproduce and
+must not be claimed as robust. Both sets of raw evidence remain available.
+
+GPU clock endpoints for v086/v088 are2032 MHz after every measurement; TRT
+endpoints vary1710–2025 MHz. These sparse snapshots cannot attribute in-kernel
+frequency changes. Default NCU's lower diagnostic clock regime can change the
+relative cost of compute and memory. Profile with --clock-control none next to
+check whether the v088/v086 ranking and stalls follow the measured runtime.
+
+## Iteration 089 — remove the post-PV compute barrier
+
+Based on v086. Every compute warp retains the PV-completion mbarrier wait and
+tcgen05 after-thread-sync fence. Remove the following256-thread named barrier;
+thread0 releases the consumed KV stage immediately after the before-thread-sync
+fence. The pre-PV barrier already drains each thread's current index/P reads,
+and PV completion drains asynchronous KV reads. Next-loop compute uses the
+other KV stage. Cross-group max reduction and pre-PV synchronization remain.
+
+This tests whether earlier stage release and one fewer per-tile rendezvous
+improve producer overlap. Arithmetic is unchanged. Barrier/lifetime reasoning
+must be backed by bounded smoke, device memcheck and full bitwise comparison;
+no numerical or safety claim is inherited solely from the small diff. Pending.
+
+### Profiler regime audit — clock control and Tensor Core boost are separate
+
+Installed NCU2025.3 CLI reports default --clock-control base and default
+--pipeline-boost-state stable. NVIDIA's GPU tools expert explains that supported
+GPUs normally use dynamic Tensor Core boost and that NCU disables the dynamic
+option for more consistent multi-pass replay ([NVIDIA expert explanation](https://forums.developer.nvidia.com/t/tensor-core-boost-state-api/340228/2)).
+The current online UI documentation uses an auto default, so the installed
+CLI help, rather than a newer release's default, is authoritative for this run.
+
+Preserve existing base/stable results. profile_regimes.sh reproduces supplemental
+none/stable, base/dynamic and none/dynamic profiles for v086/v088, changing the
+two controls independently. Collect SpeedOfLight, SchedulerStats and WarpStateStats
+with the same10 warmups and one profiled invocation as profile_ncu.py. Clock and
+boost variants are diagnostic controls, never replacements for unprofiled timing.
+The matrix is running; no causal attribution or performance claim yet.
+
+### Profiler regime result — ranking reversal follows clock control
+
+| Clock / TC boost | v086 diagnostic ms | v088 diagnostic ms |
+|---|---:|---:|
+| base / stable (original) | 3.168512 | 3.078816 |
+| base / dynamic | 3.165664 | 3.074496 |
+| none / stable | 1.870112 | 2.039680 |
+| none / dynamic | 1.869984 | 2.039232 |
+
+The ranking follows the clock-control variable. Switching TC boost modes has
+negligible measured impact in these profiles; do not attribute this reversal
+to Tensor Core boost. Reported GPC frequency is ~1.090 GHz with base control
+and ~1.902 GHz without it; DRAM remains ~3.996 GHz. None/dynamic reproduces
+the unprofiled latency ordering. This is evidence of clock-regime sensitivity,
+not yet proof of a particular memory/compute dependency causing that sensitivity.
+
+At none/dynamic, v086/v088 tensor-active is27.076%/24.810%, eligible-warp
+0.493968/0.446367 and long-scoreboard5.935144/5.448281. Even here v088's lower
+stall ratio coexists with worse total latency. Original/default profiles remain
+useful resource diagnostics but cannot alone rank these pipelines.
+
+### Iteration 089 result — safe on audited cases, sustained gain unestablished
+
+Offline REG119/STACK0. Smoke/eight-row checks and qualified b512 memcheck pass.
+Warm events1861.44 us versusTRT1691.74 us. NCU base/stable:119 registers,
+194872 shared bytes, occupancy23.282%, tensor28.067%, eligible0.472762,
+long-scoreboard6.019016, zero local sectors, aggregate shared conflicts
+3460674/4528813, diagnostic3.147072 ms.
+
+All8192-row seed1234 output bits match v086 in three repeats, as do all1024
+short-case rows at seed5678 in three repeats. The masked audit retains86
+failures, with the same reported errors as v086; neither passes its FP32
+reference tolerance. Graph warm1882.21 us versusTRT1871.89 us, cold1871.87 us
+versusTRT1927.14 us. Its short-event gain does not establish a sustained warm
+gain; keep v086 as the promoted fast path pending any further controlled evidence.
+
+## Iteration 090 — one validity bitmap load per score fragment
+
+Based on v086. Each of the four index-loading warps ballots its32 validity
+predicates, and lane0 stores a Uint32 bitmap. Existing producer synchronization
+publishes those bits before TMA completion. Each compute thread loads the bitmap
+for its aligned32-key fragment once, then uses constant bit tests instead of32
+shared-memory index loads. Four words per stage add32 shared bytes.
+
+The audited Layout-E copy has physical DP=local thread ID and column=element
+index, so bitmap index is stage*4+(ctid//64)*2+cgroup and bit index is j.
+Unlike v080 there is no all-valid branch or cross-warp flag reduction. Internal
+holes and partial tiles follow the same per-element predicate as v086. Compile,
+bounded smoke, masked comparison, full equivalence and profiling are pending.

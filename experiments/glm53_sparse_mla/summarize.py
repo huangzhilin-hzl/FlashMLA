@@ -35,6 +35,10 @@ for directory in sorted(root.glob("v[0-9][0-9][0-9]")):
         status = "same 9 all-row failures as TRT"
     if version in ("v085", "v086"):
         status = "same 9/6 all-row failures as TRT, seeds1234/5678"
+    if version == "v088":
+        status = "bitwise v085 on all8192 rows, seed1234"
+    if version == "v089":
+        status = "bitwise v086 on full/short audited inputs"
     if version == "v087":
         status = "bitwise v085 on all8192 rows, seed1234"
     if version == "v065":
@@ -44,7 +48,7 @@ for directory in sorted(root.glob("v[0-9][0-9][0-9]")):
     if version == "v033":
         status = "non-isolated timing; do not rank"
     print(f"| {version} | {candidate['median_us']:.2f} | {baseline['median_us']:.2f} | {candidate['speedup_vs_trtllm']:.4f}x | {metrics['launch__registers_per_thread']} | {traffic} | {tensor:.2f}% | {status} |")
-print("\nRaw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. No implementation has established a consistent sustained warm speedup over TRTLLM; v086 is near parity warm with a cold advantage in its recorded Graph run, at baseline-level FP8 precision.\n")
+print("\nRaw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. No implementation has established a consistent sustained warm speedup over TRTLLM; v086 is near parity warm at baseline-level FP8 precision; its initial cold advantage does not reproduce in the recorded rotating-order audit.\n")
 graph_paths = sorted(root.glob("v[0-9][0-9][0-9]_validation/*_graph.json"))
 if graph_paths:
     print("## CUDA Graph validation runs\n")
