@@ -99,6 +99,10 @@ B300 physical GPU1; b8192, H64, D576/512, TopK2048, chunk3. Each row is a paired
 | v098 | 1924.90 | 1691.71 | 0.8789x | 118 | 0.00 / 0.00 | 39.41% | bitwise v075, full2seeds/short/masks; higher precision |
 | v099 | 1968.35 | 1691.71 | 0.8595x | 80 | 70.13 / 32.55 | 26.18% | bitwise v097 full seed1234/mask; spills; slower |
 | v100 | 1931.39 | 1691.58 | 0.8758x | 122 | 0.00 / 0.00 | 39.26% | bitwise v098 full seed1234/mask; no gain |
+| v101 | 1808.42 | 1691.78 | 0.9355x | 168 | 10.49 / 3.71 | 28.50% | bitwise v097 full seed1234/mask; no gain |
+| v102 | 1814.56 | 1692.10 | 0.9325x | 142 | 0.00 / 0.00 | 28.40% | bitwise v097 full seed1234/mask; no gain |
+| v103 | 1757.22 | 1691.65 | 0.9627x | 168 | 0.00 / 0.00 | 29.45% | bitwise v097 full seed1234/mask; no gain |
+| v104 | 1755.26 | 1691.68 | 0.9638x | 120 | 0.00 / 0.00 | 29.36% | bitwise v097 full seed1234/mask; no gain |
 
 Raw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. v090/v091/v094/v096/v097 have an observed sustained warm advantage in the extended eager-event, Graph and rotating-order runs, at baseline-level FP8 precision; v097 is the current fast path. Short five-event tuning still favors TRT; use the matching execution regime. v086 is near parity warm and its initial cold advantage does not reproduce in its rotating-order audit.
 

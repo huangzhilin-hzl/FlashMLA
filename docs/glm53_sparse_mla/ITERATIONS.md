@@ -3109,3 +3109,96 @@ base/stable:122 registers,203064 shared bytes, occupancy17.767%, tensor39.258%,
 eligible0.452134, long-scoreboard5.223805, zero local sectors, aggregate shared
 conflicts4572493/747802, diagnostic3.311328 ms. No promotion or expanded
 validation; retain v098's eight producer warps for the higher-precision path.
+
+v101 offline resources are REG168/STACK56; wider fragments still spill under
+the default allocation. v102's explicit one-CTA bound changes v099's allocation
+to REG142/STACK0. Runtime timing/NCU must establish whether this fixes its cost.
+
+## Iteration 103 — role register redistribution for wider correction
+
+Based on v101, use min_blocks_per_mp=1 and request32 producer registers per
+thread and224 compute registers per thread. This totals128*32+256*224=61440
+registers, before any allocation granularity. Inspect the initial register
+allocation and actual USETMAXREG instructions before runtime; do not launch
+if the CTA allocation cannot supply those requests. The goal is to remove
+v101's correction-fragment spills while preserving all its math and fences.
+Producer decrease occurs after common Q setup; compute increase occurs before
+the Q wait. Offline/SASS and bounded runtime validation pending.
+
+## Iteration 104 — one producer rendezvous after index publication
+
+Based on v097. Retain a single128-thread producer barrier after thread0
+arrive/expect_tx and every producer's index/bitmap publication, before gather4
+reads. Remove the earlier barrier and the post-issue barrier. The retained
+rendezvous orders shared index reads and TMA issuance; each reused stage still
+waits for its consumer empty barrier before any shared write or new transaction
+expectation. A warp can start fetching the next tile's private indices sooner.
+This revisits an earlier small barrier-count gain after the substantial index
+scheduling and producer-count changes. All compute and phase-lifetime fences
+remain. Offline, bounded smoke, memory and equivalence evidence are pending.
+
+### Iteration 101 result — wider correction still spills
+
+Smoke/eight-row checks, full8192 seed1234 bitwise equivalence to v097 in three
+repeats, masked equality and qualified b512 memcheck pass. Warm1808.42 us versus
+TRT1691.78 us is slower thanv0971749.06 us. NCU base/stable:168 registers,
+194904 shared bytes, occupancy17.757%, tensor28.503%, eligible0.358347,
+long-scoreboard5.494021, local read/write10485760/3714496 sectors, aggregate
+shared conflicts4134840/847304, diagnostic3.104096 ms. No promotion.
+
+### Iteration 102 result — removing shuffle spills is insufficient
+
+Smoke/eight-row checks, full8192 seed1234 bitwise equivalence to v097 in three
+repeats, masked equality and qualified b512 memcheck pass. Warm1814.56 us versus
+TRT1692.10 us improves substantially fromv099 but remains slower thanv097.
+NCU base/stable:142 registers,193880 shared bytes, occupancy17.725%, tensor
+28.399%, eligible0.386531, long-scoreboard5.029150, zero local sectors, aggregate
+shared conflicts2001/350518, diagnostic3.112480 ms. The remaining shuffle,
+election and scheduling costs prevent promotion; lower shared counters alone
+are not an optimization objective.
+
+v103 preflight confirms REG168/STACK0 and actual USETMAXREG32/224 instructions.
+Initial168*384=64512 registers covers the requested128*32+256*224=61440;
+these per-warp allocations are multiples of256 registers. Bounded runtime
+validation follows before full timing.
+
+## Iteration 105 — dedicated MMA issue warp with PV-before-next-QK order
+
+Based on v097. Retain256 compute threads and128 producers; add warp12 as a
+32-thread dedicated MMA issuer (416 threads total). It waits for a full KV
+stage, issues current QK, waits for compute P/correction readiness, issues
+current PV, then proceeds to the next stage's QK without waiting for PV itself.
+Separate QK-done, PV-done and P-ready mbarriers each alternate once per tile.
+
+Compute still acquires the producer full barrier directly for index/bitmap
+visibility, then waits QK before score reads. Its existing pre-PV256-thread
+rendezvous drains every score read, P store and O correction before tid0 signals
+P-ready. Every compute warp waits PV before the old KV stage is released and
+before next P stores. Thus next QK writes only the disjoint score TMEM region,
+reads the alternate KV stage, and cannot overwrite scores still being consumed.
+Final PV completion precedes output transpose and TMEM deallocation.
+
+Unlike v088, waiting for next KV cannot block compute-warp reconvergence at the
+current PV wait. Unlike v074, current PV is queued before next QK, and the four
+producer warps keep their existing128-row mapping. The extra issue warp and
+readiness handshake may still cost more than the overlap saves. Offline/SASS,
+bounded smoke, memory/masked and full bitwise checks are pending. No correctness
+or performance claim is inferred solely from this synchronization argument.
+
+### Iteration 103 result — redistribution removes wider-fragment spills
+
+Smoke/eight-row checks, full8192 seed1234 bitwise equality to v097 (three
+repeats), masked equality and qualified b512 memcheck pass. Warm1757.22 us versus
+TRT1691.65 us recovers most ofv101's regression but is still slower thanv097.
+NCU base/stable:168 registers,194904 shared bytes, occupancy17.737%, tensor
+29.451%, eligible0.373962, long-scoreboard5.339017, zero local sectors,
+aggregate shared conflicts4290784/943817, diagnostic3.016000 ms. No promotion.
+
+### Iteration 104 result — fewer producer barriers do not help this schedule
+
+Smoke/eight-row checks, full8192 seed1234 bitwise equality to v097 (three
+repeats), masked equality and qualified b512 memcheck pass. Warm1755.26 us versus
+TRT1691.68 us is slightly slower thanv0971749.06 us. NCU base/stable:120
+registers,194904 shared bytes, occupancy17.777%, tensor29.356%, eligible0.362432,
+long-scoreboard5.545522, zero local sectors, aggregate shared conflicts
+3563570/676605, diagnostic3.013952 ms. No promotion or expanded timing claim.

@@ -43,6 +43,8 @@ for directory in sorted(root.glob("v[0-9][0-9][0-9]")):
         status = "full seed1234 bitwise equivalence; see iteration log"
     if version in ("v094", "v096", "v097"):
         status = "bitwise validated predecessor, full2seeds/short/masks; FP8 limits retained"
+    if version in ("v101", "v102", "v103", "v104"):
+        status = "bitwise v097 full seed1234/mask; no gain"
     if version == "v099":
         status = "bitwise v097 full seed1234/mask; spills; slower"
     if version == "v100":
