@@ -1,0 +1,179 @@
+{
+  "shared_summary": {
+    "L1 Wavefronts Shared Excessive": 0.0,
+    "L1 Wavefronts Shared": 52248576.0,
+    "L1 Wavefronts Shared Ideal": 52248576.0,
+    "max_nway": 4.0
+  },
+  "L1 Wavefronts Shared Excessive": [],
+  "L1 Wavefronts Shared Excessive_sum": 0.0,
+  "stall_long_sb": [
+    {
+      "Address": "0x7ff4fb5ae230",
+      "Source": "@!P1  BRA 0x7ff4fb5b36a0",
+      "stall_long_sb": "29005",
+      "L1 Conflicts Shared N-Way": "0",
+      "Instructions Executed": "917504"
+    },
+    {
+      "Address": "0x7ff4fb5b1b20",
+      "Source": "@!P1  BRA 0x7ff4fb5b3820",
+      "stall_long_sb": "15470",
+      "L1 Conflicts Shared N-Way": "0",
+      "Instructions Executed": "1048576"
+    },
+    {
+      "Address": "0x7ff4fb5afda0",
+      "Source": "@!P0  BRA 0x7ff4fb5b37c0",
+      "stall_long_sb": "12235",
+      "L1 Conflicts Shared N-Way": "0",
+      "Instructions Executed": "1048576"
+    },
+    {
+      "Address": "0x7ff4fb5ae310",
+      "Source": "      STS [R0+0x31100], R5",
+      "stall_long_sb": "5204",
+      "L1 Conflicts Shared N-Way": "1",
+      "Instructions Executed": "524288"
+    },
+    {
+      "Address": "0x7ff4fb5af7b0",
+      "Source": "@!P0  BRA 0x7ff4fb5b3760",
+      "stall_long_sb": "2828",
+      "L1 Conflicts Shared N-Way": "0",
+      "Instructions Executed": "1048576"
+    },
+    {
+      "Address": "0x7ff4fb5aedd0",
+      "Source": "@!P0  BRA 0x7ff4fb5b3700",
+      "stall_long_sb": "2398",
+      "L1 Conflicts Shared N-Way": "0",
+      "Instructions Executed": "65536"
+    },
+    {
+      "Address": "0x7ff4fb5ae750",
+      "Source": "      UIADD3 UR8, UPT, UPT, UR5, 0x29100, URZ",
+      "stall_long_sb": "1148",
+      "L1 Conflicts Shared N-Way": "0",
+      "Instructions Executed": "1048576"
+    },
+    {
+      "Address": "0x7ff4fb5aecf0",
+      "Source": "      BSYNC.RECONVERGENT B0",
+      "stall_long_sb": "1074",
+      "L1 Conflicts Shared N-Way": "0",
+      "Instructions Executed": "2097152"
+    }
+  ],
+  "stall_long_sb_sum": 71535.0,
+  "stall_short_sb": [
+    {
+      "Address": "0x7ff4fb5b0670",
+      "Source": "      FMNMX R36, R39, R36, !PT",
+      "stall_short_sb": "252",
+      "L1 Conflicts Shared N-Way": "0",
+      "Instructions Executed": "1048576"
+    },
+    {
+      "Address": "0x7ff4fb5afc80",
+      "Source": "      UIADD3 UR8, UPT, UPT, UR6, 0x2, URZ",
+      "stall_short_sb": "199",
+      "L1 Conflicts Shared N-Way": "0",
+      "Instructions Executed": "131072"
+    },
+    {
+      "Address": "0x7ff4fb5b34d0",
+      "Source": "      LOP3.LUT R0, R0, UR6, RZ, 0xc0, !PT",
+      "stall_short_sb": "181",
+      "L1 Conflicts Shared N-Way": "0",
+      "Instructions Executed": "8192"
+    },
+    {
+      "Address": "0x7ff4fb5afe80",
+      "Source": "      ISETP.GT.AND P4, PT, R44, -0x1, PT",
+      "stall_short_sb": "178",
+      "L1 Conflicts Shared N-Way": "0",
+      "Instructions Executed": "1048576"
+    },
+    {
+      "Address": "0x7ff4fb5ae5a0",
+      "Source": "      R2UR UR46, R7",
+      "stall_short_sb": "167",
+      "L1 Conflicts Shared N-Way": "0",
+      "Instructions Executed": "1048576"
+    },
+    {
+      "Address": "0x7ff4fb5ae2e0",
+      "Source": "      LDG.E R5, desc[UR8][R6.64]",
+      "stall_short_sb": "163",
+      "L1 Conflicts Shared N-Way": "0",
+      "Instructions Executed": "524288"
+    },
+    {
+      "Address": "0x7ff4fb5b0680",
+      "Source": "      FMNMX3 R36, R38, R37, R36, !PT",
+      "stall_short_sb": "154",
+      "L1 Conflicts Shared N-Way": "0",
+      "Instructions Executed": "1048576"
+    },
+    {
+      "Address": "0x7ff4fb5b0190",
+      "Source": "      ISETP.GT.AND P6, PT, R44, -0x1, PT",
+      "stall_short_sb": "77",
+      "L1 Conflicts Shared N-Way": "0",
+      "Instructions Executed": "1048576"
+    }
+  ],
+  "stall_short_sb_sum": 1844.0,
+  "Instructions Executed": [
+    {
+      "Address": "0x7ff4fb5b36b0",
+      "Source": "      SYNCS.PHASECHK.TRANS64.TRYWAIT P1, [R0+URZ+0x31928], R5",
+      "Instructions Executed": "24904507",
+      "L1 Conflicts Shared N-Way": "0"
+    },
+    {
+      "Address": "0x7ff4fb5b36c0",
+      "Source": "@!P1  NANOSLEEP.SYNCS 0x989680",
+      "Instructions Executed": "24904507",
+      "L1 Conflicts Shared N-Way": "0"
+    },
+    {
+      "Address": "0x7ff4fb5b36d0",
+      "Source": "@!P1  SYNCS.PHASECHK.TRANS64 P1, [R0+URZ+0x31928], R5",
+      "Instructions Executed": "24904507",
+      "L1 Conflicts Shared N-Way": "0"
+    },
+    {
+      "Address": "0x7ff4fb5b36e0",
+      "Source": "@!P1  BRA 0x7ff4fb5b36b0",
+      "Instructions Executed": "24904507",
+      "L1 Conflicts Shared N-Way": "0"
+    },
+    {
+      "Address": "0x7ff4fb5b37d0",
+      "Source": "      SYNCS.PHASECHK.TRANS64.TRYWAIT P0, [R3+URZ+0x31900], R2",
+      "Instructions Executed": "6330224",
+      "L1 Conflicts Shared N-Way": "0"
+    },
+    {
+      "Address": "0x7ff4fb5b37e0",
+      "Source": "@!P0  NANOSLEEP.SYNCS 0x989680",
+      "Instructions Executed": "6330224",
+      "L1 Conflicts Shared N-Way": "0"
+    },
+    {
+      "Address": "0x7ff4fb5b37f0",
+      "Source": "@!P0  SYNCS.PHASECHK.TRANS64 P0, [R3+URZ+0x31900], R2",
+      "Instructions Executed": "6330224",
+      "L1 Conflicts Shared N-Way": "0"
+    },
+    {
+      "Address": "0x7ff4fb5b3800",
+      "Source": "@!P0  BRA 0x7ff4fb5b37d0",
+      "Instructions Executed": "6330224",
+      "L1 Conflicts Shared N-Way": "0"
+    }
+  ],
+  "Instructions Executed_sum": 817103368.0
+}

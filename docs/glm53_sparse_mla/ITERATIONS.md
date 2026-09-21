@@ -2212,3 +2212,129 @@ validated higher-precision performance candidate; it still trails TRTLLM.
 v076 offline audit passes. CUBIN REG168,STACK0; SASS retains real USETMAXREG
 32/240. The38912-register requested role sum fits the64512-register launch
 pool. Runtime validation remains pending.
+
+### Iteration 076 result — lower softmax parallelism loses throughput
+
+b2/eight-row checks pass. Warm2146.50us versusTRT1691.58us. NCU:168 registers,
+202552 shared bytes,occupancy17.014%,tensor35.458%,eligible0.390134,
+long-scoreboard5.316915,zero local sectors,shared conflicts3944280/2214780,
+diagnostic3.668512ms. Dynamic role allocation works and avoids spilling, but
+more work per compute thread is slower thanv067's two-group version. No
+expanded accuracy claim or promotion.
+
+## Iteration 077 — raw QK maxima and fused affine exp2 inputs
+
+Based onv075. Reduce maxima in raw QK units, express the anchor window in those
+units, and convert each exp2 input with score*log2_scale+(4-anchor*log2_scale).
+This should combine the old per-element score multiply and later offset into
+one FMA; verify final SASS instead of assuming contraction. Correction factors
+now convert the raw-max difference to log2 units. Probability scale16 and both
+residual PV passes remain unchanged. Rounding and possibly anchor-boundary
+decisions change, so independent full-reference audits are required. Pending.
+
+## Iteration 078 — combine reduced producer synchronization with residual P
+
+Applyv063's three-to-one producer-barrier change tov075. Publish gather indices
+and expected transaction bytes together before the remaining producer barrier.
+The other KV stage has separate indices, and a reused stage still waits for PV
+completion. Arithmetic is unchanged, so full bitwise comparison withv075 is
+appropriate in addition to device memcheck. The same change did not improve
+v054's sustained warm timing; this tests whether the residual path has a
+different balance. Offline, smoke, events/NCU and validation pending.
+
+### Iteration 077 initial result — tiny short-run gain
+
+Offline REG118,STACK0. SASS FFMA-family lines rise from10 in v075 to27 in v077
+(the latter includes packed FMA); source-level fusion is reflected in codegen.
+Smoke/eight-row checks pass. Warm1984.70us versusTRT1691.84us, only6.24us below
+v075, not enough alone for promotion. NCU:118 registers,203064 shared bytes,
+occupancy23.304%,tensor38.701%,eligible0.493488,long-scoreboard6.698395,zero
+local sectors,shared conflicts3562355/4689615,diagnostic3.358144ms.
+
+Independent seed1234 full8192 audit passes all268435456 elements,max_abs
+0.005918741,relative_RMSE0.001735970. No second-seed/edge/stable claim yet;
+v075 remains the default higher-precision candidate.
+
+## Iteration 079 — widen probability swizzling to128 bytes
+
+Based onv075, change only the high/residual P layout atom fromK_SW64 toK_SW128.
+Each P buffer is still64x128 FP8 and8KiB; Q/KV layouts, MMA arithmetic and
+thread ownership remain unchanged. This tests whether the roughly4.2M
+shared-store conflicts include avoidable conflicts from128-byte head strides
+under a64-byte swizzle. Manual MMA descriptors derive their swizzle from the
+new layout. Compile/layout checks and bounded smoke precede performance;
+full bitwise comparison withv075 and qualified memcheck are needed before
+promotion. This is independent ofv077/v078. Pending.
+
+### Iteration 078 initial result — producer-barrier reduction nearly ties
+
+Offline REG118,STACK0. Smoke/eight-row checks pass. Warm1988.64us versus
+TRT1693.76us, only2.3us belowv075. NCU:118 registers,203064 shared bytes,
+occupancy23.297%,tensor38.615%,eligible0.537665,long-scoreboard6.560339,zero
+local sectors,shared conflicts3929262/3889222,diagnostic3.364384ms. No stable
+speedup established, so no promotion or expanded equivalence claim yet.
+
+### Iteration 079 result — SW128 does not change the observed conflicts
+
+Offline REG118,STACK0. Smoke/eight-row checks pass. Warm1992.90us versus
+TRT1691.81us tiesv075 within short-run variation. NCU:118 registers,203064
+shared bytes,occupancy23.308%,tensor38.526%,eligible0.545882,long-scoreboard
+6.362201,zero local sectors,shared conflicts3534640/4217042,diagnostic
+3.374592ms. The store-conflict count is essentially unchanged fromv075's
+4216127, so this measurement does not support the proposed P-swizzle cause.
+No promotion or expanded equivalence/memcheck claim. Collect per-instruction
+SourceCounters onv075 before attributing the remaining aggregate conflicts.
+
+## Iteration 080 — exact all-valid tile detection for mask bypass
+
+Based onv075. The128 index-loading threads vote within four full warps, publish
+four validity flags per KV stage, and combine them after the existing producer
+barrier. The combined flag is stored before arrive-and-expect-tx. Compute
+bypasses per-element index loads/selects only when every one of the128 slots
+is nonnegative. Out-of-length slots remain-1; internal holes force the original
+mask loop. Unlike rejectedv031, no endpoint or contiguity assumption is used.
+
+Probability representation, arithmetic and all MMA accumulation orders remain
+unchanged; vectorizing score scaling can still affect compiler scheduling.
+Bounded smoke, the explicit internal-hole/partial reference case, full bitwise
+comparison withv075 and device memcheck precede any promotion. Pending.
+
+### v075 source-level profile — distinguish arbitration from address conflicts
+
+SourceCounters reports52248576 shared wavefronts and exactly52248576 ideal
+wavefronts, with zero excessive wavefronts across all instrumented instructions.
+This does not support an intra-warp shared-address conflict problem despite
+aggregate hardware conflict counters of3.53M loads/4.22M stores. Preserve those
+raw counters, but do not equate them with removable address-bank conflicts.
+NVIDIA explains that hardware counters also include lost arbitration against
+TMA fills, tensor-core reads and other clients; source excessive counters
+isolate instruction address behavior ([NVIDIA clarification](https://forums.developer.nvidia.com/t/nsight-compute-h100-questions-on-l1-bank-conflict-statistic-discrepancies-between-details-and-source-pages/351780/3)).
+
+The top three long-scoreboard sample locations are conditional branches
+consuming mbarrier phase-check predicates:29005,15470 and12235 samples out of
+71535 total (79.28%). The first is the producer's KV-stage-reuse wait; the other
+two follow the compute MMA-completion waits. The count is sampled stall
+attribution, not a direct estimate of speedup or proof of DRAM bandwidth
+saturation. Source CSV and derived summaries are saved underartifacts/v075_source.
+
+### Iteration 080 result — exact mask bypass adds more overhead than it saves
+
+Offline REG110,STACK0. Smoke/eight-row checks and explicit hole/partial reference
+case pass (max_abs0.004001856). Warm2064.54us versusTRT1691.90us regresses
+fromv075. NCU:110 registers,203104 shared bytes,occupancy23.331%,tensor37.216%,
+eligible0.642488,long-scoreboard5.725958,zero local sectors,aggregate shared
+conflicts3927426/2716004,diagnostic3.492352ms. Better eligible-warp and stall
+ratios do not imply lower total latency. No promotion or full bitwise claim.
+
+## Iteration 081 — packed FP16 intermediate for probability residuals
+
+Based onv075. Round scaled FP32 probabilities to FP16, quantize high FP8 from
+those values, and form the low FP8 residual using FP16 subtraction. Keep the
+FP32 denominator based on the original exp2 values. Q, KV and both tensor-core
+PV operands remain FP8; there is no KV expansion or BF16 attention fallback.
+
+This intentionally trades some probability precision for cheaper packed
+conversion/subtraction: inspect whether SASS uses half2 arithmetic and avoids
+the FP8-to-FP16-to-FP32 reconstruction present inv075. The extra rounding and
+double-rounding boundaries require independent full-reference audits on both
+seeds and short/masked inputs. No inherited numerical claim. Pending.

@@ -27,7 +27,7 @@ for directory in sorted(root.glob("v[0-9][0-9][0-9]")):
     traffic = "unmeasured" if loads is None or stores is None else f"{loads/1e6:.2f} / {stores/1e6:.2f}"
     tensor = number("sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed")
     status = "unsafe; rejected" if version in ("v002", "v003") else "prototype"
-    if version == "v053":
+    if version in ("v053", "v077"):
         status = "all 8192 rows PASS, seed1234"
     if version in ("v066", "v067", "v069", "v075"):
         status = "all8192 rows PASS, seeds1234/5678"
