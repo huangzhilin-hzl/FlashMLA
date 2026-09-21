@@ -518,3 +518,40 @@ PV only before updating the running O accumulator; wait for the last PV before
 epilogue. This removes some serialized QK/PV waits, within the two-KV-stage
 capacity constraint. Producer/consumer phase arithmetic and resource pressure
 require fresh smoke, full-target, and memory validation. Measurements pending.
+
+### Iteration 017 result
+
+Full-target 8-row numerical check PASS, same errors as v016. Paired event
+medians: TRTLLM 1691.78 us, v017 4062.53 us (0.41644x), a regression.
+NCU: 202 registers, 202040 shared bytes, occupancy 11.318%, tensor active
+26.875%, eligible warps 0.18981, long scoreboard 5.64460. Local sectors zero;
+shared-load/store conflicts 3599303 / 12550. Diagnostic duration 6.56237 ms.
+With only two KV stages, early waiting for the next tile couples the consumer
+back to the previous PV and producer refill. The measured lower tensor activity
+rejects this ordering; no memory-safety certification is claimed for it.
+
+## Iteration 018 — defer next-QK scheduling until after softmax
+
+File: `experiments/glm53_sparse_mla/kernel_v018.py`, based on v017.
+Move the wait for the next KV tile and its QK issue after current softmax/P
+stores but before O correction. This lets softmax execute while the producer
+refills the next stage, while retaining two S/P regions and hardware PV-to-empty
+barrier signaling. Full-target 8-row check PASS. Paired event medians: TRTLLM
+1693.79 us, v018 3589.12 us (0.47192x). Better than v017 but still slower than
+v016, so v016 remains the performance base.
+
+NCU: 200 registers, 202040 shared bytes, occupancy 11.209%, tensor active
+30.689%, eligible warps 0.22110, long scoreboard 4.00437. Local sectors zero;
+shared-load/store conflicts 10590851 / 311222. Diagnostic duration 5.74925 ms.
+The intended overlap does not offset extra scheduling/waiting overhead with
+this two-stage design. Keep the unsuccessful variants as evidence.
+
+## Iteration 019 — skip identity O correction exactly
+
+File: `experiments/glm53_sparse_mla/kernel_v019.py`, based on v016.
+Online softmax only rescales the running O accumulator when a tile increases
+the running maximum. Test all head indices addressed by each O fragment and
+use a warp-wide all vote. A warp whose factors are exactly 1 skips its eight
+TMEM load/multiply/store sequences. No approximation threshold is introduced;
+TMEM instructions remain warp-converged. This tests unnecessary correction
+traffic as a bottleneck without changing the QK/PV scheduling. Pending checks.
