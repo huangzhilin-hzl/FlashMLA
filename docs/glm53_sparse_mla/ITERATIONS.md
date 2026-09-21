@@ -473,3 +473,36 @@ Assign all 512 output channels to one CTA while keeping a separate producer
 warpgroup. Use the explicit nonoverlapping 256-column N-tile stride learned
 in v009. This tests whether better loading overlap changes the earlier
 full-output versus duplicated-QK tradeoff. Validation pending.
+
+### Iteration 015 result
+
+Full b8192 8-row correctness PASS. Paired medians: TRTLLM 1691.84 us, v015
+3767.58 us; ratio 0.44905x, still slower than split-output v014 (3567.87 us).
+NCU: 124 registers, 115504 shared bytes, occupancy 23.692%, tensor active
+27.473%, eligible warps 0.29738, long scoreboard 3.30076. Local sectors zero;
+shared-load/store conflicts 9660785 / 12387311. Diagnostic duration 6.44310 ms.
+Resident warps include the CTA waiting for its 512-column TMEM allocation;
+the lower eligible-warp and tensor activity remain consistent with that limit.
+
+## Iteration 016 — full output with 128-key tiles
+
+File: `experiments/glm53_sparse_mla/kernel_v016.py`, based on v015.
+Use KV128 instead of KV64 to halve loop/barrier and online O-correction counts.
+The full-output design already has only one active TMEM user; larger shared
+buffers therefore do not sacrifice a second computing CTA. QK uses N128;
+softmax threads each process 64 keys. The wrapper requires `--block-k 128`;
+the reproducible run script forwards that value to both benchmark and NCU.
+Accuracy and resource effects are pending.
+
+### Iteration 016 result
+
+Full b8192 8-row correctness PASS: max_abs 0.00673771, relative_RMSE 0.0148667.
+Paired warm event medians: TRTLLM 1691.78 us, v016 2996.35 us; ratio 0.56461x.
+KV128 improves on v015 by 1.26x and on v014 by 1.19x. NCU: 207 registers,
+193840 shared bytes, occupancy 11.009%, tensor active 34.298%, eligible warps
+0.26279, long scoreboard 3.69279. Local sectors zero; shared-load/store
+conflicts 2548516 / 262695. Diagnostic duration 5.15706 ms.
+
+The paired baseline's tensor activity is 62.491%. The next target is to
+overlap QK for tile i+1 with softmax/correction for tile i, and PV for tile i
+with softmax for tile i+1, rather than serially waiting after both MMAs.
