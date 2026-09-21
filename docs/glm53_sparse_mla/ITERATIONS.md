@@ -237,3 +237,27 @@ long scoreboard 0.86799. Local sectors remain zero. Shared-load/store conflicts
 store conflicts. The other major path is scalar TMEM-to-shared score writes.
 Diagnostic NCU duration 23.5537 ms. Next softmax layout should bypass that
 intermediate score buffer and distribute reduction directly over TMEM fragments.
+
+### Iteration 006 result
+
+Full b8192 8-row correctness PASS, same errors as v004/v005. Paired warm
+event medians: TRTLLM 1690.59 us, v006 8459.26 us; TRT/candidate=0.19985x,
+1.70x faster than v005 but still 5.00x slower than TRTLLM. NCU: 186 registers,
+shared memory 94.988 KB; occupancy 12.427%;
+tensor active 19.176%; eligible warps/scheduler 0.53872; long scoreboard
+0.98258. Local sectors remain zero. Shared-load/store conflicts 34247027 /
+203727957. Similar residency but twice the eligible warps and higher tensor
+activity support that concurrent TMEM use now works. NCU duration 14.0830 ms.
+Compute Sanitizer memcheck is being run at b512 to exercise concurrent CTAs.
+
+## Iteration 007 — direct TMEM softmax
+
+File: `experiments/glm53_sparse_mla/kernel_v007.py`.
+Why: the intermediate S buffer still receives scalar stores with severe bank
+conflicts. A diagnostic compile of `Ld16x32bx2Op` confirmed each thread owns one
+head and 32 contiguous key columns, and lanes differing by 16 cover the other
+half of that head. Remove the shared S buffer entirely; reduce local max/sum
+in registers and exchange with an XOR-16 shuffle. All 128 threads participate,
+then vector-store FP8 P. Keep O correction and MMA unchanged. Diagnostic source
+and its coordinate mappings are preserved as `kernel_v007_diag.py`.
+Validation pending.
