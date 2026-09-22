@@ -1,0 +1,8 @@
+{"version": "v139", "device_launch": false, "cuda_context_initialized": true, "sha256": "616806f93940eb917b0db4c4c138c9f02c20dc40e956d7711f0083db3f0c4c13"}
+[91merror:[0m NVVM backend compilation failed
+  [91merror:[0m libNVVM failed while compiling generated device IR.
+  [94mnote:[0m target architecture: sm_103a
+  [94mnote:[0m backend log:
+        NVVM backend compilation failed
+  [92msuggestion:[0m check that CUDA_TOOLKIT_PATH is set correctly and that the CUDA toolkit supports
+              target architecture sm_103a; rerun with IR dump flags if backend context is needed

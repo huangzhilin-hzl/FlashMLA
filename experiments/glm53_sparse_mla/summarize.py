@@ -74,7 +74,7 @@ for directory in sorted(root.glob("v[0-9][0-9][0-9]")):
     if version == "v123":
         status = "bitwise v112 full seed1234/mask; slower"
     if version == "v125":
-        status = "bitwise v112 full2seeds/short/masks; current fast path"
+        status = "bitwise v112 full2seeds/short/masks; earlier fast path"
     if version == "v126":
         status = "bitwise v112 full seed1234/mask; more spills; slower"
     if version == "v127":
@@ -93,6 +93,12 @@ for directory in sorted(root.glob("v[0-9][0-9][0-9]")):
         status = "bitwise v128 full2seeds/short/masks; small cache-policy alternative"
     if version == "v134":
         status = "bitwise v125 full seed1234/mask; no net scheduling gain"
+    if version == "v140":
+        status = "bitwise v128 full seed1234/mask; paired correction slower"
+    if version == "v141":
+        status = "bitwise v138 full seed1234/mask; expanded audit pending"
+    if version == "v138":
+        status = "bitwise v125 full2seeds/short/masks; current fast path"
     if version == "v136":
         status = "guarded smoke/b512 and eight rows pass; slower; no full audit"
     if version == "v109":

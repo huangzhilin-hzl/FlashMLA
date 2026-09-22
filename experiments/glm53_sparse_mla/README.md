@@ -6,6 +6,7 @@ BF16 output. Each numbered file preserves an iteration; the log distinguishes me
 versions from pending prototypes and rejected experiments. These are
 experimental kernels, not an installed replacement for FlashMLA.
 
+- [当前状态与优化结论（中文）](../../docs/glm53_sparse_mla/STATUS_ZH.md)
 - [Measured results](../../docs/glm53_sparse_mla/RESULTS.md)
 - [Changes, NCU evidence, failures and references](../../docs/glm53_sparse_mla/ITERATIONS.md)
 
@@ -32,13 +33,13 @@ export CUTE_DSL_ARCH=sm_103a
 
 # Fast single-P path with closely matching TRTLLM precision; see all-row limits below.
 /opt/sglang/bin/python bench.py \
-  --kernel-version v125 --block-k 128 \
+  --kernel-version v138 --block-k 128 \
   --backends trtllm cute --scope native --check-rows 512 \
   --warmup-iters 20 --repeat-iters 100 --cache both --timing cuda-graph \
-  --output-json artifacts/v125_accuracy512_graph.json
+  --output-json artifacts/v138_accuracy512_graph.json
 
 # Short event-based tuning run, followed by one warmed NCU invocation.
-bash run_iteration.sh v125 128
+bash run_iteration.sh v138 128
 ```
 
 `run_iteration.sh` saves raw JSON, logs, NCU details/CSV and an immutable per-run
@@ -69,7 +70,8 @@ The full 8192-row/seed1234 audit checks all 268,435,456 output elements:
 | v105, dedicated MMA issuer | Same as v097 via full bitwise checks on both seeds | Earlier fast path |
 | v108, per-thread P readiness | Same as v105 via full bitwise checks on both seeds | Earlier fast path |
 | v112, balanced denominator reduction | 9 on seed1234 / 6 on seed5678, identical coordinates/values to TRTLLM | Earlier fast path |
-| v125, direct256-bit output stores | Full bitwise equality to v112 on both seeds, short case and masks | Current fast path |
+| v125, direct256-bit output stores | Full bitwise equality to v112 on both seeds, short case and masks | Earlier fast path |
+| v138, paired x32 correction loads | Full bitwise equality to v125 on both seeds, short case and masks | Current fast path |
 | v049, P scale256 | 11 | Earlier timing reference |
 | v053, residual FP8 | 0 | Original higher-precision path |
 | v065, residual FP8 with V collector reuse | 0 via full bitwise equivalence to v053 | Exact-equivalence optimization |
@@ -80,20 +82,19 @@ The full 8192-row/seed1234 audit checks all 268,435,456 output elements:
 | v114, balanced denominator reduction | 0 on two full target seeds, full short case and masks | Earlier higher-precision path |
 | v128, direct256-bit output stores | Full bitwise equality to v114 on both seeds, short case and masks | Current higher-precision path |
 
-The current fast path v125 matches v112 bitwise on both full8192-row seeds,
+The current fast path v138 matches v125 bitwise on both full8192-row seeds,
 all1024 short-case rows and masked inputs, retaining the FP8 limits below.
-Qualified b2 synccheck and b512 memcheck report zero errors. Direct256-bit
-output stores replace the shared transpose, with verified32-byte alignment.
+Qualified b2 synccheck and b512 memcheck report zero errors. It retains direct
+256-bit aligned output stores and pairs two x32 correction loads before waiting,
+with123 registers and zero observed local-memory traffic.
 
-Eager20/100 warm/cold medians are 1720.98/1733.12 µs versus TRT
-1890.26/1911.52 µs; Graph medians are 1736.62/1720.40 µs versus
-1871.82/1914.78 µs. Three rotated orders give warm1688.99–1691.26 µs
-versus v1121700.98–1712.13 µs and TRT1871.82–1878.10 µs; cold
-1687.54–1693.62 µs versus v1121695.87–1699.86 µs and TRT
-1858.26–1859.55 µs. It improves on v112 in each recorded ordering, while
-separate-run eager/Graph differences are smaller and variable. Short tuning is
-1648.86 µs versus TRT1690.75 µs. These observations use unlocked clocks and
-do not establish all-input accuracy or a universal speedup.
+Eager20/100 warm/cold medians are1708.69/1715.17 µs versusTRT1880.22/1914.93 µs;
+Graph medians are1724.70/1713.23 µs versus1869.02/1920.93 µs. Four rotated orders
+give warm1681.52–1682.54 µs versusv1251688.54–1690.40 µs andTRT1872.50–1882.02 µs;
+cold1675.25–1684.62 µs versusv1251685.52–1693.68 µs andTRT1855.97–1869.63 µs.
+It beatsv125 in each recorded warm/cold order, whilev129's cache policy is mixed
+againstv138. Short tuning is1639.46 µs versusTRT1691.49 µs. These measurements
+use unlocked clocks and do not establish all-input accuracy or universal speedup.
 
 Earlier fast path v112 independently retains the same 9/6 full-target
 failures as TRTLLM on seeds1234/5678. Only 2464/2601 of 268,435,456 BF16
@@ -316,7 +317,7 @@ evict-first. Full2seeds/short/mask bitwise equivalence and qualified sanitizers
 pass. Two rotating-order audits favor it in8/10 warm and9/10 cold round medians,
 but the gain is small and includes regressions in individual orders. Hardware
 counters show about8.8% less DRAM read traffic in the recorded warmed profile.
-It is a validated experimental alternative; v125 remains the established default.
+It is a validated experimental alternative; v138 is now the established default.
 KV evict-last (`v130`) has no consistent gain. Mandatory future-QK lookahead
 (`v131`) delays PV and regresses to2.038ms; readiness-conditional lookahead
 (`v132`) recovers to1.661ms but still does not improvev125. See the iteration log

@@ -4271,3 +4271,132 @@ aggregate shared conflicts12996/723591, diagnostic5.106496 ms. Increased residen
 warps can include a CTA waiting for its512-column TMEM reservation and do not
 establish simultaneous useful MMA work. Reducing shared storage alone did not
 repay the smaller tiles, extra output preservation and lost QK/PV overlap.
+
+### Iteration 137 compile failure — paired x32 alone does not resolve the bug
+
+Compilation with CUDA attribute queries again fails in the NVVM backend with
+no additional diagnostic. No CUBIN, register-budget verification or GPU launch
+exists. Replacing the x64 copy atom with two x32 atoms was insufficient in this
+kernel; do not present the external issue's x32 bisection result as a general
+workaround. Preserve the exact source SHA and compiler log.
+
+## Iteration 138 — paired x32 loads without redistribution
+
+Remove v137's dynamic register increase/decrease and restore416threads without
+an explicit minimum-block launch bound. Keep the paired x32 loads/stores and
+one wait per pair. This control separates paired-load behavior from register
+redistribution and checks whether default allocation spills as v121 did.
+
+## Iteration 139 — inline-PTX register directive control
+
+Keep v137's512threads, complete warpgroup roles and32/192 register targets,
+but emit side-effecting inline PTX setmaxnreg directives instead of the CuTe/NVVM
+setmaxregister operations. This probes the failing compiler-lowering path, not
+an assumed performance gain. Compilation must succeed and SASS must retain
+both USETMAXREG directives, with a sufficient initial CTA register budget,
+before any bounded GPU run. The same57344-register role budget applies.
+
+### Iteration 139 compile failure — inline PTX is not a workaround here
+
+Replacing NVVM setmaxregister operations with inline PTX still triggers the same
+generic NVVM-backend failure. No CUBIN or device launch exists. The installed
+CuTe functions were verified to use nvvm.setmaxregister, so this was a distinct
+lowering-path control, not an identical wrapper. Stop register-directive retries
+on this variant; preserving the failure is more useful than repeating them.
+
+### Iteration 138 compile result — paired x32 avoids the old x64 spills
+
+Without redistribution, compilation succeeds at REG123/STACK0. This differs
+fromv121's native x64 correction at REG128/STACK64. Runtime local-memory traffic,
+all-row equivalence and latency remain to be measured; zero static stack alone
+is not yet a performance result or a complete spill audit.
+
+### Iteration 138 initial runtime result — no spills and a small tuning gain
+
+Full8192 seed1234 output bits matchv125 in three repeats. The qualified b2
+synccheck/b512 memcheck commands complete successfully. Short warm1639.46 us
+versusTRT1691.49 us improves about9.40 us from recordedv125. NCU base/stable:
+123 registers,194920 shared bytes, occupancy19.294%, tensor31.571%, eligible
+0.398541, long-scoreboard6.192859, zero local sectors, aggregate shared conflicts
+6219608/1958982, diagnostic2.800736 ms. Expanded bitwise/latency validation and
+unlocked source sampling are in progress. No promotion yet.
+
+## Iteration 140 — paired x32 correction on higher precision
+
+Based on v128, transplant v138's paired x32 loads followed by one load wait,
+64-value packed correction and paired x32 stores. Keep residual FP8 probability
+arithmetic, collector reuse, strict synchronization and output cache policy.
+No launch bounds or dynamic register directives. This tests whether the fast
+path's absence of x64-induced spills and lower wait count transfers to the
+higher-precision register lifetimes; inspect resources and measure independently.
+
+## Iteration 141 — combine paired correction with output evict-first
+
+Based on v138, change only the output L2 eviction priority to evict-first, as in
+v129. The cache policy's modest improvement may or may not survive the paired
+correction schedule. Preserve all numerical operations and assess same-process
+ordering alongside v138 after its full validation is available.
+
+### Iteration 138 expanded result — promote paired x32 correction
+
+All8192 output rows matchv125 bitwise for seeds1234/5678, three repeats each;
+all1024 short/chunk0 seed5678 rows and masked inputs also match. Qualified
+synccheck/memcheck report zero errors. These are equivalence results, preserving
+all documented FP8 tolerance failures rather than eliminating them.
+
+Eager20/100 warm/cold1708.69/1715.17 us versusTRT1880.22/1914.93 us. Graph20/100
+1724.70/1713.23 us versusTRT1869.02/1920.93 us. Four same-process rotated orders:
+
+| Cache | v125 us, rounds0–3 | v129 us, rounds0–3 | v138 us, rounds0–3 | TRT us, rounds0–3 |
+|---|---|---|---|---|
+| warm | 1688.54 / 1689.47 / 1689.74 / 1690.40 | 1677.54 / 1678.88 / 1688.72 / 1689.39 | 1681.52 / 1681.57 / 1682.54 / 1681.74 | 1872.50 / 1877.97 / 1878.11 / 1882.02 |
+| cold | 1691.42 / 1685.52 / 1693.68 / 1687.68 | 1681.36 / 1683.31 / 1688.61 / 1689.50 | 1677.36 / 1684.62 / 1675.25 / 1679.09 | 1855.97 / 1857.63 / 1857.70 / 1869.63 |
+
+v138 beats establishedv125 in all4 warm and all4 cold orders; v129 is mixed
+againstv138. Promotev138 as the fast path, retainv128 as higher precision.
+Unlocked source profiling records602477910 instructions versus605733244 inv125
+(-0.54%),20275200 actual/ideal shared wavefronts and zero excessive. Long-scoreboard
+samples65996 includePV17413,producer empty17172,QK13624. SASS confirms adjacent
+LDTM.x32 pairs before correction FMUL2; waits are encoded as scheduling dependencies,
+so do not count NOP instructions as explicit wait instructions.
+
+### Softmax packed-FMA inspection — no redundant experiment
+
+Before creating a packed-FMA variant, inspectedv138 SASS. Its existing vector
+expression already lowers to FFMA2 pairs interleaved with32 MUFU.EX2 instructions.
+Explicitly calling fma_packed_f32x2 cannot claim a32-to16 instruction reduction
+that the compiler already performs. Do not create that proposed variant merely
+to restate the same operation. API signatures were checked in installed CuTeDSL4.6.2;
+[PTX fma semantics](https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#floating-point-instructions-fma)
+and [CuTe arch API](https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/cute_dsl_api/cute_arch.html)
+are the primary references. Seek a distinct instruction or dependency change.
+
+## Iteration 142 — pair final output loads
+
+Based onv138, also pair two final-output LDTM.x32 operations before one load
+wait, reusing the existing64-float register fragment. Normalize/convert/store
+one32-value half at a time to avoid keeping all64 BF16 results live. Preserve
+physical/logical output mapping,32-byte alignment, STG256 policy and arithmetic.
+This targets four-to-two output load waits per compute thread; the epilogue runs
+only once per16 key tiles, so expected benefit is modest. Compile and inspect
+spills before bounded smoke and exact-equivalence validation.
+
+### Iteration 140 result — higher-precision pairing regresses
+
+REG123/STACK0; all8192 seed1234 outputs matchv128 bitwise in three repeats and
+masked outputs match with zero tolerance failures. Qualified b2 synccheck/b512
+memcheck report zero errors. Short1822.75 us versusTRT1690.88 us is slower than
+v128's1802.37 us; do not promote or extrapolatev138's fast-path gain.
+NCU base/stable:123 registers,203080 shared bytes, occupancy19.343%, tensor41.792%,
+eligible0.454520,long-scoreboard6.163935, zero local sectors, aggregate shared
+conflicts6284051/1403235,diagnostic3.114080 ms. No second-seed/short full audit.
+
+### Iteration 141 initial result — small combined cache-policy gain
+
+REG123/STACK0; all8192 seed1234 outputs matchv138 bitwise in three repeats,
+masked output bits match, qualified b2 synccheck/b512 memcheck report zero errors.
+Short1636.54 us versusTRT1691.94 us is about2.91 us belowv138. NCU base/stable:
+123 registers,194920 shared bytes, occupancy19.298%, tensor31.570%,eligible0.398663,
+long-scoreboard6.196022,zero local sectors,aggregate shared conflicts6212999/
+1914229,diagnostic2.800256 ms. This small tuning change needs expanded validation
+and rotation before deciding whether to replace the normal-L2-policy default.
