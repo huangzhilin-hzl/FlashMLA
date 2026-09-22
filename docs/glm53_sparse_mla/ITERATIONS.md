@@ -6419,3 +6419,37 @@ The wider main-row assignment lowers short time by69.50/46.50us versus221/222,bu
 
 
 A CPU audit of the unchanged full1234 sparse indices finds8391526 odd physical token slots. With576-byte rows,these main128-byte copies start64 bytes into a128-byte sector group. The access-group prediction four main panels per odd token plusfour extra wavefronts for each tail warp-copy is8391526*4 + 8192*16*4*4*4 =41954712,exactly the measured v224 LDGSTS excessive count. This strongly supports a global/shared alignment and grouping explanation for this fixture;it is not an isolated latency measurement or a universal bank-conflict theorem. Existing TMA gathers avoid this vector-copy mapping constraint without repacking the canonical input.
+
+
+## Iterations225–226 — aggregate producer publication after copy completion
+
+Based on223/224. Replace129 full-barrier arrivals (one generic release plus128 asynchronous per-thread copy arrivals) with a single ordinary release after every producer has committed and waited for its copy group. The existing final128-thread producer barrier joins per-thread completion before thread0 publishes the full stage. Remove the earlier release and its now-unnecessary following producer barrier;the first validity-publication barrier remains. Full-barrier initialization becomes1. Q TMA,all copy addresses/bytes,shared layout,masks,compute arithmetic,and consumer full/empty phases remain unchanged.
+
+This trades early queuing of the next stage for fewer completion notifications and one fewer producer barrier. It may hurt memory overlap;do not assume fewer notifications are faster. Existing source profiles show substantial polling growth on the vector-copy path,but do not prove arrival overhead is its cause. Compile/resources,guarded memory/sync and parent-output checks precede timing. cp.async.wait_group guarantees completion for the executing thread;the subsequent producer barrier is required to join all128 threads before the single release: https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#data-movement-and-conversion-instructions-cp-async-wait-group-cp-async-wait-all .
+
+
+## Normal-MMA dual-plane TMEM diagnostic
+
+Add probe_tmem_dual_plane.py to validate a new packing primitive before attempting another full pipeline. PTX Layout F (M64,non-.ws,CTA1) permits datapath-lane alignment0 or16: https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#tcgen05-data-path-layout . Use two normal M64xN256 products in complementary halves of a256-column allocation. Save one M64xN64 quarter in registers,overwrite that quarter with a different narrow product,read it,restore the original quarter,and accumulate another wide product into both outputs. Exact small-integer FP8 operands give exact FP32 references for every output and score element. Compile with mandatory TMEM guardrails;inspect resources before one-CTA memory/sync checks and a296-CTA concurrency stress.
+
+This is neither the rejected v135 .ws packing nor the old v006 duplicated-QK two-output-CTA attention algorithm. It checks only packing and temporary reuse for a potential single-query/full-output pipeline. Even a pass does not establish concurrent residency or faster MLA. A future two-CTA-per-SM design would also need shared memory below half the per-SM limit,an appropriate register pool,and careful accounting for the cost of smaller KV tiles and saving/restoring output. No such full kernel or performance claim yet.
+
+
+225/226 compile with1368/1520 static instructions,123/128 registers andzero stack. Native LDGSTSBAR arrivals disappear and LDGDEPBAR/DEPBAR wait instructions appear as intended. Both pass guarded b2/b512 memory,b2 synchronization,full8192/seed1234 three-repeat exact comparison and mask equivalence;v226 masked FP32 passes. Timing/NCU follows;no expanded numerical scope yet.
+
+
+### Aggregated publication225–226 runtime
+
+v225 short: trtllm/native 1691.744us, cute-v225/native 1697.856us.
+
+NCU base/stable: gpu__time_duration.sum=2.664320 ms, launch__registers_per_thread=123 register/thread, launch__shared_mem_per_block_dynamic=194.920000 Kbyte/block, sm__warps_active.avg.pct_of_peak_sustained_active=19.332248 %, sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed=33.210695 %, smsp__warps_eligible.avg.per_cycle_active=0.336439 warp, smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio=6.573971 inst, l1tex__t_sectors_pipe_lsu_mem_local_op_ld.sum=0 sector, l1tex__t_sectors_pipe_lsu_mem_local_op_st.sum=0 sector, l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum=9,352,603 , l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum=5,819,075 .
+
+v226 short: trtllm/native 1691.872us, cute-v226/native 1750.304us.
+
+NCU base/stable: gpu__time_duration.sum=2.826464 ms, launch__registers_per_thread=128 register/thread, launch__shared_mem_per_block_dynamic=203.112000 Kbyte/block, sm__warps_active.avg.pct_of_peak_sustained_active=19.454647 %, sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed=46.050217 %, smsp__warps_eligible.avg.per_cycle_active=0.336808 warp, smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio=7.077597 inst, l1tex__t_sectors_pipe_lsu_mem_local_op_ld.sum=0 sector, l1tex__t_sectors_pipe_lsu_mem_local_op_st.sum=0 sector, l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum=9,684,948 , l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum=5,927,869 .
+
+Short1697.86/1750.30us regresses223/2241557.70/1674.18us. Base/stable NCU v2262.826464ms is slightly below v2242.834688ms despite the unprofiled regression;profiling regime does not replace actual benchmark evidence. Fewer notifications are not a demonstrated improvement;the completion-wait tradeoff changes overlap. Retain as rejected alternatives without more seeds or long timing. Defaults unchanged.
+
+The dual-plane probe first compiles with guardrails at56 registers and136 stack bytes;native guard-check calls spill live values around calls. An unguarded offline-only compile has74 registers,zero stack and no launch. The first guarded one-CTA memcheck passes three exact repeats,32768 output and4096 score elements each,withzero reported errors. Do not infer full MLA performance,register requirements or residency from this diagnostic.
+
+The remaining guarded checks pass: one-CTA synccheck and296-CTA memcheck/synccheck,three exact repeats each,zero output/score mismatches andzero sanitizer errors. Each296-CTA repeat verifies9699328 output and1212416 score elements. This validates the implemented normal-MMA complementary datapath packing and quarter save/overwrite/restore sequence on the authorized GPU;it does not measure simultaneous CTA residency or MLA performance. Preserve both guarded and unguarded-offline resources so guard-instrumentation stack use is not confused with production local-memory traffic. Next audit normal16x32bx2 fragment/mask mapping before writing the full bK64 pipeline.

@@ -1,0 +1,191 @@
+{
+  "configuration": {
+    "gpu": "NVIDIA B300 SXM6 AC",
+    "capability": [
+      10,
+      3
+    ],
+    "versions": {
+      "torch": "2.13.0+cu130",
+      "cuda": "13.0",
+      "flashinfer-python": "0.6.18",
+      "flash-mla": "not installed as a distribution",
+      "flashmla_source_revision": "unreported"
+    },
+    "args": {
+      "mode": "bench",
+      "backends": [
+        "trtllm",
+        "cute"
+      ],
+      "scope": "native",
+      "chunk": 3,
+      "rank": 0,
+      "seed": 1234,
+      "warmup_iters": 3,
+      "repeat_iters": 5,
+      "profile_iters": 20,
+      "timing": "cuda-event",
+      "cache": "warm",
+      "check_rows": 8,
+      "check_atol": 0.01,
+      "check_rtol": 0.05,
+      "trace_path": null,
+      "output_json": "artifacts/v225_full_event.json",
+      "with_stack": false
+    },
+    "workload": {
+      "local_tokens": 8192,
+      "cp": 4,
+      "context_len": 131072,
+      "heads": 64,
+      "qk_dim": 576,
+      "v_dim": 512,
+      "topk": 2048,
+      "page_size": 64,
+      "softmax_scale": 0.0625,
+      "bmm2_scale": 1.0,
+      "synthetic": true,
+      "enable_dcp": false
+    },
+    "tensors": {
+      "query": {
+        "shape": [
+          8192,
+          1,
+          64,
+          576
+        ],
+        "dtype": "torch.float8_e4m3fn",
+        "stride": [
+          36864,
+          36864,
+          576,
+          1
+        ]
+      },
+      "kv_cache": {
+        "shape": [
+          2048,
+          1,
+          64,
+          576
+        ],
+        "dtype": "torch.float8_e4m3fn",
+        "stride": [
+          36864,
+          36864,
+          576,
+          1
+        ]
+      },
+      "block_tables": {
+        "shape": [
+          8192,
+          1,
+          2048
+        ],
+        "dtype": "torch.int32",
+        "stride": [
+          2048,
+          2048,
+          1
+        ]
+      },
+      "seq_lens": {
+        "shape": [
+          8192
+        ],
+        "dtype": "torch.int32",
+        "stride": [
+          1
+        ]
+      }
+    },
+    "cases": {
+      "trtllm/native": "Q FP8 [4096,1,64,576]; KV FP8 [pages,1,64,576]; preallocated output",
+      "cute-v225/native": "FP8 Q/KV; preallocated BF16 output; block_k=128"
+    },
+    "candidate": {
+      "version": "v225",
+      "block_k": 128,
+      "file_sha256": "1566c6a1c68cbefaad8b7e806183da35d6aa54536d4eda7f42c0a0032b09ecc8",
+      "cutlass_dsl": "4.6.2",
+      "original_benchmark_sha256": "d843320fb5147a807135282a1b87bb4c247cdd7a6a16b9107d546c48c8a8fb66"
+    }
+  },
+  "correctness": {
+    "trtllm/native": {
+      "rows": [
+        0,
+        8191,
+        511,
+        512,
+        1170,
+        2340,
+        3510,
+        4680
+      ],
+      "max_abs": 0.00764106959104538,
+      "rmse": 0.0013537678169086576,
+      "relative_rmse": 0.015046226091400083,
+      "atol": 0.01,
+      "rtol": 0.05
+    },
+    "cute-v225/native": {
+      "rows": [
+        0,
+        8191,
+        511,
+        512,
+        1170,
+        2340,
+        3510,
+        4680
+      ],
+      "max_abs": 0.00764106959104538,
+      "rmse": 0.0013537656050175428,
+      "relative_rmse": 0.015046201507706051,
+      "atol": 0.01,
+      "rtol": 0.05
+    }
+  },
+  "benchmarks": [
+    {
+      "case": "trtllm/native",
+      "cache": "warm",
+      "timing": "cuda-event",
+      "mean_us": 1710.2335929870605,
+      "median_us": 1691.7439699172974,
+      "p05_us": 1688.1663799285889,
+      "p95_us": 1770.4512119293213,
+      "samples_us": [
+        1790.112018585205,
+        1691.7439699172974,
+        1689.728021621704,
+        1687.77596950531,
+        1691.8079853057861
+      ],
+      "l2_flush_bytes": 0,
+      "speedup_vs_trtllm": 1.0
+    },
+    {
+      "case": "cute-v225/native",
+      "cache": "warm",
+      "timing": "cuda-event",
+      "mean_us": 1699.8271942138672,
+      "median_us": 1697.8559494018555,
+      "p05_us": 1696.345615386963,
+      "p95_us": 1707.1360349655151,
+      "samples_us": [
+        1709.4080448150635,
+        1697.8559494018555,
+        1695.9680318832397,
+        1698.0479955673218,
+        1697.8559494018555
+      ],
+      "l2_flush_bytes": 0,
+      "speedup_vs_trtllm": 0.9964001778320998
+    }
+  ]
+}
