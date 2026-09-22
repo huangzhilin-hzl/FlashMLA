@@ -183,6 +183,10 @@ for directory in sorted(root.glob("v[0-9][0-9][0-9]")):
         status = "guarded checks/full seed1234/mask parent equivalence; KV-tail P reuse slower"
     if version == "v232":
         status = "guarded checks pass;9 full seed1234 failures,86 mask failures; single-buffer slower"
+    if version == "v271":
+        status = "bitwise v190 full seed1234/short/masks; small provisional short gain; pending paired audit"
+    if version in ("v265", "v266"):
+        status = "bitwise parent full seed1234/short/masks; eight producers slower; not promoted"
     if version in ("v263", "v264"):
         status = "guarded fixed/varlen and full/short/mask parent equivalence; index hint reduces total DRAM reads but no latency gain"
     if version == "v262":

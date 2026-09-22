@@ -1,0 +1,6 @@
+{
+  "initial_snapshot_attempt": "rejected by assert dest does not exist",
+  "cause": "template substitution retained the existing pipeline_timeline snapshot destination",
+  "effect": "no files copied or overwritten",
+  "correction": "use fresh eight_producer_timeline snapshot destination"
+}

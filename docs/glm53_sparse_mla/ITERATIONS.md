@@ -6922,3 +6922,76 @@ The diagnostic timeline places about 0.6 us between producer stage acquisition a
 Use five complete warpgroups so dynamic register redistribution remains legal. Strict v265 uses donor48/compute168; fast v266 uses donor32/compute192 for its paired correction fragments. Both final pools are 61440 registers, matching 640*96 initial allocation. Verify the emitted initial allocation and zero local spills before launch; the narrower donor budgets and changed compute budgets may invalidate the intended benefit. Keep the default four-producer versions unless guarded/numerical checks and unprofiled measurements establish a gain.
 
 Both compile with 96 initial registers and zero stack/local memory. PTX emits reqntid640 and the intended role budgets, with exact 61440-register initial/final pools. The first control assertion expected maxntid instead of the actual reqntid and was corrected before any launch. Native gather4 sites are 20 per producer warp versus 40 in the defaults; eight warps still issue 160 gathers per stage. MMA sites remain 34/26. Static instructions are 1464/1288 for v265/v266, but fewer static sites do not imply fewer dynamic instructions with twice as many producers. Guarded and numerical qualification follows before timing.
+
+v265 passes guarded b2 smoke, b512/chunk0 memcheck and fixed/variable-length synccheck. Full8192/seed1234 and short1024/chunk0/seed5678 match v197 across three uninstrumented repeats each; masked outputs also match and pass the original FP32 tolerance. The new producer/barrier/register geometry is qualified for the first bounded timing comparison. No second full seed yet.
+
+v265 short timing is 1675.712 us versus TRTLLM 1691.744 us, slower than v197. NCU base/stable: 2.845440 ms, 96 initial registers, 203112 B dynamic shared, 24.830501% occupancy, 45.747866% tensor activity, 0.461924 eligible warps/cycle, long-scoreboard ratio 7.962180, zero local traffic and aggregate shared conflicts 7385621/3687274. The CTA still occupies one SM shared/TMEM allocation; the occupancy increase comes from more threads in that CTA, not a second CTA. More eligible warps do not yield lower latency here. Raw stall counts also involve more producer warps, limiting direct comparison to the original topology. No expanded timing or promotion.
+
+v266 passes guarded b2 smoke, b512/chunk0 memcheck and fixed/variable-length synccheck. Three full8192/seed1234 and short1024/chunk0/seed5678 repeats match v190 bitwise; masked outputs match with 86 inherited tolerance failures. No precision change or second full seed. Paired short timing and NCU follow.
+
+Extend the diagnostic timestamp generator to issuer thread512 and producer warps8–15 for v265/v266. Under the same Python interpreter, all four prior versions' generated source and insertion counts remain unchanged at stride1024. A direct local-versus-Pod byte comparison initially failed on Python-version differences in ast.unparse formatting; comparing both generator revisions in one interpreter resolves that check. The new topology requires fresh compile, guarded and exact-output checks before sampling. These instrumented copies will test whether producer submission shortens while another interval grows; they cannot establish production stage costs or rank latency.
+
+
+v266 short timing is 1560.768 us versus TRTLLM 1691.776 us, slower than v190. NCU base/stable: 2.658688 ms, 96 initial registers, 194920 B dynamic shared, 24.789284% occupancy, 33.262984% tensor activity, 0.416322 eligible warps/cycle, long-scoreboard ratio 7.596082, zero local traffic and aggregate shared conflicts 6219111/5675442. Eight producers do not improve either precision path in this resource configuration. No second full seed, expanded timing or default promotion. The guarded diagnostic timeline comparison is still pending.
+
+
+The first instrumented v265/v266 compile uses 96 registers but adds 8 stack bytes and one STL/LDL pair. Native code stores the per-thread trace shared address at entry and reloads it only at final export; production sources remain spill-free. Retain these compile artifacts without launching them. A revised probe re-reads the thread index through side-effecting inline assembly at export, avoiding that address lifetime. Because the probe changes for all versions, recompile and requalify both defaults and both eight-producer copies before comparing a fresh timeline. This is a diagnostic-only adjustment, not a production optimization.
+
+
+The revised diagnostic copies compile with 114/128/96/96 registers for v190/v197/v265/v266, zero stack and zero LDL/STL. All four pass guarded b2 smoke, b512/chunk0 memcheck and both fixed/variable-length synccheck, matching their parent outputs bitwise. The fast default's changed register count remains an instrumentation limitation. Full8192 paired sampling follows; do not merge these observations with the earlier probe revision.
+
+
+The fresh full8192 diagnostic run matches all four parents across three repeats; timestamp completeness and same-role ordering checks pass. Mean producer stage-acquisition-to-submission intervals are 0.612/0.648 us for v190/v266 and 0.626/0.657 us for v197/v265. Doubling producers does not shorten this observed interval, which includes publication/barrier/request work rather than isolated TMA latency. Mean full/QK/PV waits are 0.142/0.348/0.482 versus 0.128/0.357/0.482 us for the fast pair, and 0.139/0.380/0.662 versus 0.136/0.374/0.666 us for the strict pair. There is no large reduction in the observed critical waits. Instrumented CTA-span medians are 26.624/25.968 and 28.592/28.592 us; the fast ordering differs from production timing, reinforcing that these probes cannot rank performance. Each version has 24 sampled CTA observations; producer intervals exclude the first two tiles because those stages need no empty wait.
+
+## Iterations267–268 — amortize CTA setup with the current direct-output pipeline
+
+Based independently on v190, keep one TMEM/shared/barrier allocation across multiple query rows. v267 launches ceil(batch/2) CTAs and strides by that grid size, processing at most two queries each; v268 launches min(batch,148) CTAs and strides by the B300 SM count. Carry an absolute key-tile counter for stage/full/empty/QK/PV/P-ready phases and a separate Q phase across queries. Reset all softmax and accumulation state per query, keep the complete arithmetic and direct output path, fence and rendezvous every role before the next query, and deallocate TMEM only at CTA exit. No input expansion, reordered sparse entries or cross-query value reuse.
+
+Earlier v119 used the old output transpose and spilled 8 stack bytes, losing to v112. The current paired correction, mask bypass and direct STG256 epilogue substantially change register lifetimes and CTA setup balance, motivating a fresh bounded control. v267 tests a short reuse horizon while v268 tests full persistence; neither is presumed faster. Added phase arithmetic, final rendezvous, register lifetimes and different query scheduling can outweigh reduced setup. Inspect zero local spills before runtime qualification; include variable-length multi-query CTAs and odd batch coverage before timing.
+
+
+v265 unlocked source issues 712360444 instructions versus v197's 599875543, approximately 18.75% more. Shared wavefronts remain 28663808 actual/ideal with zero excessive. Long-scoreboard samples total 66316, with compute PV 22413, producer empty-stage wait 19828 and compute QK 11296. Both producer count and polling population change; neither total stall counts nor their reductions elsewhere represent a per-warp latency improvement. Retain source/opcode evidence to distinguish duplicated producer/control work from unchanged MMA/gather data work.
+
+
+v267/v268 both compile with 128 registers, 64 stack bytes, 16 LDL/13 STL sites and 1544 static native instructions. Expected 26 MMA sites and two completion commits remain, so this is additional register pressure rather than the prior issuer-loop triplication. Do not launch either spilling version. A new resource-policy control will add complete donor warpgroups and a role-local compute budget, keeping these initial sources immutable.
+
+v265 opcode comparison attributes roughly 61.83 million of the 112.48 million extra issues to three barrier polling/sleep opcodes, plus 24.12 million additional branches. Producer count and control allocation also change: vector/uniform arithmetic deltas are mixed. The dynamic total is not an increase in useful MMA work.
+
+
+## Iterations269–270 — register-policy controls for query reuse
+
+Based on v267/v268, use 512 threads as four complete warpgroups: eight compute warps, four producers, one issuer and three idle donors. Donor groups release to64 registers once; compute groups request192 at each query's role entry. Keep the inter-query full-CTA rendezvous, which also synchronizes before a repeated equal-count request. The final pool is 256*64 + 256*192 = 65536, requiring initial128*512; verify actual compilation before launch. Preserve all query/stage scheduling and arithmetic. The 64-register donor budget retains room for persistent loop state; earlier nonpersistent v200 used the same full-pool policy without a default speed gain.
+
+PTX specifies an absolute requested count and allows .inc when the current count is less than or equal to the requested count; all warps of each complete warpgroup execute the same instruction and synchronize before its next execution. Reference: https://docs.nvidia.com/cuda/pdf/ptx_isa_9.0.pdf (setmaxnreg). Do not infer correctness from the resource arithmetic alone: fresh guarded multi-query/variable-length checks and exact comparisons are required.
+
+
+v269/v270 compile with 128 initial registers, 56 stack bytes, 20 LDL/13 STL sites, 1552 static instructions, 26 MMA sites and two commits. The register policy is insufficient to remove spill from the outer query loop's cross-role live values. Do not launch these sources. This is a compile-only failure, not a measured runtime regression; preserve both resource controls.
+
+
+## Iterations271–272 — independent query loops per pipeline role
+
+Based on v269/v270, move the outer query loop inside each producer, issuer and compute branch. Donate registers once and request the compute budget once, before its query loop. Move Q loading into the compute branch at the start of each query. Each role maintains the same absolute tile and Q phase counters. Keep all tile-level work, compute-only epilogue rendezvous and all arithmetic unchanged. Idle donor warps have no query work. This removes the added whole-CTA query rendezvous and avoids carrying compute fragments through a role reconvergence each query.
+
+The intended cross-query dependency argument is:
+
+| Reused state | Required predecessor before overwrite | Retained ordering |
+|---|---|---|
+| Q shared tile | Last old-query QK has finished | Compute waits QK and final PV; all compute threads finish the epilogue barrier before warp0 loads the next Q |
+| KV/index/bitmap stage | Prior owner has released its stage | Producer waits empty using the absolute tile phase, including across query boundaries |
+| Score/output TMEM | Old output reads complete | Next-query QK waits the next Q publication; that load starts after the compute epilogue barrier |
+| Shared P and reduction scratch | Old PV and compute reads complete | Retained PV waits and the compute epilogue barrier precede the next compute query |
+| Barrier phase reuse | Successful old-phase waits precede new arrivals | Existing QK/PV/P-ready/full/empty handoffs continue with absolute counters; Q phase toggles per query |
+
+This is a source-level dependency argument, not runtime proof. In addition to standard first-full-seed/short/mask checks, require guarded variable-length multi-query CTAs and odd batch coverage. If zero local spills are obtained, verify the emitted allocation still supplies the 65536-register pool before any launch. No speed or precision claim yet.
+
+
+v271/v272 compile with 128 initial registers, 8 stack bytes, 16 LDL/6 STL sites and 1560 static instructions, retaining 26 MMA sites and two commits. Independent role loops reduce but do not eliminate the spill; neither has launched. Inspect the remaining local sites before choosing another resource or live-range change.
+
+
+Native-site inspection shows the remaining v271 stack slots hold a shared-address value and query-loop state: entry stores, role-entry reloads, query back-edge updates and one producer reload before the elected gather sequence. There is no evidence here of spilling the floating-point fragments. Revise the earlier zero-spill launch gate for this bounded control: 8 bytes of scalar metadata can be measured after guarded qualification, rather than rejecting all persistence designs solely for a nonzero frame. This is an explicit evaluation-policy change, not a claim that local traffic is free. Start with v271 only; record measured local sectors and timing before extending the persistent horizon. Add b513/chunk0 guarded synccheck with all-output exact comparisons, covering an uneven two-query partition. All standard checks remain required.
+
+
+v271 passes guarded b2 smoke, b512/chunk0 memcheck and fixed/variable-length synccheck with zero sanitizer errors. Added b513/chunk0 guarded synccheck compares all outputs bitwise to v190 across three repeats and passes, including the uneven final CTA. Three full8192/seed1234 and short1024/chunk0/seed5678 repeats also match v190 bitwise; masked outputs match with the inherited86 tolerance failures. No precision improvement or second full seed is claimed. PTX/native inspection confirms reqntid512, initial128 and donor64/compute192; an exact-space text assertion was corrected for an extra PTX tab, without binary/source changes. Short timing and NCU will measure the remaining scalar local-memory cost. v272 remains compile-only pending v271's result.
+
+
+v271 short timing is 1541.695952 us versus TRTLLM1691.967964 us, a small provisional improvement over v190's historical1549.06 us. NCU base/stable: 2.627168 ms, 128 initial registers, 194920 B dynamic shared, 19.837321% occupancy, 33.678097% tensor activity, 0.365125 eligible warps/cycle, long-scoreboard ratio6.620661, local read/write sectors2785280/1098916 and aggregate shared conflicts6729168/5563984. These local sectors are real L1TEX requests, not necessarily DRAM traffic. The short difference is too small for promotion. Qualify v272's longer reuse horizon, then collect a second full seed and same-process paired timing with endpoint telemetry off for any plausible winner.

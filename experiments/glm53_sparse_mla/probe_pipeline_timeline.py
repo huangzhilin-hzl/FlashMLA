@@ -43,17 +43,18 @@ def marker(event, block='block', leader=None):
 
 class Instrument(ast.NodeTransformer):
     """Transform only the device kernel; preserve all original math expressions."""
-    def __init__(self):
+    def __init__(self, issuer_tid):
         self.role = None
         self.issuer_elected = False
+        self.issuer_tid = issuer_tid
         self.counts = {}
 
     def visit_If(self, node):
         previous = self.role
         test = ast.unparse(node.test)
-        if 'warp >= 8' in test and 'warp < 12' in test:
+        if 'warp >= 8' in test and f'warp < {self.issuer_tid // 32}' in test:
             self.role = 'producer'
-        elif test == 'warp == 12':
+        elif test == f'warp == {self.issuer_tid // 32}':
             self.role = 'issuer'
         elif test == 'warp < 8':
             self.role = 'compute'
@@ -102,7 +103,7 @@ class Instrument(ast.NodeTransformer):
                         before = [marker('compute_pv_wait', owner, 0)]
                         after = [marker('compute_pv_ready', owner, 0)]
                 elif self.role == 'issuer' and target == 'p_ready':
-                    leader = None if self.issuer_elected else 384
+                    leader = None if self.issuer_elected else self.issuer_tid
                     before = [marker('issuer_p_wait', leader=leader)]
                     after = [marker('issuer_p_ready', leader=leader)]
                 elif self.role == 'producer' and target.startswith('empty'):
@@ -145,11 +146,11 @@ class Instrument(ast.NodeTransformer):
         return result
 
 
-def instrument_source(source, stride):
+def instrument_source(source, stride, issuer_tid=384):
     tree = ast.parse(source)
     cls = next(n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == 'SparseMLA')
     kernel = next(n for n in cls.body if isinstance(n, ast.FunctionDef) and n.name == 'kernel')
-    transform = Instrument()
+    transform = Instrument(issuer_tid)
     kernel.body = transform.statements(kernel.body)
     # Allocate after existing objects so original shared addresses remain stable.
     anchor = next(i for i, n in enumerate(kernel.body)
@@ -160,8 +161,9 @@ if tid < {NKEY_TILES * NEVENT}:
 ''').body
     kernel.body[anchor + 1:anchor + 1] = allocation
     kernel.body.extend(ast.parse(f'''cute.arch.barrier()
-if (qi % {stride} == 0) & (tid < {NKEY_TILES * NEVENT}):
-    timeline[qi // {stride}, tid] = trace_smem[tid]
+trace_tid = trace_thread_id()
+if (qi % {stride} == 0) & (trace_tid < {NKEY_TILES * NEVENT}):
+    timeline[qi // {stride}, trace_tid] = trace_smem[trace_tid]
 ''').body)
     ast.fix_missing_locations(tree)
     code = ast.unparse(tree) + '\n'
@@ -181,6 +183,13 @@ if (qi % {stride} == 0) & (tid < {NKEY_TILES * NEVENT}):
     once('(q, kv, idx, lens, out, tensor_map)]', '(q, kv, idx, lens, out, tensor_map, timeline)]')
     once('    return run', '    run.timeline = timeline\n    return run')
     helper = f'''
+@dsl_user_op
+def trace_thread_id(*, loc=None, ip=None):
+    # Re-read at export so the per-thread shared address need not survive all roles.
+    return cutlass.Int32(llvm.inline_asm(cutlass.Int32.mlir_type, [],
+        "mov.u32 $0, %tid.x;", "=r", has_side_effects=True,
+        is_align_stack=False, asm_dialect=llvm.AsmDialect.AD_ATT, loc=loc, ip=ip))
+
 @dsl_user_op
 def trace_timestamp(pointer, *, loc=None, ip=None):
     llvm.inline_asm(None,
@@ -211,14 +220,15 @@ def main():
     p.add_argument('--compile-only', action='store_true')
     p.add_argument('--output-dir', type=Path, required=True)
     args = p.parse_args()
-    assert set(args.versions) <= {'v190', 'v197', 'v252', 'v257'}
+    assert set(args.versions) <= {'v190', 'v197', 'v252', 'v257', 'v265', 'v266'}
     assert args.local_tokens > 0 and args.stride > 0 and args.repeat > 0
     outdir = args.output_dir.resolve()
     outdir.mkdir(parents=True, exist_ok=True)
     generated = []
     for version in args.versions:
         original = ROOT / f'kernel_{version}.py'
-        code, counts = instrument_source(original.read_text(), args.stride)
+        issuer_tid = 512 if version in {'v265', 'v266'} else 384
+        code, counts = instrument_source(original.read_text(), args.stride, issuer_tid)
         path = outdir / f'kernel_{version}_timeline.py'
         path.write_text(code)
         generated.append((version, path, counts, hashlib.sha256(original.read_bytes()).hexdigest()))

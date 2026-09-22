@@ -1,0 +1,22 @@
+{
+  "v271": {
+    "threads": 512,
+    "initial_registers": 128,
+    "stack_bytes": 8,
+    "donor_registers": 64,
+    "compute_registers": 192,
+    "initial_and_final_pool": 65536,
+    "native_redistribution_sites": 2,
+    "source_matches_compiled_archive": true
+  },
+  "v272": {
+    "threads": 512,
+    "initial_registers": 128,
+    "stack_bytes": 8,
+    "donor_registers": 64,
+    "compute_registers": 192,
+    "initial_and_final_pool": 65536,
+    "native_redistribution_sites": 2,
+    "source_matches_compiled_archive": true
+  }
+}

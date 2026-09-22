@@ -1,0 +1,5 @@
+{
+  "initial_assertion": "failed on an extra tab before the setmaxnreg immediate",
+  "correction": "whitespace-insensitive regular expression; native immediates64/192 independently inspected",
+  "runtime_effect": "no source or binary changes; the explicit text-format assertion was after initial guarded qualification"
+}

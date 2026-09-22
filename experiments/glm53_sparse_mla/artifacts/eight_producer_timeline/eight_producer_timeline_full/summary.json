@@ -1,0 +1,2313 @@
+{
+  "notice": "Instrumented observations, not production timings or instruction latencies.",
+  "versions": {
+    "v190": {
+      "intervals": {
+        "compute_full_wait": {
+          "n": 384,
+          "min_us": 0.032,
+          "median_us": 0.064,
+          "p95_us": 1.024,
+          "max_us": 2.816,
+          "mean_us": 0.142
+        },
+        "compute_qk_wait": {
+          "n": 384,
+          "min_us": 0.288,
+          "median_us": 0.32,
+          "p95_us": 0.512,
+          "max_us": 0.544,
+          "mean_us": 0.34808333333333336
+        },
+        "compute_pv_wait": {
+          "n": 384,
+          "min_us": 0.416,
+          "median_us": 0.48,
+          "p95_us": 0.512,
+          "max_us": 0.672,
+          "mean_us": 0.48191666666666666
+        },
+        "score_load_observation": {
+          "n": 384,
+          "min_us": 0.0,
+          "median_us": 0.032,
+          "p95_us": 0.064,
+          "max_us": 0.064,
+          "mean_us": 0.028916666666666667
+        },
+        "softmax_high": {
+          "n": 384,
+          "min_us": 0.288,
+          "median_us": 0.352,
+          "p95_us": 0.384,
+          "max_us": 0.416,
+          "mean_us": 0.35941666666666666
+        },
+        "probability_tail": {
+          "n": 384,
+          "min_us": 0.064,
+          "median_us": 0.256,
+          "p95_us": 0.288,
+          "max_us": 0.32,
+          "mean_us": 0.24841666666666667
+        },
+        "issuer_p_wait": {
+          "n": 384,
+          "min_us": 0.544,
+          "median_us": 0.8,
+          "p95_us": 0.832,
+          "max_us": 0.832,
+          "mean_us": 0.7736666666666667
+        },
+        "qk_submission": {
+          "n": 384,
+          "min_us": 0.32,
+          "median_us": 0.352,
+          "p95_us": 0.384,
+          "max_us": 0.384,
+          "mean_us": 0.35583333333333333
+        },
+        "pv_submission": {
+          "n": 384,
+          "min_us": 0.096,
+          "median_us": 0.128,
+          "p95_us": 0.128,
+          "max_us": 0.128,
+          "mean_us": 0.12116666666666667
+        },
+        "producer_empty_wait": {
+          "n": 336,
+          "min_us": 0.544,
+          "median_us": 0.928,
+          "p95_us": 0.992,
+          "max_us": 1.344,
+          "mean_us": 0.9334285714285715
+        },
+        "producer_after_empty": {
+          "n": 336,
+          "min_us": 0.544,
+          "median_us": 0.608,
+          "p95_us": 0.64,
+          "max_us": 1.504,
+          "mean_us": 0.6123809523809524
+        },
+        "cta_observed_span": {
+          "n": 24,
+          "min_us": 26.112,
+          "median_us": 26.624,
+          "p95_us": 28.672,
+          "max_us": 30.848,
+          "mean_us": 26.93733333333333
+        },
+        "probability_tail_without_prior_pv_wait": {
+          "n": 384,
+          "min_us": 0.064,
+          "median_us": 0.256,
+          "p95_us": 0.288,
+          "max_us": 0.32,
+          "mean_us": 0.24841666666666667
+        },
+        "qk_issue_relative_previous_pv": {
+          "n": 360,
+          "min_us": 0.32,
+          "median_us": 0.352,
+          "p95_us": 0.352,
+          "max_us": 0.96,
+          "mean_us": 0.3522666666666667
+        }
+      },
+      "nonbootstrap_qk_early_count": 0,
+      "nonbootstrap_qk_count": 360,
+      "sampled_early_fraction": 0.0,
+      "per_cta": [
+        {
+          "repeat": 0,
+          "query_row": 0,
+          "tiles": 16,
+          "observed_span_us": 30.848,
+          "summed_intervals_us": {
+            "compute_full_wait": 4.992000000000001,
+            "compute_qk_wait": 6.464000000000002,
+            "compute_pv_wait": 8.256,
+            "score_load_observation": 0.5440000000000002,
+            "softmax_high": 5.824000000000001,
+            "probability_tail": 3.6800000000000006,
+            "issuer_p_wait": 12.704000000000002,
+            "qk_submission": 5.888000000000001,
+            "pv_submission": 1.8880000000000008,
+            "producer_empty_wait": 12.896000000000004,
+            "producer_after_empty": 10.752
+          }
+        },
+        {
+          "repeat": 0,
+          "query_row": 1024,
+          "tiles": 16,
+          "observed_span_us": 26.432,
+          "summed_intervals_us": {
+            "compute_full_wait": 1.8560000000000008,
+            "compute_qk_wait": 5.344,
+            "compute_pv_wait": 7.552000000000003,
+            "score_load_observation": 0.5120000000000001,
+            "softmax_high": 5.728000000000001,
+            "probability_tail": 4.095999999999999,
+            "issuer_p_wait": 12.352000000000002,
+            "qk_submission": 5.632000000000001,
+            "pv_submission": 1.8880000000000008,
+            "producer_empty_wait": 12.960000000000004,
+            "producer_after_empty": 8.351999999999999
+          }
+        },
+        {
+          "repeat": 0,
+          "query_row": 2048,
+          "tiles": 16,
+          "observed_span_us": 26.112,
+          "summed_intervals_us": {
+            "compute_full_wait": 1.5040000000000007,
+            "compute_qk_wait": 5.44,
+            "compute_pv_wait": 7.584000000000003,
+            "score_load_observation": 0.4800000000000002,
+            "softmax_high": 5.728000000000001,
+            "probability_tail": 4.032,
+            "issuer_p_wait": 12.320000000000002,
+            "qk_submission": 5.792000000000001,
+            "pv_submission": 1.9840000000000009,
+            "producer_empty_wait": 13.152000000000005,
+            "producer_after_empty": 8.351999999999999
+          }
+        },
+        {
+          "repeat": 0,
+          "query_row": 3072,
+          "tiles": 16,
+          "observed_span_us": 26.56,
+          "summed_intervals_us": {
+            "compute_full_wait": 1.9520000000000006,
+            "compute_qk_wait": 5.472,
+            "compute_pv_wait": 7.488000000000003,
+            "score_load_observation": 0.5120000000000002,
+            "softmax_high": 5.760000000000001,
+            "probability_tail": 4.223999999999999,
+            "issuer_p_wait": 12.512000000000002,
+            "qk_submission": 5.632000000000001,
+            "pv_submission": 1.7600000000000007,
+            "producer_empty_wait": 13.216000000000005,
+            "producer_after_empty": 8.319999999999999
+          }
+        },
+        {
+          "repeat": 0,
+          "query_row": 4096,
+          "tiles": 16,
+          "observed_span_us": 26.56,
+          "summed_intervals_us": {
+            "compute_full_wait": 2.1120000000000005,
+            "compute_qk_wait": 5.376,
+            "compute_pv_wait": 7.680000000000003,
+            "score_load_observation": 0.5120000000000002,
+            "softmax_high": 5.6000000000000005,
+            "probability_tail": 4.032,
+            "issuer_p_wait": 12.384000000000002,
+            "qk_submission": 5.696000000000001,
+            "pv_submission": 1.9840000000000009,
+            "producer_empty_wait": 13.248000000000005,
+            "producer_after_empty": 8.255999999999998
+          }
+        },
+        {
+          "repeat": 0,
+          "query_row": 5120,
+          "tiles": 16,
+          "observed_span_us": 26.88,
+          "summed_intervals_us": {
+            "compute_full_wait": 2.432000000000001,
+            "compute_qk_wait": 5.5360000000000005,
+            "compute_pv_wait": 7.552000000000003,
+            "score_load_observation": 0.41600000000000015,
+            "softmax_high": 5.696000000000001,
+            "probability_tail": 4.064,
+            "issuer_p_wait": 12.192000000000002,
+            "qk_submission": 5.664000000000001,
+            "pv_submission": 1.9200000000000008,
+            "producer_empty_wait": 13.120000000000005,
+            "producer_after_empty": 8.351999999999999
+          }
+        },
+        {
+          "repeat": 0,
+          "query_row": 6144,
+          "tiles": 16,
+          "observed_span_us": 26.752,
+          "summed_intervals_us": {
+            "compute_full_wait": 2.2720000000000007,
+            "compute_qk_wait": 5.376,
+            "compute_pv_wait": 7.904000000000002,
+            "score_load_observation": 0.544,
+            "softmax_high": 5.696000000000001,
+            "probability_tail": 3.6799999999999997,
+            "issuer_p_wait": 12.320000000000002,
+            "qk_submission": 5.632000000000001,
+            "pv_submission": 1.8880000000000008,
+            "producer_empty_wait": 13.248000000000005,
+            "producer_after_empty": 8.383999999999999
+          }
+        },
+        {
+          "repeat": 0,
+          "query_row": 7168,
+          "tiles": 16,
+          "observed_span_us": 26.688,
+          "summed_intervals_us": {
+            "compute_full_wait": 2.2080000000000006,
+            "compute_qk_wait": 5.472,
+            "compute_pv_wait": 7.520000000000003,
+            "score_load_observation": 0.3840000000000001,
+            "softmax_high": 5.856000000000001,
+            "probability_tail": 4.000000000000001,
+            "issuer_p_wait": 12.192000000000002,
+            "qk_submission": 5.6000000000000005,
+            "pv_submission": 1.9840000000000009,
+            "producer_empty_wait": 12.832000000000004,
+            "producer_after_empty": 8.383999999999999
+          }
+        },
+        {
+          "repeat": 1,
+          "query_row": 0,
+          "tiles": 16,
+          "observed_span_us": 28.672,
+          "summed_intervals_us": {
+            "compute_full_wait": 3.2960000000000007,
+            "compute_qk_wait": 5.920000000000001,
+            "compute_pv_wait": 8.16,
+            "score_load_observation": 0.3840000000000001,
+            "softmax_high": 5.792000000000001,
+            "probability_tail": 3.904,
+            "issuer_p_wait": 12.640000000000002,
+            "qk_submission": 5.824000000000001,
+            "pv_submission": 2.016000000000001,
+            "producer_empty_wait": 12.640000000000004,
+            "producer_after_empty": 9.472
+          }
+        },
+        {
+          "repeat": 1,
+          "query_row": 1024,
+          "tiles": 16,
+          "observed_span_us": 26.432,
+          "summed_intervals_us": {
+            "compute_full_wait": 1.9200000000000008,
+            "compute_qk_wait": 5.5040000000000004,
+            "compute_pv_wait": 7.648000000000003,
+            "score_load_observation": 0.5440000000000003,
+            "softmax_high": 5.792000000000001,
+            "probability_tail": 3.968000000000001,
+            "issuer_p_wait": 12.416000000000002,
+            "qk_submission": 5.6000000000000005,
+            "pv_submission": 1.8880000000000008,
+            "producer_empty_wait": 12.928000000000004,
+            "producer_after_empty": 8.447999999999999
+          }
+        },
+        {
+          "repeat": 1,
+          "query_row": 2048,
+          "tiles": 16,
+          "observed_span_us": 26.24,
+          "summed_intervals_us": {
+            "compute_full_wait": 1.5360000000000007,
+            "compute_qk_wait": 5.5680000000000005,
+            "compute_pv_wait": 7.648000000000003,
+            "score_load_observation": 0.3840000000000001,
+            "softmax_high": 5.888000000000001,
+            "probability_tail": 3.9040000000000012,
+            "issuer_p_wait": 12.416000000000002,
+            "qk_submission": 5.696000000000001,
+            "pv_submission": 1.9520000000000008,
+            "producer_empty_wait": 13.056000000000004,
+            "producer_after_empty": 8.543999999999999
+          }
+        },
+        {
+          "repeat": 1,
+          "query_row": 3072,
+          "tiles": 16,
+          "observed_span_us": 26.752,
+          "summed_intervals_us": {
+            "compute_full_wait": 2.2080000000000006,
+            "compute_qk_wait": 5.6000000000000005,
+            "compute_pv_wait": 7.552000000000003,
+            "score_load_observation": 0.4800000000000002,
+            "softmax_high": 5.792000000000001,
+            "probability_tail": 4.032,
+            "issuer_p_wait": 12.416000000000002,
+            "qk_submission": 5.632000000000001,
+            "pv_submission": 1.8880000000000008,
+            "producer_empty_wait": 13.408000000000005,
+            "producer_after_empty": 8.287999999999998
+          }
+        },
+        {
+          "repeat": 1,
+          "query_row": 4096,
+          "tiles": 16,
+          "observed_span_us": 26.944,
+          "summed_intervals_us": {
+            "compute_full_wait": 2.3680000000000008,
+            "compute_qk_wait": 5.472,
+            "compute_pv_wait": 7.488000000000003,
+            "score_load_observation": 0.4480000000000002,
+            "softmax_high": 5.696000000000001,
+            "probability_tail": 4.16,
+            "issuer_p_wait": 12.384000000000002,
+            "qk_submission": 5.5680000000000005,
+            "pv_submission": 1.9200000000000008,
+            "producer_empty_wait": 12.896000000000004,
+            "producer_after_empty": 8.479999999999999
+          }
+        },
+        {
+          "repeat": 1,
+          "query_row": 5120,
+          "tiles": 16,
+          "observed_span_us": 26.624,
+          "summed_intervals_us": {
+            "compute_full_wait": 2.2080000000000006,
+            "compute_qk_wait": 5.472,
+            "compute_pv_wait": 7.712000000000003,
+            "score_load_observation": 0.5120000000000001,
+            "softmax_high": 5.728000000000001,
+            "probability_tail": 3.968,
+            "issuer_p_wait": 12.288000000000002,
+            "qk_submission": 5.696000000000001,
+            "pv_submission": 1.8880000000000008,
+            "producer_empty_wait": 12.992000000000004,
+            "producer_after_empty": 8.383999999999999
+          }
+        },
+        {
+          "repeat": 1,
+          "query_row": 6144,
+          "tiles": 16,
+          "observed_span_us": 26.624,
+          "summed_intervals_us": {
+            "compute_full_wait": 2.0160000000000005,
+            "compute_qk_wait": 5.5680000000000005,
+            "compute_pv_wait": 7.936000000000002,
+            "score_load_observation": 0.41600000000000015,
+            "softmax_high": 5.728000000000001,
+            "probability_tail": 3.744,
+            "issuer_p_wait": 12.192000000000002,
+            "qk_submission": 5.696000000000001,
+            "pv_submission": 2.016000000000001,
+            "producer_empty_wait": 13.216000000000005,
+            "producer_after_empty": 8.383999999999999
+          }
+        },
+        {
+          "repeat": 1,
+          "query_row": 7168,
+          "tiles": 16,
+          "observed_span_us": 26.4,
+          "summed_intervals_us": {
+            "compute_full_wait": 2.0480000000000005,
+            "compute_qk_wait": 5.5680000000000005,
+            "compute_pv_wait": 7.488000000000003,
+            "score_load_observation": 0.4800000000000002,
+            "softmax_high": 5.632000000000001,
+            "probability_tail": 4.064,
+            "issuer_p_wait": 12.352000000000002,
+            "qk_submission": 5.664000000000001,
+            "pv_submission": 1.9840000000000009,
+            "producer_empty_wait": 12.800000000000004,
+            "producer_after_empty": 8.351999999999999
+          }
+        },
+        {
+          "repeat": 2,
+          "query_row": 0,
+          "tiles": 16,
+          "observed_span_us": 28.64,
+          "summed_intervals_us": {
+            "compute_full_wait": 3.168000000000001,
+            "compute_qk_wait": 5.952000000000001,
+            "compute_pv_wait": 8.224,
+            "score_load_observation": 0.32000000000000006,
+            "softmax_high": 5.888000000000001,
+            "probability_tail": 3.9039999999999995,
+            "issuer_p_wait": 12.768000000000002,
+            "qk_submission": 5.888000000000001,
+            "pv_submission": 1.9840000000000009,
+            "producer_empty_wait": 12.576000000000004,
+            "producer_after_empty": 9.632
+          }
+        },
+        {
+          "repeat": 2,
+          "query_row": 1024,
+          "tiles": 16,
+          "observed_span_us": 26.464,
+          "summed_intervals_us": {
+            "compute_full_wait": 2.080000000000001,
+            "compute_qk_wait": 5.5040000000000004,
+            "compute_pv_wait": 7.584000000000003,
+            "score_load_observation": 0.3840000000000001,
+            "softmax_high": 5.792000000000001,
+            "probability_tail": 3.968,
+            "issuer_p_wait": 12.320000000000002,
+            "qk_submission": 5.696000000000001,
+            "pv_submission": 1.9520000000000008,
+            "producer_empty_wait": 13.120000000000005,
+            "producer_after_empty": 8.287999999999998
+          }
+        },
+        {
+          "repeat": 2,
+          "query_row": 2048,
+          "tiles": 16,
+          "observed_span_us": 26.848,
+          "summed_intervals_us": {
+            "compute_full_wait": 2.016000000000001,
+            "compute_qk_wait": 5.5360000000000005,
+            "compute_pv_wait": 7.776000000000003,
+            "score_load_observation": 0.5440000000000003,
+            "softmax_high": 5.760000000000001,
+            "probability_tail": 4.128,
+            "issuer_p_wait": 12.512000000000002,
+            "qk_submission": 5.760000000000001,
+            "pv_submission": 2.016000000000001,
+            "producer_empty_wait": 13.472000000000005,
+            "producer_after_empty": 8.479999999999999
+          }
+        },
+        {
+          "repeat": 2,
+          "query_row": 3072,
+          "tiles": 16,
+          "observed_span_us": 26.976,
+          "summed_intervals_us": {
+            "compute_full_wait": 2.3040000000000007,
+            "compute_qk_wait": 5.5040000000000004,
+            "compute_pv_wait": 7.680000000000003,
+            "score_load_observation": 0.4480000000000002,
+            "softmax_high": 5.760000000000001,
+            "probability_tail": 4.063999999999999,
+            "issuer_p_wait": 12.352000000000002,
+            "qk_submission": 5.760000000000001,
+            "pv_submission": 1.9520000000000008,
+            "producer_empty_wait": 13.664000000000005,
+            "producer_after_empty": 8.319999999999999
+          }
+        },
+        {
+          "repeat": 2,
+          "query_row": 4096,
+          "tiles": 16,
+          "observed_span_us": 26.4,
+          "summed_intervals_us": {
+            "compute_full_wait": 1.7280000000000006,
+            "compute_qk_wait": 5.5040000000000004,
+            "compute_pv_wait": 7.744000000000003,
+            "score_load_observation": 0.5120000000000002,
+            "softmax_high": 5.696000000000001,
+            "probability_tail": 4.000000000000001,
+            "issuer_p_wait": 12.320000000000002,
+            "qk_submission": 5.728000000000001,
+            "pv_submission": 2.016000000000001,
+            "producer_empty_wait": 12.928000000000004,
+            "producer_after_empty": 8.383999999999999
+          }
+        },
+        {
+          "repeat": 2,
+          "query_row": 5120,
+          "tiles": 16,
+          "observed_span_us": 26.752,
+          "summed_intervals_us": {
+            "compute_full_wait": 2.3040000000000007,
+            "compute_qk_wait": 5.408,
+            "compute_pv_wait": 7.488000000000003,
+            "score_load_observation": 0.4480000000000002,
+            "softmax_high": 5.760000000000001,
+            "probability_tail": 4.159999999999999,
+            "issuer_p_wait": 12.320000000000002,
+            "qk_submission": 5.632000000000001,
+            "pv_submission": 1.8560000000000008,
+            "producer_empty_wait": 13.120000000000005,
+            "producer_after_empty": 8.383999999999999
+          }
+        },
+        {
+          "repeat": 2,
+          "query_row": 6144,
+          "tiles": 16,
+          "observed_span_us": 26.432,
+          "summed_intervals_us": {
+            "compute_full_wait": 1.9520000000000008,
+            "compute_qk_wait": 5.6000000000000005,
+            "compute_pv_wait": 7.968000000000002,
+            "score_load_observation": 0.41600000000000004,
+            "softmax_high": 5.792000000000001,
+            "probability_tail": 3.4880000000000013,
+            "issuer_p_wait": 12.160000000000002,
+            "qk_submission": 5.696000000000001,
+            "pv_submission": 1.9520000000000008,
+            "producer_empty_wait": 13.312000000000005,
+            "producer_after_empty": 8.415999999999999
+          }
+        },
+        {
+          "repeat": 2,
+          "query_row": 7168,
+          "tiles": 16,
+          "observed_span_us": 26.464,
+          "summed_intervals_us": {
+            "compute_full_wait": 2.0480000000000005,
+            "compute_qk_wait": 5.5040000000000004,
+            "compute_pv_wait": 7.424000000000003,
+            "score_load_observation": 0.4800000000000002,
+            "softmax_high": 5.632000000000001,
+            "probability_tail": 4.128,
+            "issuer_p_wait": 12.256000000000002,
+            "qk_submission": 5.5680000000000005,
+            "pv_submission": 1.9520000000000008,
+            "producer_empty_wait": 12.832000000000004,
+            "producer_after_empty": 8.351999999999999
+          }
+        }
+      ]
+    },
+    "v266": {
+      "intervals": {
+        "compute_full_wait": {
+          "n": 384,
+          "min_us": 0.032,
+          "median_us": 0.064,
+          "p95_us": 0.992,
+          "max_us": 2.784,
+          "mean_us": 0.12841666666666668
+        },
+        "compute_qk_wait": {
+          "n": 384,
+          "min_us": 0.32,
+          "median_us": 0.352,
+          "p95_us": 0.544,
+          "max_us": 0.576,
+          "mean_us": 0.357
+        },
+        "compute_pv_wait": {
+          "n": 384,
+          "min_us": 0.416,
+          "median_us": 0.48,
+          "p95_us": 0.512,
+          "max_us": 0.704,
+          "mean_us": 0.48175
+        },
+        "score_load_observation": {
+          "n": 384,
+          "min_us": 0.0,
+          "median_us": 0.0,
+          "p95_us": 0.032,
+          "max_us": 0.032,
+          "mean_us": 0.012083333333333333
+        },
+        "softmax_high": {
+          "n": 384,
+          "min_us": 0.288,
+          "median_us": 0.352,
+          "p95_us": 0.384,
+          "max_us": 0.416,
+          "mean_us": 0.35516666666666663
+        },
+        "probability_tail": {
+          "n": 384,
+          "min_us": 0.064,
+          "median_us": 0.256,
+          "p95_us": 0.288,
+          "max_us": 0.288,
+          "mean_us": 0.23908333333333334
+        },
+        "issuer_p_wait": {
+          "n": 384,
+          "min_us": 0.512,
+          "median_us": 0.768,
+          "p95_us": 0.8,
+          "max_us": 0.8,
+          "mean_us": 0.7410833333333333
+        },
+        "qk_submission": {
+          "n": 384,
+          "min_us": 0.32,
+          "median_us": 0.352,
+          "p95_us": 0.352,
+          "max_us": 0.384,
+          "mean_us": 0.3433333333333333
+        },
+        "pv_submission": {
+          "n": 384,
+          "min_us": 0.096,
+          "median_us": 0.128,
+          "p95_us": 0.128,
+          "max_us": 0.16,
+          "mean_us": 0.11933333333333333
+        },
+        "producer_empty_wait": {
+          "n": 336,
+          "min_us": 0.576,
+          "median_us": 0.832,
+          "p95_us": 0.896,
+          "max_us": 1.344,
+          "mean_us": 0.8447619047619047
+        },
+        "producer_after_empty": {
+          "n": 336,
+          "min_us": 0.544,
+          "median_us": 0.64,
+          "p95_us": 0.704,
+          "max_us": 1.056,
+          "mean_us": 0.6482857142857142
+        },
+        "cta_observed_span": {
+          "n": 24,
+          "min_us": 25.6,
+          "median_us": 25.968000000000004,
+          "p95_us": 28.416,
+          "max_us": 29.92,
+          "mean_us": 26.34
+        },
+        "probability_tail_without_prior_pv_wait": {
+          "n": 384,
+          "min_us": 0.064,
+          "median_us": 0.256,
+          "p95_us": 0.288,
+          "max_us": 0.288,
+          "mean_us": 0.23908333333333334
+        },
+        "qk_issue_relative_previous_pv": {
+          "n": 360,
+          "min_us": 0.32,
+          "median_us": 0.352,
+          "p95_us": 0.384,
+          "max_us": 0.8,
+          "mean_us": 0.36008888888888885
+        }
+      },
+      "nonbootstrap_qk_early_count": 0,
+      "nonbootstrap_qk_count": 360,
+      "sampled_early_fraction": 0.0,
+      "per_cta": [
+        {
+          "repeat": 0,
+          "query_row": 0,
+          "tiles": 16,
+          "observed_span_us": 29.92,
+          "summed_intervals_us": {
+            "compute_full_wait": 4.5120000000000005,
+            "compute_qk_wait": 6.592000000000002,
+            "compute_pv_wait": 8.256,
+            "score_load_observation": 0.192,
+            "softmax_high": 5.792000000000001,
+            "probability_tail": 3.5520000000000005,
+            "issuer_p_wait": 12.096000000000002,
+            "qk_submission": 5.5680000000000005,
+            "pv_submission": 1.8560000000000008,
+            "producer_empty_wait": 13.248000000000005,
+            "producer_after_empty": 10.208
+          }
+        },
+        {
+          "repeat": 0,
+          "query_row": 1024,
+          "tiles": 16,
+          "observed_span_us": 26.496,
+          "summed_intervals_us": {
+            "compute_full_wait": 2.2720000000000007,
+            "compute_qk_wait": 5.696000000000001,
+            "compute_pv_wait": 7.552000000000003,
+            "score_load_observation": 0.192,
+            "softmax_high": 5.6000000000000005,
+            "probability_tail": 3.9999999999999987,
+            "issuer_p_wait": 11.936000000000002,
+            "qk_submission": 5.5680000000000005,
+            "pv_submission": 1.8560000000000008,
+            "producer_empty_wait": 11.808000000000003,
+            "producer_after_empty": 8.991999999999999
+          }
+        },
+        {
+          "repeat": 0,
+          "query_row": 2048,
+          "tiles": 16,
+          "observed_span_us": 25.6,
+          "summed_intervals_us": {
+            "compute_full_wait": 1.3760000000000006,
+            "compute_qk_wait": 5.632000000000001,
+            "compute_pv_wait": 7.424000000000003,
+            "score_load_observation": 0.16,
+            "softmax_high": 5.792000000000001,
+            "probability_tail": 3.968000000000001,
+            "issuer_p_wait": 11.968000000000002,
+            "qk_submission": 5.408,
+            "pv_submission": 1.9200000000000008,
+            "producer_empty_wait": 11.712000000000003,
+            "producer_after_empty": 9.024
+          }
+        },
+        {
+          "repeat": 0,
+          "query_row": 3072,
+          "tiles": 16,
+          "observed_span_us": 25.856,
+          "summed_intervals_us": {
+            "compute_full_wait": 1.8880000000000006,
+            "compute_qk_wait": 5.6000000000000005,
+            "compute_pv_wait": 7.360000000000003,
+            "score_load_observation": 0.16,
+            "softmax_high": 5.632000000000001,
+            "probability_tail": 4.032000000000001,
+            "issuer_p_wait": 11.840000000000002,
+            "qk_submission": 5.408,
+            "pv_submission": 1.9200000000000008,
+            "producer_empty_wait": 11.840000000000002,
+            "producer_after_empty": 8.863999999999999
+          }
+        },
+        {
+          "repeat": 0,
+          "query_row": 4096,
+          "tiles": 16,
+          "observed_span_us": 25.984,
+          "summed_intervals_us": {
+            "compute_full_wait": 1.8880000000000008,
+            "compute_qk_wait": 5.6000000000000005,
+            "compute_pv_wait": 7.616000000000003,
+            "score_load_observation": 0.128,
+            "softmax_high": 5.696000000000001,
+            "probability_tail": 3.904000000000001,
+            "issuer_p_wait": 11.808000000000002,
+            "qk_submission": 5.5680000000000005,
+            "pv_submission": 1.8880000000000008,
+            "producer_empty_wait": 11.616000000000003,
+            "producer_after_empty": 9.152
+          }
+        },
+        {
+          "repeat": 0,
+          "query_row": 5120,
+          "tiles": 16,
+          "observed_span_us": 25.6,
+          "summed_intervals_us": {
+            "compute_full_wait": 1.5680000000000007,
+            "compute_qk_wait": 5.6000000000000005,
+            "compute_pv_wait": 7.552000000000003,
+            "score_load_observation": 0.224,
+            "softmax_high": 5.6000000000000005,
+            "probability_tail": 3.936000000000001,
+            "issuer_p_wait": 11.840000000000002,
+            "qk_submission": 5.408,
+            "pv_submission": 1.8240000000000007,
+            "producer_empty_wait": 11.680000000000003,
+            "producer_after_empty": 8.831999999999999
+          }
+        },
+        {
+          "repeat": 0,
+          "query_row": 6144,
+          "tiles": 16,
+          "observed_span_us": 25.824,
+          "summed_intervals_us": {
+            "compute_full_wait": 1.6640000000000006,
+            "compute_qk_wait": 5.5680000000000005,
+            "compute_pv_wait": 7.904000000000002,
+            "score_load_observation": 0.256,
+            "softmax_high": 5.6000000000000005,
+            "probability_tail": 3.5520000000000005,
+            "issuer_p_wait": 11.776000000000002,
+            "qk_submission": 5.472,
+            "pv_submission": 1.8880000000000008,
+            "producer_empty_wait": 11.936000000000003,
+            "producer_after_empty": 8.927999999999999
+          }
+        },
+        {
+          "repeat": 0,
+          "query_row": 7168,
+          "tiles": 16,
+          "observed_span_us": 25.888,
+          "summed_intervals_us": {
+            "compute_full_wait": 1.9840000000000007,
+            "compute_qk_wait": 5.632000000000001,
+            "compute_pv_wait": 7.712000000000003,
+            "score_load_observation": 0.128,
+            "softmax_high": 5.6000000000000005,
+            "probability_tail": 3.7440000000000007,
+            "issuer_p_wait": 11.712000000000002,
+            "qk_submission": 5.472,
+            "pv_submission": 1.9200000000000008,
+            "producer_empty_wait": 11.424000000000003,
+            "producer_after_empty": 8.959999999999999
+          }
+        },
+        {
+          "repeat": 1,
+          "query_row": 0,
+          "tiles": 16,
+          "observed_span_us": 28.416,
+          "summed_intervals_us": {
+            "compute_full_wait": 3.040000000000001,
+            "compute_qk_wait": 6.272000000000001,
+            "compute_pv_wait": 8.352,
+            "score_load_observation": 0.096,
+            "softmax_high": 5.984000000000001,
+            "probability_tail": 3.5200000000000014,
+            "issuer_p_wait": 12.256000000000002,
+            "qk_submission": 5.632000000000001,
+            "pv_submission": 1.9520000000000008,
+            "producer_empty_wait": 11.744000000000003,
+            "producer_after_empty": 9.952
+          }
+        },
+        {
+          "repeat": 1,
+          "query_row": 1024,
+          "tiles": 16,
+          "observed_span_us": 26.112,
+          "summed_intervals_us": {
+            "compute_full_wait": 1.8240000000000007,
+            "compute_qk_wait": 5.760000000000001,
+            "compute_pv_wait": 7.584000000000003,
+            "score_load_observation": 0.224,
+            "softmax_high": 5.664000000000001,
+            "probability_tail": 3.968000000000001,
+            "issuer_p_wait": 11.904000000000002,
+            "qk_submission": 5.5040000000000004,
+            "pv_submission": 1.9840000000000009,
+            "producer_empty_wait": 11.552000000000003,
+            "producer_after_empty": 8.863999999999999
+          }
+        },
+        {
+          "repeat": 1,
+          "query_row": 2048,
+          "tiles": 16,
+          "observed_span_us": 25.76,
+          "summed_intervals_us": {
+            "compute_full_wait": 1.5360000000000005,
+            "compute_qk_wait": 5.696000000000001,
+            "compute_pv_wait": 7.456000000000003,
+            "score_load_observation": 0.224,
+            "softmax_high": 5.5360000000000005,
+            "probability_tail": 3.968000000000001,
+            "issuer_p_wait": 11.680000000000001,
+            "qk_submission": 5.5680000000000005,
+            "pv_submission": 1.9200000000000008,
+            "producer_empty_wait": 12.128000000000002,
+            "producer_after_empty": 8.895999999999999
+          }
+        },
+        {
+          "repeat": 1,
+          "query_row": 3072,
+          "tiles": 16,
+          "observed_span_us": 25.824,
+          "summed_intervals_us": {
+            "compute_full_wait": 1.7920000000000007,
+            "compute_qk_wait": 5.5680000000000005,
+            "compute_pv_wait": 7.552000000000003,
+            "score_load_observation": 0.28800000000000003,
+            "softmax_high": 5.632000000000001,
+            "probability_tail": 3.8400000000000007,
+            "issuer_p_wait": 11.872000000000002,
+            "qk_submission": 5.5360000000000005,
+            "pv_submission": 1.9200000000000008,
+            "producer_empty_wait": 11.712000000000003,
+            "producer_after_empty": 8.959999999999999
+          }
+        },
+        {
+          "repeat": 1,
+          "query_row": 4096,
+          "tiles": 16,
+          "observed_span_us": 26.048,
+          "summed_intervals_us": {
+            "compute_full_wait": 1.8560000000000005,
+            "compute_qk_wait": 5.6000000000000005,
+            "compute_pv_wait": 7.520000000000003,
+            "score_load_observation": 0.256,
+            "softmax_high": 5.664000000000001,
+            "probability_tail": 3.8720000000000008,
+            "issuer_p_wait": 11.776000000000002,
+            "qk_submission": 5.472,
+            "pv_submission": 1.9200000000000008,
+            "producer_empty_wait": 11.744000000000003,
+            "producer_after_empty": 8.959999999999999
+          }
+        },
+        {
+          "repeat": 1,
+          "query_row": 5120,
+          "tiles": 16,
+          "observed_span_us": 26.24,
+          "summed_intervals_us": {
+            "compute_full_wait": 2.1760000000000006,
+            "compute_qk_wait": 5.696000000000001,
+            "compute_pv_wait": 7.520000000000003,
+            "score_load_observation": 0.16,
+            "softmax_high": 5.632000000000001,
+            "probability_tail": 3.968000000000001,
+            "issuer_p_wait": 11.776000000000002,
+            "qk_submission": 5.44,
+            "pv_submission": 1.8880000000000008,
+            "producer_empty_wait": 11.808000000000003,
+            "producer_after_empty": 8.991999999999999
+          }
+        },
+        {
+          "repeat": 1,
+          "query_row": 6144,
+          "tiles": 16,
+          "observed_span_us": 25.824,
+          "summed_intervals_us": {
+            "compute_full_wait": 1.7280000000000006,
+            "compute_qk_wait": 5.5680000000000005,
+            "compute_pv_wait": 7.936000000000002,
+            "score_load_observation": 0.28800000000000003,
+            "softmax_high": 5.6000000000000005,
+            "probability_tail": 3.5840000000000005,
+            "issuer_p_wait": 11.840000000000002,
+            "qk_submission": 5.44,
+            "pv_submission": 1.9520000000000008,
+            "producer_empty_wait": 11.872000000000003,
+            "producer_after_empty": 8.831999999999999
+          }
+        },
+        {
+          "repeat": 1,
+          "query_row": 7168,
+          "tiles": 16,
+          "observed_span_us": 25.984,
+          "summed_intervals_us": {
+            "compute_full_wait": 2.0800000000000005,
+            "compute_qk_wait": 5.5360000000000005,
+            "compute_pv_wait": 7.680000000000003,
+            "score_load_observation": 0.256,
+            "softmax_high": 5.5680000000000005,
+            "probability_tail": 3.8080000000000007,
+            "issuer_p_wait": 11.648000000000001,
+            "qk_submission": 5.312,
+            "pv_submission": 1.8880000000000008,
+            "producer_empty_wait": 11.520000000000003,
+            "producer_after_empty": 8.927999999999999
+          }
+        },
+        {
+          "repeat": 2,
+          "query_row": 0,
+          "tiles": 16,
+          "observed_span_us": 28.288,
+          "summed_intervals_us": {
+            "compute_full_wait": 3.072000000000001,
+            "compute_qk_wait": 6.080000000000001,
+            "compute_pv_wait": 8.224,
+            "score_load_observation": 0.224,
+            "softmax_high": 5.856000000000001,
+            "probability_tail": 3.6159999999999997,
+            "issuer_p_wait": 12.128000000000002,
+            "qk_submission": 5.632000000000001,
+            "pv_submission": 1.9200000000000008,
+            "producer_empty_wait": 11.712000000000003,
+            "producer_after_empty": 9.952
+          }
+        },
+        {
+          "repeat": 2,
+          "query_row": 1024,
+          "tiles": 16,
+          "observed_span_us": 25.984,
+          "summed_intervals_us": {
+            "compute_full_wait": 1.8240000000000007,
+            "compute_qk_wait": 5.632000000000001,
+            "compute_pv_wait": 7.648000000000003,
+            "score_load_observation": 0.256,
+            "softmax_high": 5.664000000000001,
+            "probability_tail": 3.8400000000000007,
+            "issuer_p_wait": 11.712000000000002,
+            "qk_submission": 5.5680000000000005,
+            "pv_submission": 1.8560000000000008,
+            "producer_empty_wait": 11.552000000000003,
+            "producer_after_empty": 9.056
+          }
+        },
+        {
+          "repeat": 2,
+          "query_row": 2048,
+          "tiles": 16,
+          "observed_span_us": 25.92,
+          "summed_intervals_us": {
+            "compute_full_wait": 1.6000000000000005,
+            "compute_qk_wait": 5.792000000000001,
+            "compute_pv_wait": 7.776000000000003,
+            "score_load_observation": 0.16,
+            "softmax_high": 5.632000000000001,
+            "probability_tail": 3.7120000000000015,
+            "issuer_p_wait": 11.712000000000002,
+            "qk_submission": 5.5680000000000005,
+            "pv_submission": 1.9200000000000008,
+            "producer_empty_wait": 11.968000000000004,
+            "producer_after_empty": 8.991999999999999
+          }
+        },
+        {
+          "repeat": 2,
+          "query_row": 3072,
+          "tiles": 16,
+          "observed_span_us": 25.952,
+          "summed_intervals_us": {
+            "compute_full_wait": 1.7600000000000007,
+            "compute_qk_wait": 5.632000000000001,
+            "compute_pv_wait": 7.584000000000003,
+            "score_load_observation": 0.096,
+            "softmax_high": 5.792000000000001,
+            "probability_tail": 3.904000000000001,
+            "issuer_p_wait": 11.904000000000002,
+            "qk_submission": 5.5040000000000004,
+            "pv_submission": 1.9840000000000009,
+            "producer_empty_wait": 11.872000000000003,
+            "producer_after_empty": 9.024
+          }
+        },
+        {
+          "repeat": 2,
+          "query_row": 4096,
+          "tiles": 16,
+          "observed_span_us": 25.92,
+          "summed_intervals_us": {
+            "compute_full_wait": 1.7280000000000006,
+            "compute_qk_wait": 5.5680000000000005,
+            "compute_pv_wait": 7.616000000000003,
+            "score_load_observation": 0.128,
+            "softmax_high": 5.824000000000001,
+            "probability_tail": 3.8400000000000016,
+            "issuer_p_wait": 11.872000000000002,
+            "qk_submission": 5.5360000000000005,
+            "pv_submission": 1.9520000000000008,
+            "producer_empty_wait": 11.712000000000003,
+            "producer_after_empty": 8.959999999999999
+          }
+        },
+        {
+          "repeat": 2,
+          "query_row": 5120,
+          "tiles": 16,
+          "observed_span_us": 26.688,
+          "summed_intervals_us": {
+            "compute_full_wait": 2.3680000000000003,
+            "compute_qk_wait": 5.664000000000001,
+            "compute_pv_wait": 7.712000000000003,
+            "score_load_observation": 0.128,
+            "softmax_high": 5.728000000000001,
+            "probability_tail": 3.9680000000000017,
+            "issuer_p_wait": 11.904000000000002,
+            "qk_submission": 5.408,
+            "pv_submission": 1.9200000000000004,
+            "producer_empty_wait": 12.192000000000002,
+            "producer_after_empty": 8.863999999999999
+          }
+        },
+        {
+          "repeat": 2,
+          "query_row": 6144,
+          "tiles": 16,
+          "observed_span_us": 25.856,
+          "summed_intervals_us": {
+            "compute_full_wait": 1.6640000000000006,
+            "compute_qk_wait": 5.5360000000000005,
+            "compute_pv_wait": 7.904000000000002,
+            "score_load_observation": 0.224,
+            "softmax_high": 5.6000000000000005,
+            "probability_tail": 3.7760000000000007,
+            "issuer_p_wait": 11.840000000000002,
+            "qk_submission": 5.408,
+            "pv_submission": 1.8240000000000007,
+            "producer_empty_wait": 11.872000000000003,
+            "producer_after_empty": 8.831999999999999
+          }
+        },
+        {
+          "repeat": 2,
+          "query_row": 7168,
+          "tiles": 16,
+          "observed_span_us": 26.176,
+          "summed_intervals_us": {
+            "compute_full_wait": 2.1120000000000005,
+            "compute_qk_wait": 5.5680000000000005,
+            "compute_pv_wait": 7.552000000000003,
+            "score_load_observation": 0.192,
+            "softmax_high": 5.696000000000001,
+            "probability_tail": 3.936000000000001,
+            "issuer_p_wait": 11.776000000000002,
+            "qk_submission": 5.44,
+            "pv_submission": 1.9520000000000008,
+            "producer_empty_wait": 11.616000000000003,
+            "producer_after_empty": 8.799999999999999
+          }
+        }
+      ]
+    },
+    "v197": {
+      "intervals": {
+        "compute_full_wait": {
+          "n": 384,
+          "min_us": 0.032,
+          "median_us": 0.064,
+          "p95_us": 0.992,
+          "max_us": 3.488,
+          "mean_us": 0.13925
+        },
+        "compute_qk_wait": {
+          "n": 384,
+          "min_us": 0.352,
+          "median_us": 0.384,
+          "p95_us": 0.544,
+          "max_us": 0.576,
+          "mean_us": 0.3799166666666667
+        },
+        "compute_pv_wait": {
+          "n": 384,
+          "min_us": 0.608,
+          "median_us": 0.672,
+          "p95_us": 0.704,
+          "max_us": 0.704,
+          "mean_us": 0.6620833333333334
+        },
+        "score_load_observation": {
+          "n": 384,
+          "min_us": 0.0,
+          "median_us": 0.0,
+          "p95_us": 0.032,
+          "max_us": 0.032,
+          "mean_us": 0.011666666666666667
+        },
+        "softmax_high": {
+          "n": 384,
+          "min_us": 0.32,
+          "median_us": 0.384,
+          "p95_us": 0.416,
+          "max_us": 0.416,
+          "mean_us": 0.37383333333333335
+        },
+        "probability_tail": {
+          "n": 384,
+          "min_us": 0.128,
+          "median_us": 0.16,
+          "p95_us": 0.192,
+          "max_us": 0.416,
+          "mean_us": 0.17616666666666667
+        },
+        "issuer_p_wait": {
+          "n": 384,
+          "min_us": 0.576,
+          "median_us": 0.672,
+          "p95_us": 0.736,
+          "max_us": 0.928,
+          "mean_us": 0.67425
+        },
+        "qk_submission": {
+          "n": 384,
+          "min_us": 0.32,
+          "median_us": 0.352,
+          "p95_us": 0.352,
+          "max_us": 0.384,
+          "mean_us": 0.3443333333333333
+        },
+        "pv_submission": {
+          "n": 384,
+          "min_us": 0.352,
+          "median_us": 0.352,
+          "p95_us": 0.384,
+          "max_us": 0.416,
+          "mean_us": 0.3645833333333333
+        },
+        "producer_empty_wait": {
+          "n": 336,
+          "min_us": 0.096,
+          "median_us": 1.024,
+          "p95_us": 1.248,
+          "max_us": 1.824,
+          "mean_us": 1.0500952380952382
+        },
+        "producer_after_empty": {
+          "n": 336,
+          "min_us": 0.576,
+          "median_us": 0.608,
+          "p95_us": 0.672,
+          "max_us": 1.536,
+          "mean_us": 0.626
+        },
+        "cta_observed_span": {
+          "n": 24,
+          "min_us": 28.064,
+          "median_us": 28.592,
+          "p95_us": 30.944,
+          "max_us": 32.512,
+          "mean_us": 28.884
+        },
+        "probability_tail_without_prior_pv_wait": {
+          "n": 384,
+          "min_us": 0.128,
+          "median_us": 0.16,
+          "p95_us": 0.192,
+          "max_us": 0.416,
+          "mean_us": 0.17616666666666667
+        },
+        "qk_issue_relative_previous_pv": {
+          "n": 360,
+          "min_us": 0.544,
+          "median_us": 0.576,
+          "p95_us": 0.608,
+          "max_us": 1.44,
+          "mean_us": 0.5873777777777778
+        }
+      },
+      "nonbootstrap_qk_early_count": 0,
+      "nonbootstrap_qk_count": 360,
+      "sampled_early_fraction": 0.0,
+      "per_cta": [
+        {
+          "repeat": 0,
+          "query_row": 0,
+          "tiles": 16,
+          "observed_span_us": 32.512,
+          "summed_intervals_us": {
+            "compute_full_wait": 5.152000000000001,
+            "compute_qk_wait": 6.464000000000001,
+            "compute_pv_wait": 10.944,
+            "score_load_observation": 0.256,
+            "softmax_high": 5.984000000000001,
+            "probability_tail": 2.8160000000000003,
+            "issuer_p_wait": 10.912,
+            "qk_submission": 5.664000000000001,
+            "pv_submission": 6.176000000000001,
+            "producer_empty_wait": 14.592000000000006,
+            "producer_after_empty": 10.656
+          }
+        },
+        {
+          "repeat": 0,
+          "query_row": 1024,
+          "tiles": 16,
+          "observed_span_us": 28.704,
+          "summed_intervals_us": {
+            "compute_full_wait": 1.8880000000000008,
+            "compute_qk_wait": 6.048000000000001,
+            "compute_pv_wait": 10.496,
+            "score_load_observation": 0.032,
+            "softmax_high": 6.080000000000001,
+            "probability_tail": 2.8800000000000003,
+            "issuer_p_wait": 10.848,
+            "qk_submission": 5.343999999999999,
+            "pv_submission": 5.952000000000001,
+            "producer_empty_wait": 14.848000000000006,
+            "producer_after_empty": 8.511999999999999
+          }
+        },
+        {
+          "repeat": 0,
+          "query_row": 2048,
+          "tiles": 16,
+          "observed_span_us": 28.544,
+          "summed_intervals_us": {
+            "compute_full_wait": 1.7920000000000007,
+            "compute_qk_wait": 6.016000000000001,
+            "compute_pv_wait": 10.464,
+            "score_load_observation": 0.256,
+            "softmax_high": 5.984000000000001,
+            "probability_tail": 3.0400000000000005,
+            "issuer_p_wait": 11.040000000000001,
+            "qk_submission": 5.472,
+            "pv_submission": 5.792000000000001,
+            "producer_empty_wait": 14.976000000000003,
+            "producer_after_empty": 8.607999999999999
+          }
+        },
+        {
+          "repeat": 0,
+          "query_row": 3072,
+          "tiles": 16,
+          "observed_span_us": 28.672,
+          "summed_intervals_us": {
+            "compute_full_wait": 2.1440000000000006,
+            "compute_qk_wait": 6.080000000000001,
+            "compute_pv_wait": 10.656,
+            "score_load_observation": 0.16,
+            "softmax_high": 5.952000000000001,
+            "probability_tail": 2.7520000000000007,
+            "issuer_p_wait": 10.72,
+            "qk_submission": 5.5360000000000005,
+            "pv_submission": 5.824000000000001,
+            "producer_empty_wait": 15.072000000000003,
+            "producer_after_empty": 8.575999999999999
+          }
+        },
+        {
+          "repeat": 0,
+          "query_row": 4096,
+          "tiles": 16,
+          "observed_span_us": 28.384,
+          "summed_intervals_us": {
+            "compute_full_wait": 2.0800000000000005,
+            "compute_qk_wait": 6.080000000000001,
+            "compute_pv_wait": 10.56,
+            "score_load_observation": 0.192,
+            "softmax_high": 6.048000000000001,
+            "probability_tail": 2.5280000000000005,
+            "issuer_p_wait": 10.56,
+            "qk_submission": 5.472,
+            "pv_submission": 5.760000000000001,
+            "producer_empty_wait": 14.368000000000006,
+            "producer_after_empty": 8.671999999999999
+          }
+        },
+        {
+          "repeat": 0,
+          "query_row": 5120,
+          "tiles": 16,
+          "observed_span_us": 28.48,
+          "summed_intervals_us": {
+            "compute_full_wait": 2.2720000000000007,
+            "compute_qk_wait": 6.048000000000001,
+            "compute_pv_wait": 10.464,
+            "score_load_observation": 0.224,
+            "softmax_high": 5.920000000000001,
+            "probability_tail": 2.56,
+            "issuer_p_wait": 10.4,
+            "qk_submission": 5.5680000000000005,
+            "pv_submission": 5.728000000000001,
+            "producer_empty_wait": 14.432000000000006,
+            "producer_after_empty": 8.479999999999999
+          }
+        },
+        {
+          "repeat": 0,
+          "query_row": 6144,
+          "tiles": 16,
+          "observed_span_us": 28.768,
+          "summed_intervals_us": {
+            "compute_full_wait": 2.0480000000000005,
+            "compute_qk_wait": 5.984000000000001,
+            "compute_pv_wait": 10.464,
+            "score_load_observation": 0.28800000000000003,
+            "softmax_high": 5.952000000000001,
+            "probability_tail": 3.040000000000001,
+            "issuer_p_wait": 10.976,
+            "qk_submission": 5.472,
+            "pv_submission": 5.728000000000001,
+            "producer_empty_wait": 15.168000000000003,
+            "producer_after_empty": 8.511999999999999
+          }
+        },
+        {
+          "repeat": 0,
+          "query_row": 7168,
+          "tiles": 16,
+          "observed_span_us": 28.192,
+          "summed_intervals_us": {
+            "compute_full_wait": 2.0480000000000005,
+            "compute_qk_wait": 5.920000000000001,
+            "compute_pv_wait": 10.496,
+            "score_load_observation": 0.16,
+            "softmax_high": 5.920000000000001,
+            "probability_tail": 2.656,
+            "issuer_p_wait": 10.592,
+            "qk_submission": 5.472,
+            "pv_submission": 5.856000000000001,
+            "producer_empty_wait": 14.112000000000005,
+            "producer_after_empty": 8.575999999999999
+          }
+        },
+        {
+          "repeat": 1,
+          "query_row": 0,
+          "tiles": 16,
+          "observed_span_us": 30.944,
+          "summed_intervals_us": {
+            "compute_full_wait": 3.5200000000000005,
+            "compute_qk_wait": 6.464000000000001,
+            "compute_pv_wait": 10.912,
+            "score_load_observation": 0.256,
+            "softmax_high": 6.112000000000001,
+            "probability_tail": 2.592,
+            "issuer_p_wait": 10.816000000000003,
+            "qk_submission": 5.760000000000001,
+            "pv_submission": 6.016000000000001,
+            "producer_empty_wait": 13.984000000000005,
+            "producer_after_empty": 10.496
+          }
+        },
+        {
+          "repeat": 1,
+          "query_row": 1024,
+          "tiles": 16,
+          "observed_span_us": 28.48,
+          "summed_intervals_us": {
+            "compute_full_wait": 1.9200000000000008,
+            "compute_qk_wait": 5.920000000000001,
+            "compute_pv_wait": 10.56,
+            "score_load_observation": 0.16,
+            "softmax_high": 5.888000000000001,
+            "probability_tail": 2.9440000000000004,
+            "issuer_p_wait": 10.784,
+            "qk_submission": 5.408,
+            "pv_submission": 5.856000000000001,
+            "producer_empty_wait": 14.816000000000006,
+            "producer_after_empty": 8.415999999999999
+          }
+        },
+        {
+          "repeat": 1,
+          "query_row": 2048,
+          "tiles": 16,
+          "observed_span_us": 28.544,
+          "summed_intervals_us": {
+            "compute_full_wait": 1.7920000000000007,
+            "compute_qk_wait": 6.144000000000001,
+            "compute_pv_wait": 10.624,
+            "score_load_observation": 0.064,
+            "softmax_high": 5.984000000000001,
+            "probability_tail": 3.0720000000000005,
+            "issuer_p_wait": 11.008000000000001,
+            "qk_submission": 5.5360000000000005,
+            "pv_submission": 5.920000000000001,
+            "producer_empty_wait": 15.232000000000003,
+            "producer_after_empty": 8.511999999999999
+          }
+        },
+        {
+          "repeat": 1,
+          "query_row": 3072,
+          "tiles": 16,
+          "observed_span_us": 28.512,
+          "summed_intervals_us": {
+            "compute_full_wait": 1.9200000000000008,
+            "compute_qk_wait": 5.952000000000001,
+            "compute_pv_wait": 10.528,
+            "score_load_observation": 0.224,
+            "softmax_high": 5.920000000000001,
+            "probability_tail": 2.912000000000001,
+            "issuer_p_wait": 10.88,
+            "qk_submission": 5.408000000000001,
+            "pv_submission": 5.760000000000001,
+            "producer_empty_wait": 15.040000000000003,
+            "producer_after_empty": 8.447999999999999
+          }
+        },
+        {
+          "repeat": 1,
+          "query_row": 4096,
+          "tiles": 16,
+          "observed_span_us": 28.416,
+          "summed_intervals_us": {
+            "compute_full_wait": 2.0800000000000005,
+            "compute_qk_wait": 6.016000000000001,
+            "compute_pv_wait": 10.688,
+            "score_load_observation": 0.16,
+            "softmax_high": 6.048000000000001,
+            "probability_tail": 2.624,
+            "issuer_p_wait": 10.496,
+            "qk_submission": 5.6000000000000005,
+            "pv_submission": 5.792000000000001,
+            "producer_empty_wait": 14.560000000000006,
+            "producer_after_empty": 8.543999999999999
+          }
+        },
+        {
+          "repeat": 1,
+          "query_row": 5120,
+          "tiles": 16,
+          "observed_span_us": 28.672,
+          "summed_intervals_us": {
+            "compute_full_wait": 2.3040000000000007,
+            "compute_qk_wait": 6.144000000000001,
+            "compute_pv_wait": 10.4,
+            "score_load_observation": 0.192,
+            "softmax_high": 5.952000000000001,
+            "probability_tail": 2.688,
+            "issuer_p_wait": 10.528,
+            "qk_submission": 5.5040000000000004,
+            "pv_submission": 5.728000000000001,
+            "producer_empty_wait": 14.528000000000006,
+            "producer_after_empty": 8.511999999999999
+          }
+        },
+        {
+          "repeat": 1,
+          "query_row": 6144,
+          "tiles": 16,
+          "observed_span_us": 28.704,
+          "summed_intervals_us": {
+            "compute_full_wait": 2.0160000000000005,
+            "compute_qk_wait": 6.016000000000001,
+            "compute_pv_wait": 10.592,
+            "score_load_observation": 0.128,
+            "softmax_high": 5.952000000000001,
+            "probability_tail": 3.0400000000000014,
+            "issuer_p_wait": 10.944,
+            "qk_submission": 5.344,
+            "pv_submission": 5.824000000000001,
+            "producer_empty_wait": 14.976000000000003,
+            "producer_after_empty": 8.575999999999999
+          }
+        },
+        {
+          "repeat": 1,
+          "query_row": 7168,
+          "tiles": 16,
+          "observed_span_us": 28.064,
+          "summed_intervals_us": {
+            "compute_full_wait": 1.9520000000000008,
+            "compute_qk_wait": 6.016000000000001,
+            "compute_pv_wait": 10.656,
+            "score_load_observation": 0.16,
+            "softmax_high": 5.824000000000001,
+            "probability_tail": 2.688,
+            "issuer_p_wait": 10.432,
+            "qk_submission": 5.5040000000000004,
+            "pv_submission": 5.760000000000001,
+            "producer_empty_wait": 14.208000000000006,
+            "producer_after_empty": 8.511999999999999
+          }
+        },
+        {
+          "repeat": 2,
+          "query_row": 0,
+          "tiles": 16,
+          "observed_span_us": 30.336,
+          "summed_intervals_us": {
+            "compute_full_wait": 2.880000000000001,
+            "compute_qk_wait": 6.304000000000001,
+            "compute_pv_wait": 10.976,
+            "score_load_observation": 0.096,
+            "softmax_high": 6.144000000000001,
+            "probability_tail": 2.8480000000000003,
+            "issuer_p_wait": 10.944,
+            "qk_submission": 5.696000000000001,
+            "pv_submission": 6.016000000000001,
+            "producer_empty_wait": 14.464000000000006,
+            "producer_after_empty": 9.791999999999998
+          }
+        },
+        {
+          "repeat": 2,
+          "query_row": 1024,
+          "tiles": 16,
+          "observed_span_us": 28.672,
+          "summed_intervals_us": {
+            "compute_full_wait": 1.6960000000000006,
+            "compute_qk_wait": 6.080000000000001,
+            "compute_pv_wait": 10.56,
+            "score_load_observation": 0.224,
+            "softmax_high": 6.016000000000001,
+            "probability_tail": 2.912000000000001,
+            "issuer_p_wait": 10.976,
+            "qk_submission": 5.6000000000000005,
+            "pv_submission": 5.856000000000001,
+            "producer_empty_wait": 14.720000000000006,
+            "producer_after_empty": 8.575999999999999
+          }
+        },
+        {
+          "repeat": 2,
+          "query_row": 2048,
+          "tiles": 16,
+          "observed_span_us": 28.832,
+          "summed_intervals_us": {
+            "compute_full_wait": 1.760000000000001,
+            "compute_qk_wait": 6.048000000000001,
+            "compute_pv_wait": 10.752,
+            "score_load_observation": 0.256,
+            "softmax_high": 5.920000000000001,
+            "probability_tail": 3.1680000000000006,
+            "issuer_p_wait": 11.168000000000001,
+            "qk_submission": 5.5680000000000005,
+            "pv_submission": 5.888000000000001,
+            "producer_empty_wait": 15.488000000000003,
+            "producer_after_empty": 8.607999999999999
+          }
+        },
+        {
+          "repeat": 2,
+          "query_row": 3072,
+          "tiles": 16,
+          "observed_span_us": 28.736,
+          "summed_intervals_us": {
+            "compute_full_wait": 2.0800000000000005,
+            "compute_qk_wait": 6.048000000000001,
+            "compute_pv_wait": 10.528,
+            "score_load_observation": 0.16,
+            "softmax_high": 6.080000000000001,
+            "probability_tail": 2.8480000000000008,
+            "issuer_p_wait": 10.88,
+            "qk_submission": 5.44,
+            "pv_submission": 5.888000000000001,
+            "producer_empty_wait": 15.136000000000003,
+            "producer_after_empty": 8.479999999999999
+          }
+        },
+        {
+          "repeat": 2,
+          "query_row": 4096,
+          "tiles": 16,
+          "observed_span_us": 28.352,
+          "summed_intervals_us": {
+            "compute_full_wait": 1.8240000000000007,
+            "compute_qk_wait": 6.016000000000001,
+            "compute_pv_wait": 10.496,
+            "score_load_observation": 0.128,
+            "softmax_high": 6.112000000000001,
+            "probability_tail": 2.592,
+            "issuer_p_wait": 10.752,
+            "qk_submission": 5.5360000000000005,
+            "pv_submission": 5.792000000000001,
+            "producer_empty_wait": 14.528000000000006,
+            "producer_after_empty": 8.607999999999999
+          }
+        },
+        {
+          "repeat": 2,
+          "query_row": 5120,
+          "tiles": 16,
+          "observed_span_us": 28.512,
+          "summed_intervals_us": {
+            "compute_full_wait": 2.1760000000000006,
+            "compute_qk_wait": 6.016000000000001,
+            "compute_pv_wait": 10.464,
+            "score_load_observation": 0.256,
+            "softmax_high": 5.984000000000001,
+            "probability_tail": 2.656,
+            "issuer_p_wait": 10.624,
+            "qk_submission": 5.5360000000000005,
+            "pv_submission": 5.728000000000001,
+            "producer_empty_wait": 14.560000000000006,
+            "producer_after_empty": 8.415999999999999
+          }
+        },
+        {
+          "repeat": 2,
+          "query_row": 6144,
+          "tiles": 16,
+          "observed_span_us": 28.64,
+          "summed_intervals_us": {
+            "compute_full_wait": 1.9200000000000008,
+            "compute_qk_wait": 6.016000000000001,
+            "compute_pv_wait": 10.464,
+            "score_load_observation": 0.16,
+            "softmax_high": 5.920000000000001,
+            "probability_tail": 3.072000000000001,
+            "issuer_p_wait": 11.040000000000001,
+            "qk_submission": 5.408,
+            "pv_submission": 5.696000000000001,
+            "producer_empty_wait": 15.040000000000003,
+            "producer_after_empty": 8.607999999999999
+          }
+        },
+        {
+          "repeat": 2,
+          "query_row": 7168,
+          "tiles": 16,
+          "observed_span_us": 28.544,
+          "summed_intervals_us": {
+            "compute_full_wait": 2.2080000000000006,
+            "compute_qk_wait": 6.048000000000001,
+            "compute_pv_wait": 10.496,
+            "score_load_observation": 0.28800000000000003,
+            "softmax_high": 5.856000000000001,
+            "probability_tail": 2.72,
+            "issuer_p_wait": 10.592,
+            "qk_submission": 5.376,
+            "pv_submission": 5.664000000000001,
+            "producer_empty_wait": 13.984000000000005,
+            "producer_after_empty": 8.639999999999999
+          }
+        }
+      ]
+    },
+    "v265": {
+      "intervals": {
+        "compute_full_wait": {
+          "n": 384,
+          "min_us": 0.032,
+          "median_us": 0.064,
+          "p95_us": 1.088,
+          "max_us": 2.24,
+          "mean_us": 0.13641666666666666
+        },
+        "compute_qk_wait": {
+          "n": 384,
+          "min_us": 0.32,
+          "median_us": 0.352,
+          "p95_us": 0.544,
+          "max_us": 0.576,
+          "mean_us": 0.37424999999999997
+        },
+        "compute_pv_wait": {
+          "n": 384,
+          "min_us": 0.608,
+          "median_us": 0.672,
+          "p95_us": 0.704,
+          "max_us": 0.704,
+          "mean_us": 0.6663333333333333
+        },
+        "score_load_observation": {
+          "n": 384,
+          "min_us": 0.0,
+          "median_us": 0.0,
+          "p95_us": 0.032,
+          "max_us": 0.032,
+          "mean_us": 0.011583333333333334
+        },
+        "softmax_high": {
+          "n": 384,
+          "min_us": 0.32,
+          "median_us": 0.384,
+          "p95_us": 0.416,
+          "max_us": 0.448,
+          "mean_us": 0.3805
+        },
+        "probability_tail": {
+          "n": 384,
+          "min_us": 0.128,
+          "median_us": 0.16,
+          "p95_us": 0.224,
+          "max_us": 0.416,
+          "mean_us": 0.17666666666666667
+        },
+        "issuer_p_wait": {
+          "n": 384,
+          "min_us": 0.608,
+          "median_us": 0.672,
+          "p95_us": 0.736,
+          "max_us": 0.928,
+          "mean_us": 0.67525
+        },
+        "qk_submission": {
+          "n": 384,
+          "min_us": 0.32,
+          "median_us": 0.352,
+          "p95_us": 0.352,
+          "max_us": 0.384,
+          "mean_us": 0.3378333333333333
+        },
+        "pv_submission": {
+          "n": 384,
+          "min_us": 0.32,
+          "median_us": 0.352,
+          "p95_us": 0.384,
+          "max_us": 0.384,
+          "mean_us": 0.36191666666666666
+        },
+        "producer_empty_wait": {
+          "n": 336,
+          "min_us": 0.224,
+          "median_us": 0.96,
+          "p95_us": 1.184,
+          "max_us": 1.376,
+          "mean_us": 0.9882857142857143
+        },
+        "producer_after_empty": {
+          "n": 336,
+          "min_us": 0.608,
+          "median_us": 0.64,
+          "p95_us": 0.704,
+          "max_us": 1.312,
+          "mean_us": 0.656952380952381
+        },
+        "cta_observed_span": {
+          "n": 24,
+          "min_us": 28.064,
+          "median_us": 28.592,
+          "p95_us": 30.464,
+          "max_us": 31.808,
+          "mean_us": 28.796
+        },
+        "probability_tail_without_prior_pv_wait": {
+          "n": 384,
+          "min_us": 0.128,
+          "median_us": 0.16,
+          "p95_us": 0.224,
+          "max_us": 0.416,
+          "mean_us": 0.17666666666666667
+        },
+        "qk_issue_relative_previous_pv": {
+          "n": 360,
+          "min_us": 0.544,
+          "median_us": 0.576,
+          "p95_us": 0.608,
+          "max_us": 1.184,
+          "mean_us": 0.5834666666666667
+        }
+      },
+      "nonbootstrap_qk_early_count": 0,
+      "nonbootstrap_qk_count": 360,
+      "sampled_early_fraction": 0.0,
+      "per_cta": [
+        {
+          "repeat": 0,
+          "query_row": 0,
+          "tiles": 16,
+          "observed_span_us": 31.808,
+          "summed_intervals_us": {
+            "compute_full_wait": 3.904000000000001,
+            "compute_qk_wait": 6.8480000000000025,
+            "compute_pv_wait": 10.976,
+            "score_load_observation": 0.192,
+            "softmax_high": 6.112000000000001,
+            "probability_tail": 2.688,
+            "issuer_p_wait": 10.784000000000002,
+            "qk_submission": 5.6000000000000005,
+            "pv_submission": 5.984000000000001,
+            "producer_empty_wait": 13.056000000000004,
+            "producer_after_empty": 11.072000000000001
+          }
+        },
+        {
+          "repeat": 0,
+          "query_row": 1024,
+          "tiles": 16,
+          "observed_span_us": 28.64,
+          "summed_intervals_us": {
+            "compute_full_wait": 1.6640000000000006,
+            "compute_qk_wait": 5.920000000000001,
+            "compute_pv_wait": 10.624,
+            "score_load_observation": 0.192,
+            "softmax_high": 6.112000000000001,
+            "probability_tail": 2.9440000000000004,
+            "issuer_p_wait": 11.008000000000001,
+            "qk_submission": 5.44,
+            "pv_submission": 5.888000000000001,
+            "producer_empty_wait": 14.080000000000005,
+            "producer_after_empty": 9.152
+          }
+        },
+        {
+          "repeat": 0,
+          "query_row": 2048,
+          "tiles": 16,
+          "observed_span_us": 28.512,
+          "summed_intervals_us": {
+            "compute_full_wait": 1.5680000000000007,
+            "compute_qk_wait": 5.920000000000001,
+            "compute_pv_wait": 10.624,
+            "score_load_observation": 0.128,
+            "softmax_high": 6.208000000000001,
+            "probability_tail": 3.1680000000000006,
+            "issuer_p_wait": 11.200000000000001,
+            "qk_submission": 5.344,
+            "pv_submission": 5.792000000000001,
+            "producer_empty_wait": 13.856000000000002,
+            "producer_after_empty": 9.12
+          }
+        },
+        {
+          "repeat": 0,
+          "query_row": 3072,
+          "tiles": 16,
+          "observed_span_us": 28.32,
+          "summed_intervals_us": {
+            "compute_full_wait": 1.5360000000000007,
+            "compute_qk_wait": 5.824000000000001,
+            "compute_pv_wait": 10.656,
+            "score_load_observation": 0.128,
+            "softmax_high": 6.080000000000001,
+            "probability_tail": 2.944000000000001,
+            "issuer_p_wait": 10.976,
+            "qk_submission": 5.312,
+            "pv_submission": 5.856000000000001,
+            "producer_empty_wait": 13.920000000000002,
+            "producer_after_empty": 8.927999999999999
+          }
+        },
+        {
+          "repeat": 0,
+          "query_row": 4096,
+          "tiles": 16,
+          "observed_span_us": 28.288,
+          "summed_intervals_us": {
+            "compute_full_wait": 2.1440000000000006,
+            "compute_qk_wait": 5.920000000000001,
+            "compute_pv_wait": 10.592,
+            "score_load_observation": 0.128,
+            "softmax_high": 6.112000000000001,
+            "probability_tail": 2.6240000000000006,
+            "issuer_p_wait": 10.528,
+            "qk_submission": 5.44,
+            "pv_submission": 5.728000000000001,
+            "producer_empty_wait": 13.472000000000005,
+            "producer_after_empty": 8.991999999999999
+          }
+        },
+        {
+          "repeat": 0,
+          "query_row": 5120,
+          "tiles": 16,
+          "observed_span_us": 28.192,
+          "summed_intervals_us": {
+            "compute_full_wait": 2.0800000000000005,
+            "compute_qk_wait": 5.984000000000001,
+            "compute_pv_wait": 10.528,
+            "score_load_observation": 0.128,
+            "softmax_high": 6.080000000000001,
+            "probability_tail": 2.72,
+            "issuer_p_wait": 10.432,
+            "qk_submission": 5.408,
+            "pv_submission": 5.792000000000001,
+            "producer_empty_wait": 13.664000000000005,
+            "producer_after_empty": 8.991999999999999
+          }
+        },
+        {
+          "repeat": 0,
+          "query_row": 6144,
+          "tiles": 16,
+          "observed_span_us": 28.576,
+          "summed_intervals_us": {
+            "compute_full_wait": 1.9840000000000007,
+            "compute_qk_wait": 5.856000000000001,
+            "compute_pv_wait": 10.56,
+            "score_load_observation": 0.16,
+            "softmax_high": 6.144000000000001,
+            "probability_tail": 3.008000000000001,
+            "issuer_p_wait": 10.944,
+            "qk_submission": 5.376,
+            "pv_submission": 5.728000000000001,
+            "producer_empty_wait": 14.304000000000002,
+            "producer_after_empty": 9.088
+          }
+        },
+        {
+          "repeat": 0,
+          "query_row": 7168,
+          "tiles": 16,
+          "observed_span_us": 28.48,
+          "summed_intervals_us": {
+            "compute_full_wait": 2.3360000000000007,
+            "compute_qk_wait": 5.984000000000001,
+            "compute_pv_wait": 10.464,
+            "score_load_observation": 0.192,
+            "softmax_high": 6.112000000000001,
+            "probability_tail": 2.624,
+            "issuer_p_wait": 10.496,
+            "qk_submission": 5.312,
+            "pv_submission": 5.696000000000001,
+            "producer_empty_wait": 13.760000000000005,
+            "producer_after_empty": 8.991999999999999
+          }
+        },
+        {
+          "repeat": 1,
+          "query_row": 0,
+          "tiles": 16,
+          "observed_span_us": 30.432,
+          "summed_intervals_us": {
+            "compute_full_wait": 2.976000000000001,
+            "compute_qk_wait": 6.336000000000002,
+            "compute_pv_wait": 11.072000000000001,
+            "score_load_observation": 0.256,
+            "softmax_high": 6.272000000000001,
+            "probability_tail": 2.7520000000000002,
+            "issuer_p_wait": 11.040000000000001,
+            "qk_submission": 5.632000000000001,
+            "pv_submission": 5.984000000000001,
+            "producer_empty_wait": 13.632000000000005,
+            "producer_after_empty": 9.984
+          }
+        },
+        {
+          "repeat": 1,
+          "query_row": 1024,
+          "tiles": 16,
+          "observed_span_us": 28.8,
+          "summed_intervals_us": {
+            "compute_full_wait": 1.9520000000000006,
+            "compute_qk_wait": 5.888000000000001,
+            "compute_pv_wait": 10.88,
+            "score_load_observation": 0.224,
+            "softmax_high": 6.048000000000001,
+            "probability_tail": 2.8800000000000003,
+            "issuer_p_wait": 10.944,
+            "qk_submission": 5.408,
+            "pv_submission": 5.696000000000001,
+            "producer_empty_wait": 13.984000000000005,
+            "producer_after_empty": 8.991999999999999
+          }
+        },
+        {
+          "repeat": 1,
+          "query_row": 2048,
+          "tiles": 16,
+          "observed_span_us": 28.8,
+          "summed_intervals_us": {
+            "compute_full_wait": 1.7600000000000007,
+            "compute_qk_wait": 5.920000000000001,
+            "compute_pv_wait": 10.816,
+            "score_load_observation": 0.28800000000000003,
+            "softmax_high": 6.144000000000001,
+            "probability_tail": 3.104,
+            "issuer_p_wait": 11.200000000000001,
+            "qk_submission": 5.472,
+            "pv_submission": 5.888000000000001,
+            "producer_empty_wait": 14.432000000000002,
+            "producer_after_empty": 9.056
+          }
+        },
+        {
+          "repeat": 1,
+          "query_row": 3072,
+          "tiles": 16,
+          "observed_span_us": 28.32,
+          "summed_intervals_us": {
+            "compute_full_wait": 1.9840000000000009,
+            "compute_qk_wait": 5.888000000000001,
+            "compute_pv_wait": 10.592,
+            "score_load_observation": 0.16,
+            "softmax_high": 5.952000000000001,
+            "probability_tail": 2.912000000000001,
+            "issuer_p_wait": 10.752000000000002,
+            "qk_submission": 5.376,
+            "pv_submission": 5.760000000000001,
+            "producer_empty_wait": 14.208000000000002,
+            "producer_after_empty": 8.895999999999999
+          }
+        },
+        {
+          "repeat": 1,
+          "query_row": 4096,
+          "tiles": 16,
+          "observed_span_us": 28.16,
+          "summed_intervals_us": {
+            "compute_full_wait": 1.9840000000000009,
+            "compute_qk_wait": 5.824000000000001,
+            "compute_pv_wait": 10.528,
+            "score_load_observation": 0.256,
+            "softmax_high": 6.144000000000001,
+            "probability_tail": 2.56,
+            "issuer_p_wait": 10.528,
+            "qk_submission": 5.344,
+            "pv_submission": 5.632000000000001,
+            "producer_empty_wait": 13.536000000000005,
+            "producer_after_empty": 8.991999999999999
+          }
+        },
+        {
+          "repeat": 1,
+          "query_row": 5120,
+          "tiles": 16,
+          "observed_span_us": 28.736,
+          "summed_intervals_us": {
+            "compute_full_wait": 2.5600000000000005,
+            "compute_qk_wait": 5.952000000000001,
+            "compute_pv_wait": 10.496,
+            "score_load_observation": 0.192,
+            "softmax_high": 6.016000000000001,
+            "probability_tail": 2.592,
+            "issuer_p_wait": 10.56,
+            "qk_submission": 5.408,
+            "pv_submission": 5.760000000000001,
+            "producer_empty_wait": 13.792000000000005,
+            "producer_after_empty": 9.056
+          }
+        },
+        {
+          "repeat": 1,
+          "query_row": 6144,
+          "tiles": 16,
+          "observed_span_us": 28.736,
+          "summed_intervals_us": {
+            "compute_full_wait": 1.9840000000000007,
+            "compute_qk_wait": 5.92,
+            "compute_pv_wait": 10.56,
+            "score_load_observation": 0.224,
+            "softmax_high": 5.984000000000001,
+            "probability_tail": 3.1040000000000005,
+            "issuer_p_wait": 11.040000000000001,
+            "qk_submission": 5.344,
+            "pv_submission": 5.792000000000001,
+            "producer_empty_wait": 14.336000000000002,
+            "producer_after_empty": 9.024
+          }
+        },
+        {
+          "repeat": 1,
+          "query_row": 7168,
+          "tiles": 16,
+          "observed_span_us": 28.288,
+          "summed_intervals_us": {
+            "compute_full_wait": 2.2080000000000006,
+            "compute_qk_wait": 5.952000000000001,
+            "compute_pv_wait": 10.528,
+            "score_load_observation": 0.224,
+            "softmax_high": 5.920000000000001,
+            "probability_tail": 2.7520000000000002,
+            "issuer_p_wait": 10.624,
+            "qk_submission": 5.408,
+            "pv_submission": 5.696000000000001,
+            "producer_empty_wait": 13.536000000000005,
+            "producer_after_empty": 9.024
+          }
+        },
+        {
+          "repeat": 2,
+          "query_row": 0,
+          "tiles": 16,
+          "observed_span_us": 30.464,
+          "summed_intervals_us": {
+            "compute_full_wait": 3.104000000000001,
+            "compute_qk_wait": 6.432000000000001,
+            "compute_pv_wait": 11.040000000000001,
+            "score_load_observation": 0.16,
+            "softmax_high": 6.176000000000001,
+            "probability_tail": 2.7520000000000002,
+            "issuer_p_wait": 10.976,
+            "qk_submission": 5.6000000000000005,
+            "pv_submission": 6.080000000000001,
+            "producer_empty_wait": 13.568000000000005,
+            "producer_after_empty": 10.176
+          }
+        },
+        {
+          "repeat": 2,
+          "query_row": 1024,
+          "tiles": 16,
+          "observed_span_us": 28.704,
+          "summed_intervals_us": {
+            "compute_full_wait": 2.0800000000000005,
+            "compute_qk_wait": 5.920000000000001,
+            "compute_pv_wait": 10.656,
+            "score_load_observation": 0.28800000000000003,
+            "softmax_high": 5.984000000000001,
+            "probability_tail": 3.0080000000000005,
+            "issuer_p_wait": 10.912,
+            "qk_submission": 5.44,
+            "pv_submission": 5.792000000000001,
+            "producer_empty_wait": 14.048000000000005,
+            "producer_after_empty": 8.895999999999999
+          }
+        },
+        {
+          "repeat": 2,
+          "query_row": 2048,
+          "tiles": 16,
+          "observed_span_us": 28.896,
+          "summed_intervals_us": {
+            "compute_full_wait": 1.8880000000000008,
+            "compute_qk_wait": 5.920000000000001,
+            "compute_pv_wait": 10.72,
+            "score_load_observation": 0.16,
+            "softmax_high": 6.272000000000001,
+            "probability_tail": 3.0080000000000005,
+            "issuer_p_wait": 11.104000000000001,
+            "qk_submission": 5.44,
+            "pv_submission": 5.856000000000001,
+            "producer_empty_wait": 14.656000000000002,
+            "producer_after_empty": 9.056
+          }
+        },
+        {
+          "repeat": 2,
+          "query_row": 3072,
+          "tiles": 16,
+          "observed_span_us": 28.832,
+          "summed_intervals_us": {
+            "compute_full_wait": 2.432000000000001,
+            "compute_qk_wait": 5.888000000000001,
+            "compute_pv_wait": 10.592,
+            "score_load_observation": 0.256,
+            "softmax_high": 6.048000000000001,
+            "probability_tail": 2.8160000000000007,
+            "issuer_p_wait": 10.784,
+            "qk_submission": 5.28,
+            "pv_submission": 5.696000000000001,
+            "producer_empty_wait": 14.176000000000002,
+            "producer_after_empty": 8.959999999999999
+          }
+        },
+        {
+          "repeat": 2,
+          "query_row": 4096,
+          "tiles": 16,
+          "observed_span_us": 28.128,
+          "summed_intervals_us": {
+            "compute_full_wait": 2.0800000000000005,
+            "compute_qk_wait": 5.920000000000001,
+            "compute_pv_wait": 10.592,
+            "score_load_observation": 0.16,
+            "softmax_high": 6.112000000000001,
+            "probability_tail": 2.624,
+            "issuer_p_wait": 10.432,
+            "qk_submission": 5.408,
+            "pv_submission": 5.728000000000001,
+            "producer_empty_wait": 13.408000000000005,
+            "producer_after_empty": 8.991999999999999
+          }
+        },
+        {
+          "repeat": 2,
+          "query_row": 5120,
+          "tiles": 16,
+          "observed_span_us": 28.32,
+          "summed_intervals_us": {
+            "compute_full_wait": 2.2080000000000006,
+            "compute_qk_wait": 5.952000000000001,
+            "compute_pv_wait": 10.688,
+            "score_load_observation": 0.128,
+            "softmax_high": 6.016000000000001,
+            "probability_tail": 2.624,
+            "issuer_p_wait": 10.528,
+            "qk_submission": 5.312,
+            "pv_submission": 5.664000000000001,
+            "producer_empty_wait": 13.664000000000005,
+            "producer_after_empty": 9.024
+          }
+        },
+        {
+          "repeat": 2,
+          "query_row": 6144,
+          "tiles": 16,
+          "observed_span_us": 28.608,
+          "summed_intervals_us": {
+            "compute_full_wait": 1.9840000000000009,
+            "compute_qk_wait": 5.856000000000001,
+            "compute_pv_wait": 10.528,
+            "score_load_observation": 0.096,
+            "softmax_high": 6.016000000000001,
+            "probability_tail": 3.040000000000001,
+            "issuer_p_wait": 11.008000000000001,
+            "qk_submission": 5.344,
+            "pv_submission": 5.760000000000001,
+            "producer_empty_wait": 13.824000000000002,
+            "producer_after_empty": 9.088
+          }
+        },
+        {
+          "repeat": 2,
+          "query_row": 7168,
+          "tiles": 16,
+          "observed_span_us": 28.064,
+          "summed_intervals_us": {
+            "compute_full_wait": 1.9840000000000007,
+            "compute_qk_wait": 5.888000000000001,
+            "compute_pv_wait": 10.56,
+            "score_load_observation": 0.128,
+            "softmax_high": 6.048000000000001,
+            "probability_tail": 2.592,
+            "issuer_p_wait": 10.496,
+            "qk_submission": 5.28,
+            "pv_submission": 5.728000000000001,
+            "producer_empty_wait": 13.152000000000005,
+            "producer_after_empty": 9.184
+          }
+        }
+      ]
+    }
+  }
+}
