@@ -1,0 +1,13 @@
+{
+  "static_native_instructions": 1456,
+  "LDL": 0,
+  "STL": 0,
+  "PTX_prefetch_sites": 5,
+  "prefetch_native": [
+    "/*09c0*/              @!P3 CCTL.E.PF2 [R16] ;                                                               /* 0x000000001000b98f */",
+    "/*09d0*/              @!P3 CCTL.E.PF2 [R16+0x80] ;                                                          /* 0x000000801000b98f */",
+    "/*09e0*/              @!P3 CCTL.E.PF2 [R16+0x100] ;                                                         /* 0x000001001000b98f */",
+    "/*09f0*/              @!P3 CCTL.E.PF2 [R16+0x180] ;                                                         /* 0x000001801000b98f */",
+    "/*0a00*/              @!P3 CCTL.E.PF2 [R16+0x200] ;                                                         /* 0x000002001000b98f */"
+  ]
+}

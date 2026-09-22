@@ -6788,3 +6788,39 @@ Compile and inspect actual prefetch instructions/resources, then guarded fixed/v
 
 
 v254 compiles with 123 registers and zero stack, matching v190's resource count. Static native instructions rise from 1448 to 1456. All five PTX prefetches survive as predicated CCTL.E.PF2 instructions at offsets 0/128/256/384/512; no local-memory instructions appear. The intended operation is emitted, but runtime accessibility/equivalence and timing remain to be qualified.
+
+
+v254 guarded b2/chunk3 smoke, b512/chunk0 memcheck and fixed/variable-length synccheck pass without sanitizer errors. Full8192/seed1234 and short1024/chunk0/seed5678 match v190 across three uninstrumented repeats each; masked outputs also match, retaining the fast path's 86 tolerance failures. No second full seed or strict-precision claim. Paired short timing/NCU follows.
+
+
+v254 short timing is 1624.160 us versus TRTLLM 1691.808 us, slower than v190's 1549.06 us. NCU base/stable: 2.887872 ms, 123 registers, 194920 B dynamic shared, 19.370499% occupancy, 30.625927% tensor activity, 0.344139 eligible warps/cycle, long-scoreboard ratio 7.220484, zero local traffic and aggregate shared conflicts 6426524/4135671. Five-address KV prefetching is not a measured gain. Inspect cache traffic and source attribution before considering a lighter prefetch control; no extended timing or promotion.
+
+
+v254 unlocked source issues 545028343 instructions with 20275200 actual/ideal shared wavefronts and zero excessive. Long-scoreboard samples total 65155, including compute PV 18625 and a newly exposed producer index dependency 9481 at the bounds check preceding prefetch. The five-address hint now requires the index before the empty-stage wait, whereas v190 can defer use until after that wait. The standard profile's L2 hit rate increases from 76.607747% to 82.704753%, but this does not establish lower traffic or latency. A separate matched cache-traffic profile is pending.
+
+v254's matched unlocked cache profile measures v190/v254 respectively: 1.428014/1.463181 GB DRAM reads, 169755635/263046639 L2 requests, and 398555058/766133036 L2 sectors. L2 hit rates are 76.662567/82.827320%, while diagnostic durations are 1.546016/1.621888 ms. Prefetch raises requests about 55%, sectors about 92%, and DRAM reads about 2.46%; the higher hit ratio does not indicate useful traffic reduction. This supports abandoning five-address KV prefetch for the default path.
+
+## Iteration255 — pipeline private sparse-index reads before current gathers
+
+Based on qualified fast default v190, bootstrap the first private slot before the producer loop. Once the current slot has been published to its shared index/bitmap locations, load the next iteration's slot into a private register before the current stage's producer barriers and TMA gathers. Carry that value across the remaining producer work and use it as next iteration's original index. Guard the lookahead by valid length, retaining -1 for nonexistent tail positions. No KV data prefetch is added.
+
+This isolates earlier index-load placement from v254's costly extra cache traffic. Shared-stage ownership, gather addresses/order, all producer/compute barriers, masks and arithmetic remain unchanged. v190 already overlaps index loading with the empty-stage wait, so additional overlap may be small or absent. It may also increase register pressure, or the compiler may sink the load. Inspect emitted placement/resources before guarded fixed/variable-length checks and full/short/masked comparisons against v190. No performance claim until measured.
+
+
+v255 compiles with 123 registers, zero stack and 1464 static instructions, with no LDL/STL or data-prefetch sites. Native bootstrap index LDG is at 0x0790 and the next-index LDG at 0x0b20, directly before producer BAR.SYNC at 0x0b30; later producer barriers are at 0x0be0 and 0x1cc0. The compiler retains the requested earlier placement. Whether that placement hides latency must account for barrier completion semantics; static ordering alone does not establish overlap.
+
+
+v255 passes guarded b2/chunk3 smoke, b512/chunk0 memcheck, fixed/variable-length synccheck and three exact repeats of full8192/seed1234 and short1024/chunk0/seed5678 against v190. Masked outputs also match, retaining 86 tolerance failures. No second full seed. A specification check limits the intended overlap: CTA barrier completion orders prior generic memory accesses, and the next-index load is immediately before that barrier, ahead of the current TMA issue interval. Qualification establishes correctness, not the intended latency hiding. Record a short timing/NCU control, then move the load past the publication barriers. Source: https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#parallel-synchronization-and-communication-instructions-bar .
+
+v255 short timing is 1546.336 us versus TRTLLM 1691.584 us, only about 0.18% below v190's historical 1549.06 us; this is not an established gain. NCU base/stable is nearly unchanged at 2.636512 ms: 123 registers, 194920 B dynamic shared, 19.277174% occupancy, 33.541812% tensor activity, 0.368403 eligible warps/cycle, long-scoreboard ratio 6.403094, zero local traffic and aggregate shared conflicts 5899545/4552690. No promotion. Inspect source and compare the corrected placement before deciding whether a longer paired comparison is warranted.
+
+v255 unlocked source issues 543691755 instructions with 20275200 actual/ideal shared wavefronts and zero excessive. Long-scoreboard samples total 61891, with compute PV 16923 and producer empty-stage wait 15319. No source count is treated as a latency fraction. The short result remains too close to the historical default to establish a gain.
+
+## Iteration256 — move lookahead index issue after publication barriers
+
+Based on qualified v255, move the next private index load after the second producer barrier, directly before elected current-stage TMA gathers. It still completes before the final producer barrier and before its value is used on the next iteration. All shared current-index/bitmap publication and full-barrier initialization remain before this load. No data prefetch, new synchronization, changed indices or arithmetic are introduced.
+
+This gives index retrieval an independent gather-issuance interval before the next barrier can require its completion, instead of placing the load immediately before the first publication barrier. Compiler sinking/hoisting and resource changes must still be inspected. Guarded fixed/variable-length and full/short/masked equivalence against v255 precede timing; no gain is implied by source placement.
+
+
+v256 compiles with the same 123 registers, zero stack and 1464 static instructions as v255; no data-prefetch or local-memory sites appear. Native next-index LDG is now at 0x0bb0, after the second producer barrier at 0x0b90 and before elected gather issuance; the final producer barrier is at 0x1d00. This verifies the intended position survives lowering. Fresh guarded and numerical qualification follows before timing.

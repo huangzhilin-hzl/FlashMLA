@@ -1,0 +1,37 @@
+[
+  {
+    "Address": "0x7f9e075ae340",
+    "Source": "@!P3  CCTL.E.PF2 [R16]",
+    "Instructions Executed": "524288",
+    "Thread Instructions Executed": "16777216",
+    "Predicated-On Thread Instructions Executed": "16777216"
+  },
+  {
+    "Address": "0x7f9e075ae350",
+    "Source": "@!P3  CCTL.E.PF2 [R16+0x80]",
+    "Instructions Executed": "524288",
+    "Thread Instructions Executed": "16777216",
+    "Predicated-On Thread Instructions Executed": "16777216"
+  },
+  {
+    "Address": "0x7f9e075ae360",
+    "Source": "@!P3  CCTL.E.PF2 [R16+0x100]",
+    "Instructions Executed": "524288",
+    "Thread Instructions Executed": "16777216",
+    "Predicated-On Thread Instructions Executed": "16777216"
+  },
+  {
+    "Address": "0x7f9e075ae370",
+    "Source": "@!P3  CCTL.E.PF2 [R16+0x180]",
+    "Instructions Executed": "524288",
+    "Thread Instructions Executed": "16777216",
+    "Predicated-On Thread Instructions Executed": "16777216"
+  },
+  {
+    "Address": "0x7f9e075ae380",
+    "Source": "@!P3  CCTL.E.PF2 [R16+0x200]",
+    "Instructions Executed": "524288",
+    "Thread Instructions Executed": "16777216",
+    "Predicated-On Thread Instructions Executed": "16777216"
+  }
+]

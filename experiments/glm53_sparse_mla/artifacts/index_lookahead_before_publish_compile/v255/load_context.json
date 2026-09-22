@@ -1,0 +1,82 @@
+[
+  {
+    "load": "/*06e0*/                   LDG.E R13, desc[UR76][R8.64] ;",
+    "context": [
+      "/*06a0*/                   LDCU.64 UR6, c[0x0][0x398] ;",
+      "/*06b0*/                   UIMAD.WIDE.U32 UR6, UR28, 0x4, UR6 ;",
+      "/*06c0*/                   IMAD.U32 R8, RZ, RZ, UR6 ;",
+      "/*06d0*/                   IMAD.U32 R9, RZ, RZ, UR7 ;",
+      "/*06e0*/                   LDG.E R13, desc[UR76][R8.64] ;",
+      "/*06f0*/                   VIADD R14, R107, 0xffffff00 ;",
+      "/*0700*/                   IMAD.MOV.U32 R12, RZ, RZ, -0x1 ;",
+      "/*0710*/                   S2R R10, SR_CTAID.X ;",
+      "/*0720*/                   ISETP.GE.AND P0, PT, R14, R13, PT ;",
+      "/*0730*/                   ISETP.GT.U32.OR P0, PT, R107, 0x17f, P0 ;",
+      "/*0740*/              @!P0 LDC.64 R4, c[0x0][0x390] ;"
+    ]
+  },
+  {
+    "load": "/*0790*/              @!P0 LDG.E R12, desc[UR76][R6.64+-0x400] ;",
+    "context": [
+      "/*0750*/              @!P0 IMAD R2, R10, 0x800, R107 ;",
+      "/*0760*/              @!P0 IMAD.WIDE.U32 R6, R2, 0x4, R4 ;",
+      "/*0770*/                   SHF.R.S32.HI R2, RZ, 0x1f, R13 ;",
+      "/*0780*/                   LEA.HI R2, R2, R13, RZ, 0x7 ;",
+      "/*0790*/              @!P0 LDG.E R12, desc[UR76][R6.64+-0x400] ;",
+      "/*07a0*/                   LOP3.LUT R4, R2.reuse, 0xffffff80, RZ, 0xc0, !PT ;",
+      "/*07b0*/                   SHF.R.S32.HI R3, RZ, 0x7, R2 ;",
+      "/*07c0*/                   ISETP.NE.U32.AND P0, PT, R13, R4, PT ;",
+      "/*07d0*/                   LEA.HI.SX32 R2, R2, 0x1, 0x19 ;",
+      "/*07e0*/                   ISETP.GT.AND P0, PT, R13, -0x1, P0 ;",
+      "/*07f0*/              @!P0 IMAD.MOV R2, RZ, RZ, R3 ;"
+    ]
+  },
+  {
+    "load": "/*0b20*/              @!P2 LDG.E R12, desc[UR76][R18.64] ;",
+    "context": [
+      "/*0ae0*/                   VOTE.ANY R2, PT, P0 ;",
+      "/*0af0*/              @!P1 LEA R5, R5, UR4, 0x2 ;",
+      "/*0b00*/              @!P1 STS [R5+0x2f900], R2 ;",
+      "/*0b10*/                   IMAD.MOV.U32 R12, RZ, RZ, -0x1 ;",
+      "/*0b20*/              @!P2 LDG.E R12, desc[UR76][R18.64] ;",
+      "/*0b30*/                   BAR.SYNC.DEFER_BLOCKING 0x2, 0x80 ;",
+      "/*0b40*/                   ISETP.NE.U32.AND P1, PT, R14, RZ, PT ;",
+      "/*0b50*/                   ELECT P2, URZ, PT ;",
+      "/*0b60*/                   IMAD.U32 R2, RZ, RZ, UR5 ;",
+      "/*0b70*/                   IADD3 R0, PT, PT, R0, 0x1, RZ ;",
+      "/*0b80*/                   VIADD R3, R3, 0x1 ;"
+    ]
+  },
+  {
+    "load": "/*1e00*/                   LDG.E R6, desc[UR76][R6.64] ;",
+    "context": [
+      "/*1dc0*/                   LDCU.64 UR6, c[0x0][0x398] ;",
+      "/*1dd0*/                   UIMAD.WIDE.U32 UR6, UR28, 0x4, UR6 ;",
+      "/*1de0*/                   IMAD.U32 R6, RZ, RZ, UR6 ;",
+      "/*1df0*/                   IMAD.U32 R7, RZ, RZ, UR7 ;",
+      "/*1e00*/                   LDG.E R6, desc[UR76][R6.64] ;",
+      "/*1e10*/                   R2UR UR56, R2 ;",
+      "/*1e20*/                   SHF.R.S32.HI R3, RZ, 0x1f, R6 ;",
+      "/*1e30*/                   LEA.HI R4, R3, R6, RZ, 0x7 ;",
+      "/*1e40*/                   LOP3.LUT R3, R4, 0xffffff80, RZ, 0xc0, !PT ;",
+      "/*1e50*/                   ISETP.NE.U32.AND P0, PT, R6.reuse, R3, PT ;",
+      "/*1e60*/                   SHF.R.S32.HI R3, RZ, 0x7, R4 ;"
+    ]
+  },
+  {
+    "load": "/*2de0*/                   LDG.E R3, desc[UR76][R2.64] ;",
+    "context": [
+      "/*2da0*/                   LDS R108, [UR4+0x2f940] ;",
+      "/*2db0*/                   UIMAD.WIDE.U32 UR6, UR28, 0x4, UR6 ;",
+      "/*2dc0*/                   IMAD.U32 R3, RZ, RZ, UR7 ;",
+      "/*2dd0*/                   IMAD.U32 R2, RZ, RZ, UR6 ;",
+      "/*2de0*/                   LDG.E R3, desc[UR76][R2.64] ;",
+      "/*2df0*/                   LOP3.LUT R120, R107.reuse, 0x7f, RZ, 0xc0, !PT ;",
+      "/*2e00*/                   IMAD.MOV.U32 R105, RZ, RZ, RZ ;",
+      "/*2e10*/                   LOP3.LUT R119, R107, 0x180, RZ, 0xc0, !PT ;",
+      "/*2e20*/                   SHF.R.S32.HI R0, RZ, 0x1f, R3 ;",
+      "/*2e30*/                   LEA.HI R117, R0, R3, RZ, 0x7 ;",
+      "/*2e40*/                   LOP3.LUT R0, R117, 0xffffff80, RZ, 0xc0, !PT ;"
+    ]
+  }
+]

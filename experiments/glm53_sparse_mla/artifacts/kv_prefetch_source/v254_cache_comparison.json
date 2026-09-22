@@ -1,0 +1,14 @@
+{
+  "v190": {
+    "lts__t_sector_hit_rate.pct": {
+      "value": "76.607747",
+      "unit": "%"
+    }
+  },
+  "v254": {
+    "lts__t_sector_hit_rate.pct": {
+      "value": "82.704753",
+      "unit": "%"
+    }
+  }
+}
