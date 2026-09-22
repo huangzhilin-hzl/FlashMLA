@@ -7290,3 +7290,55 @@ v289 continuation passes b513/chunk0 guarded exact equivalence plus synccheck,th
 
 
 v289 timing/profiling did not start: the fresh GPU1 preflight observed86667 MiB in use on both samples and exited3. A subsequent read-only query still reported that allocation; no visible compute PID was returned from this container. No process was altered. This is an occupied-GPU condition, not a kernel timing or NCU result. All completed qualification logs and interruption metadata are retained in v289; runtime performance remains pending while local analysis/archival continues.
+
+
+GPU1 subsequently returned tozero allocated MiB. Preserve the original busy preflight under its own filename and rerun the normal idle-gated v289 iteration. Short timing1532.32 us versus TRT1691.81 does not improve v2871530.08; NCU base/stable2.650592 ms,128 registers,203112 B dynamic shared,20.295572% occupancy,49.105252% tensor activity,0.411992 eligible warps/cycle,long-scoreboard6.693737 andzero local sectors. Aggregate shared conflicts7813198/2684139. Together with fast288, earlier publication after the last max rendezvous gives no short-run gain over286/287. Keep288/289 as first-seed-qualified controls without second-seed/expanded timing or promotion; proceed to moving publication off the compute role.
+
+
+## Iterations290–291 — let the MMA issuer publish next Q
+
+Based on fully qualified286/287, move only positive-tile next-Q publication from compute warp0 to issuer warp12 immediately after acquiring the final P-ready phase and before submitting current final PV. Initial Q publication and zero-iteration fallback remain on compute, exactly as before. Acquisition of P-ready implies current QK was consumed and the compute role has passed its old Qbar wait; strict P-ready follows a compute256 join, while fast P-ready requires all256 arrivals. This moves five existing TMAs and one existing Qbar arrival between roles, without changing byte count, buffers, query phases, arithmetic or other barrier operations.
+
+Hypothesis: remove per-tile Q-prefetch predicates and TMA address work from eight compute warps and let the dedicated issuer perform it. This may reduce compute-side interference, but it also puts five TMA submissions directly before current PV on the issuer's critical path and may increase donor register pressure. The290/291 source is therefore a scheduling control, not an assumed improvement. AST inversion moves only that block back, restores its compute guard, and exactly matches286/287 before version labels. GPU1 is occupied; native compilation and all runtime checks remain pending. Do not report a performance result or promote from source analysis alone.
+
+
+v290/v291 compile with128 initial registers,512 threads,donor64/compute192 or176 and unchanged26/34 MMA plus2 commits. Fast keeps8 stack bytes but adds a scalar LDL site (12 LDL/4 STL),grows1600→1632 static instructions,R2UR69→87 anduniform MOV.SPILL/FILL4→6. Strict remainszero stack/local but grows1728→1792 instructions,R2UR62→94 anduniform spill/fill4→15. This is increased control/register exchange, not a local fragment spill. The new publication-role hypothesis still warrants bounded guards and a short measurement, without assuming source-side work redistribution guarantees less native work. Qualify fast290 first.
+
+
+v290 passes guarded smoke,memcheck,fixed/variable synccheck and b513/chunk0 guarded exact equivalence across three repeats; full8192/seed1234,short1024/chunk0/seed5678 and masks match286. Fast masks retain86 inherited tolerance failures. Timing/NCU follows.
+
+
+v290 short1454.944015 us versus TRT1691.936016 is about3.10% slower than2861411.231995. NCU base/stable2.510912 ms,128 registers,194920 B dynamic shared,20.300921% occupancy,35.157183% tensor activity,0.373724 eligible warps/cycle,long-scoreboard6.594471,local read/write1908240/443016 sectors andaggregate shared conflicts7459662/4546761. Local reads increase38% from2861383952; moving publication off compute did not reduce total control cost or improve this measurement. No promotion or expanded fast290 timing. Strict291 passes the same guarded smoke,memory,fixed/variable/odd-batch checks,fullseed1234/short/masks exact287 with strict masked FP32 PASS; its short/NCU follows.
+
+
+v291 timing/profiling was blocked by a fresh two-sample preflight observing86667 MiB allocated on GPU1; no measurement started. Preserve its busy preflight and all completed qualification logs. A later read-only snapshot showed234327 MiB allocated, so further GPU work waits while CPU-only compilation/analysis continues.
+
+
+## Iterations292–293 — issue current PV before issuer-owned next-Q prefetch
+
+Companion controls to290/291: move the same issuer-owned next-Q block from before the PV MMA group to immediately after its existing PV commit. The old Q is still dead after final P-ready acquisition, and no next QK can run before Qbar; current PV uses P/KV/O rather than shared Q. This tests whether taking TMA submissions off compute helps only when the issuer's current PV submission is not delayed. No new barrier, byte, buffer, arithmetic or phase change; initial Q and zero-iteration fallback remain unchanged. AST inversion restores290/291 exactly before labels. Runtime qualification, if resources permit, will compare directly to fully qualified286/287; source-only290/291 are not numerical references. Native resources and tests are pending.
+
+
+Installed CuTeDSL4.6.2 source only queries shared-memory device attributes for automatic carveout when min_blocks_per_mp>1. These controls use1, so compile292/293 with CUDA_VISIBLE_DEVICES empty, fake tensors and no initialize-cuda flag. Both complete successfully without exposing any GPU or launching candidates; retain offline_mode.json and compile metadata. This enables resource inspection during device occupancy, but says nothing about runtime correctness.
+
+Native292/293 retain128 registers,512 threads,64/192 or64/176 role budgets and26/34 MMA plus2 commits. Compared with290/291, static counts remain1632/1792; fast stays8 stack bytes with12 LDL/4 STL,strict stayszero stack/local. Fast uniform spill/fill grows6→8 and R2UR87→89; strict counts remain15 and94. Native scheduling can differ despite equal aggregate counts. Qualify against286/287 if proceeding; no runtime result yet.
+
+
+## Iterations294–295 — checked fixed-TopK compilation with a dynamic alternative
+
+The target chunk3 fixture has length2048 for every query. Based on promoted fast284/strict287, add a compile-time full_topk flag: full mode uses nvalid2048 and advances tile_base by16 in each role, retaining the exact absolute tile-phase schedule and all masks/barriers/math. Dynamic mode emits the original lens loads and increments. The rationale is removing repeated length loads and enabling constant trip-count/phase simplification; it may instead unroll/bloat code or increase live ranges, so inspect both compiled modes before runtime. The original benchmark and inputs are unchanged.
+
+make_runner checks torch.all(lens==2048).item() once during runner construction and passes that result to compilation. This is a GPU reduction plus host synchronization in setup, explicitly excluded from the benchmark's native-call timing. This benchmark reuses unchanged lengths; the specialized runner requires rebuilding if lengths change. That is an explicit specialization contract, not a claim that the general TRT API forbids changing lengths. Q/KV/indices remain runtime tensors, all selected keys are processed, and no other attention implementation is called. The returned callable exposes fixed_topk_2048 for audit. SparseMLA defaults full_topk=True so the fake full-target offline compile inspects the intended specialization; separately compile false mode and compare it to the parent. Do not report native latency as including this setup cost.
+
+AST inversion of the six kernel-body length/advance selections exactly restores each parent. Other kernel code is unchanged; added constructor/runner metadata selection is explicit. Future validation must prove full mode is actually selected for both full seeds and a full-length masked persistent fixture, while short/variable fixtures select dynamic mode. Existing mask fixtures contain a129-length row and therefore exercise dynamic mode; they alone cannot validate the specialized mask path. Measure/setup-report the new metadata check separately if the specialization reaches runtime. No compile/runtime/performance result yet.
+
+
+Before runtime, clarify the constructor comment to refer to unchanged benchmark inputs rather than imply a general TRT API restriction. The documented metadata-reuse comment in benchmark_source.py belongs to its FlashMLA wrapper, not TRT. The source correction is comment-only and AST-identical; preserve the initial CPU outputs/source under fixed_topk_compile_precomment and regenerate the final resource record against corrected source hashes. No candidate was launched before this correction.
+
+
+Initial CPU output shows full294/295 shrink1592→1496 and1728→1592 static instructions versus284/287. Fast keeps128 registers,8-byte metadata frame and reduces11→9 LDL sites (4 STL); strict remains128 registers,zero stack/local. MMA/commit26/2 and34/2 remain unchanged. Dynamic false-mode instruction encodings exactly match their parents,3184/3456 encoding words withzero differences. Final corrected-comment recompilation will bind these resource observations to the delivered hashes.
+
+Add validate_fixed_topk.py for explicit mode assertions and direct parent equivalence on full,dynamic,andmasked-full fixtures,including odd persistent513 queries. Masked-full keeps every length2048 while introducing holes at tile/warp boundaries,all-invalid later tiles for one row,andholes on later persistent queries. It verifies full-mode selection instead of relying on the old mask fixture's dynamic fallback. Optional setup-check timing measures five isolated torch.all(...).item() calls after input/check operations and a prior CUDA synchronize; it is a warmed metadata-check diagnostic,not full construction cost or native kernel time. Script parsing passed locally; it has not run on GPU.
+
+
+Final corrected-source CPU compilation preserves every native encoding in all four modes versus the initial comment-only drafts. Dynamic294/295 remain native-identical to284/287. Full mode removes six scalar global LDG sites (7→1,excluding UTMALDG); fast local sites reduce15→13,strict remains0. PTX bounds/budgets512threads,64/192 or64/176 are verified,with full and dynamic mode/source SHA metadata retained. These resource checks permit bounded runtime evaluation when GPU1 becomes idle,not promotion.

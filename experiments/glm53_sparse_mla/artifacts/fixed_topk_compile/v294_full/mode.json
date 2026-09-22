@@ -1,0 +1,7 @@
+{
+  "version": "v294",
+  "full_topk": true,
+  "CUDA_VISIBLE_DEVICES": "",
+  "initialize_cuda": false,
+  "candidate_launched": false
+}

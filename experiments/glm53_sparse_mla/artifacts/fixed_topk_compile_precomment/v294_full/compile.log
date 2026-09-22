@@ -1,0 +1,3 @@
+{"version": "v294", "full_topk": true, "CUDA_VISIBLE_DEVICES": "", "initialize_cuda": false, "candidate_launched": false}
+{"version": "v294", "device_launch": false, "cutlass_dsl": "4.6.2", "cutlass_module": "/opt/sglang/lib/python3.12/site-packages/nvidia_cutlass_dsl/dsl_packages/cutlass/__init__.py", "cuda_context_initialized": false, "sha256": "f3e7ad5ff479461422c26220a84331f0a8db9578b1867b2319dde4c10a50edb8"}
+OFFLINE COMPILE PASS

@@ -622,3 +622,18 @@ alternating-process recheck yields two wins/one loss. Keep fast default v284 and
 retain v286 as a validated alternative. Its eager1519.808/1544.160 us and
 Graph1561.584/1536.416 are measured regimes, not a universal improvement claim.
 Both kernels retain their precision class; compiler remains CuTeDSL4.6.2.
+
+
+## Pending checked TopK specialization
+
+v294/v295 compile separate fixed2048 and dynamic-length paths. The dynamic paths
+have exactly the native instruction encodings of284/287. Offline fixed-path code
+shrinks to1496/1592 instructions with unchanged register/stack class, but no GPU
+numerical or performance validation has completed yet; these are not defaults.
+The runner performs torch.all(lens==2048).item() during construction. Its GPU
+reduction/host synchronization is setup cost, excluded from native-call timing.
+Rebuild this runner when lengths change; this is a specialization contract, not a
+general restriction of the TRT API. Original benchmark inputs/precision stay intact.
+validate_fixed_topk.py checks actual mode selection and full/dynamic/masked-full
+parent equivalence, including persistent odd batches. Its optional setup diagnostic
+reports only warmed length-check cost, excluding compilation and other setup.

@@ -1,0 +1,12 @@
+{
+  "v292": {
+    "source_sha256": "e09189d952b0c44ccdc5fc1df12dc860a5ee6d5d9513b5f40d3b0476f94901de",
+    "local_sites": 16,
+    "guarded_runtime_next": true
+  },
+  "v293": {
+    "source_sha256": "4c4e72e88dca43aac949f8ae207d4df460f76401205efd1a6a9c29c2dd5f5237",
+    "local_sites": 0,
+    "guarded_runtime_next": true
+  }
+}
