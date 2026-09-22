@@ -1,0 +1,3 @@
+Looking in indexes: https://pypi.antfin-inc.com/simple
+WARNING: Retrying (Retry(total=4, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ConnectTimeoutError(<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7f7fcd1144d0>, 'Connection to pypi.antfin-inc.com timed out. (connect timeout=100.0)')': /simple/nvidia-cutlass-dsl/
+WARNING: Retrying (Retry(total=3, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ConnectTimeoutError(<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7f7fcd0dc1a0>, 'Connection to pypi.antfin-inc.com timed out. (connect timeout=100.0)')': /simple/nvidia-cutlass-dsl/

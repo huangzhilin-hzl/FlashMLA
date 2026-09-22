@@ -5662,3 +5662,92 @@ Unlocked/dynamic NCU with cache-control none, after10 warmups: v183/v190 DRAM re
 Both versions win all eight same-run rotating-order comparisons, with the larger benefit under cold cache. This supports a small cache-policy improvement, not a proportional8.6% speedup. v191 standalone Graph warm remains1884.24 us versusTRT1859.55 us; its cold1851.68 us also does not beat the previous independently measured v1841849.60 us. Preserve regime dependence and unlocked-clock distributions.
 
 Promote v190/v191 as experimental defaults based on the eight paired wins and complete recorded equivalence audits. Retain all standalone-regime limitations above. v192/v193 deliberately compare to their unchanged v183/v184 parents to isolate compiler/register effects from this cache hint.
+
+
+### Compiler 4.6.3 / iterations 192–193 compile result
+
+Isolated imports and native compiler library resolve inside compiler_envs/cutlass463;
+all five packages report4.6.3. Unchanged v183/v184 compile to exactly the same
+SASS encoding words as4.6.2, with REG123/122 and zero stack. No runtime control
+is inferred beyond native code identity. Old v124/v137 and new v192/v193 still
+fail with ptxas C7600: register allocation failed with target192. None launched.
+The official fix does not resolve these specific candidates.
+
+## Iterations 194–195 — keep register increase inside the compute branch
+
+Based on v192/v193. Keep the32-register decrease for both complete donor
+warpgroups, but move compute's192-register request past Q setup into the
+warp<8 role branch. This tests whether the common control-flow merge after
+inc/dec creates constraints before the true role split. Q setup remains on
+warp0 before its increase, under the initial allocation. All math and tile
+operations are unchanged. Compile-only until resource/budget inspection passes.
+
+## Iterations 196–197 — increase producer/issuer register allowance
+
+Based on v194/v195. Use64 registers for both donor warpgroups and176 for
+compute. This separates insufficient donor allowance from compute pressure;
+the total request is61440 and requires initial allocation of at least120
+registers per thread for512 threads. Check the actual initial allocation and
+complete-warpgroup control before any runtime test. More total SM capacity
+does not substitute for sufficient registers in this CTA's own pool.
+Primary semantics: https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#miscellaneous-instructions-setmaxnreg
+
+
+### Iterations 194–197 compile controls
+
+v194/v195 now compile on4.6.3 with REG128, STACK0 and two native USETMAXREG
+instructions. Both use initial65536-register CTA allocation and final57344,
+with eight complete donor and eight complete compute warps. v196 compiles
+but has STACK24 and static5STL/6LDL; reject it before runtime. v197 uses the
+64/176 budget with REG128, STACK0 and final61440 registers.
+
+Cross-compile v194/v195/v197 with installed4.6.2: all also compile with
+REG128/STACK0, but SASS encodings differ from4.6.3. Therefore the successful
+control-flow change does not require the patch compiler; qualify and time
+these candidates under installed4.6.2 first. Inherited source comments
+recommending4.6.3 predate this control; they are not a dependency requirement.
+No newer-compiler runtime/performance result is claimed yet.
+
+Old4.6.2 v124 logs report NVVM compilation failure;4.6.3 reaches PTX assembly
+and reports register-allocation C7600. These are distinct failure stages. The
+new patch alone is insufficient, rather than evidence its advertised fix has
+no effect. Moving the increase into the compute branch resolves compilation
+for the current native x32 implementation on both compilers.
+
+## Iterations 198–199 — native x64 correction with successful role-local allocation
+
+Based on v194/v195. Replace only output-correction copies with two native
+64-column loads/stores per compute thread. Final BF16 output keeps32-column
+copies, and score load/max/indexed masking remains unchanged. Fast v198
+replaces pairedx32 loads/stores; higher-precision v199 replaces four serial
+x32 copies. Preserve packed FP32 correction, TMEM fences and P/PV readiness.
+
+This revisits x64 after resolving the allocation control-flow failure; compiler
+versions remain separate controls. Inspect static registers/spills and actual
+x64 instructions, then require guarded TMEM/memory, sync and full/masked
+bitwise checks before judging speed. No result yet.
+
+
+### Iterations 194,195,197 — installed-compiler qualification and short measurements
+
+All three use installed CuTeDSL4.6.2. Guarded b2 smoke/b512 memcheck and b2 synccheck pass with zero errors. Full seed1234 matches the relevant v183/v184 parent bitwise in three repeats, and masked comparisons also match; v195/v197 pass the masked FP32 reference. No other compiler runtime result is claimed.
+
+v194 short: trtllm/native 1690.82 us, cute-v194/native 1560.77 us.
+
+v194 NCU base/stable: gpu__time_duration.sum=2.656800 ms, launch__registers_per_thread=128 register/thread, launch__shared_mem_per_block_dynamic=194.920000 Kbyte/block, sm__warps_active.avg.pct_of_peak_sustained_active=19.389328 %, sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed=33.286282 %, smsp__warps_eligible.avg.per_cycle_active=0.352976 warp, smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio=6.532359 inst, l1tex__t_sectors_pipe_lsu_mem_local_op_ld.sum=0 sector, l1tex__t_sectors_pipe_lsu_mem_local_op_st.sum=0 sector, l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum=6,568,689 , l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum=4,282,564 .
+
+v195 short: trtllm/native 1691.71 us, cute-v195/native 1673.41 us.
+
+v195 NCU base/stable: gpu__time_duration.sum=2.838752 ms, launch__registers_per_thread=128 register/thread, launch__shared_mem_per_block_dynamic=203.112000 Kbyte/block, sm__warps_active.avg.pct_of_peak_sustained_active=19.405082 %, sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed=45.820621 %, smsp__warps_eligible.avg.per_cycle_active=0.386270 warp, smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio=6.766837 inst, l1tex__t_sectors_pipe_lsu_mem_local_op_ld.sum=0 sector, l1tex__t_sectors_pipe_lsu_mem_local_op_st.sum=0 sector, l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum=6,913,938 , l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum=2,989,857 .
+
+v197 short: trtllm/native 1691.94 us, cute-v197/native 1662.30 us.
+
+v197 NCU base/stable: gpu__time_duration.sum=2.817632 ms, launch__registers_per_thread=128 register/thread, launch__shared_mem_per_block_dynamic=203.112000 Kbyte/block, sm__warps_active.avg.pct_of_peak_sustained_active=19.392097 %, sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed=46.154693 %, smsp__warps_eligible.avg.per_cycle_active=0.381841 warp, smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio=6.816036 inst, l1tex__t_sectors_pipe_lsu_mem_local_op_ld.sum=0 sector, l1tex__t_sectors_pipe_lsu_mem_local_op_st.sum=0 sector, l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum=6,954,856 , l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum=2,989,558 .
+
+Launch registers128 describe the initial allocation; actual role limits are32/192 forv194/v195 and64/176 forv197. The extra three donor warps exit after donation, so512 launch threads do not imply512 continuously active useful threads. Hardware local read/write sectors are zero in all three.
+
+v1941560.77 us is slower than v1831550.50, despite more compute registers. Do not extend it solely for speed; retain it as a qualified x64 parent. v1951673.41 andv1971662.30 improve v1841693.89 by20.48/31.59 us and warrant full-seed/short equivalence and longer same-process comparison against currentv191. Defaults remainv190/v191 pending those comparisons.
+
+### Iterations 198–199 compile result
+
+Both native x64 candidates compile on4.6.2 and4.6.3 with REG128/STACK0, two LDTM.x64 and two STTM.x64 instructions, and no static local load/store instructions. The role-local allocation also resolves this x64 compilation pattern on the installed compiler; no toolchain upgrade is required for qualification. Keep the two compiler artifacts separate and use4.6.2 for runtime first.

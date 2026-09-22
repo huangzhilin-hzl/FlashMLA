@@ -3,3 +3,5 @@ __pycache__/
 *.ncu-rep
 *.nsys-rep
 *.cubin
+compiler_envs/
+compiler_wheels/

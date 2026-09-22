@@ -1,0 +1,8 @@
+Processing ./compiler_wheels/cutlass463/nvidia_cutlass_dsl-4.6.3-py3-none-any.whl
+Processing ./compiler_wheels/cutlass463/nvidia_cutlass_dsl_libs_base-4.6.3-cp312-cp312-manylinux_2_28_x86_64.whl
+Processing ./compiler_wheels/cutlass463/nvidia_cutlass_dsl_libs_core-4.6.3-py3-none-any.whl
+Processing ./compiler_wheels/cutlass463/nvidia_cutlass_dsl_libs_cu12-4.6.3-cp312-cp312-manylinux_2_28_x86_64.whl
+Processing ./compiler_wheels/cutlass463/nvidia_cutlass_dsl_libs_cu13-4.6.3-cp312-cp312-manylinux_2_28_x86_64.whl
+Installing collected packages: nvidia-cutlass-dsl-libs-cu13, nvidia-cutlass-dsl-libs-cu12, nvidia-cutlass-dsl-libs-core, nvidia-cutlass-dsl-libs-base, nvidia-cutlass-dsl
+
+Successfully installed nvidia-cutlass-dsl-4.6.3 nvidia-cutlass-dsl-libs-base-4.6.3 nvidia-cutlass-dsl-libs-core-4.6.3 nvidia-cutlass-dsl-libs-cu12-4.6.3 nvidia-cutlass-dsl-libs-cu13-4.6.3

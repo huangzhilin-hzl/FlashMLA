@@ -10,6 +10,7 @@ is not a numerical, memory-safety or performance validation.
 import argparse
 import hashlib
 import importlib
+import importlib.metadata
 import json
 from pathlib import Path
 
@@ -38,6 +39,8 @@ descriptors = [
 tensors = [make_fake_tensor(dtype, shape, stride, assumed_align=16)
            for dtype, shape, stride in descriptors]
 print(json.dumps({"version": args.kernel_version, "device_launch": False,
+                  "cutlass_dsl": importlib.metadata.version("nvidia-cutlass-dsl"),
+                  "cutlass_module": cutlass.__file__,
                   "cuda_context_initialized": args.initialize_cuda,
                   "sha256": hashlib.sha256(Path(module.__file__).read_bytes()).hexdigest()}), flush=True)
 compiled = cute.compile(module.SparseMLA(args.block_k), *tensors, make_fake_stream(),

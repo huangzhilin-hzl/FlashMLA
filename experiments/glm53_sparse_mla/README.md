@@ -433,3 +433,21 @@ precision standalone warm case still trailsTRT, and its cold time is slightly
 worse than the older independent v184 record. Unlocked NCU reports about8.6%
 less DRAM read traffic but no latency gain in that profiled regime. This is a
 small cache-policy improvement, not an8.6% speedup or a universal lead.
+
+
+Compiler controls use task-local `compiler_envs/cutlass463` with matching official
+DSL/base/core/cu12/cu13 wheels. Their SHA256 and dependencies are recorded in
+`artifacts/compiler463/wheel_manifest.json`; the shared environment remains4.6.2.
+The scoped `bash with_cutlass463.sh /opt/sglang/bin/python ...` wrapper verifies
+package versions and native compiler paths before running a command. It does
+not install packages or alter the default interpreter. For offline installation,
+verify the wheel manifest, clear process-local PIP_CONSTRAINT/PIP_BUILD_CONSTRAINT,
+set PIP_CONFIG_FILE=/dev/null and use pip --no-index --no-deps --target with all
+five local wheels in one invocation. Never infer a runtime gain from compilation.
+
+`compiler463`, `compiler463_roles`, `compiler462_roles` and `compiler_x64` retain
+separate compile controls. Moving compute register allocation into its actual
+role branch permits native x32/x64 kernels to compile with installed4.6.2 as
+well. v194/v195/v197 runtime records use4.6.2; the4.6.3 instruction streams are
+not interchangeable evidence. Current defaults remainv190/v191 while higher
+precision register-allocation candidates finish their extended checks.

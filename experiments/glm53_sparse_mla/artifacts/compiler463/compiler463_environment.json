@@ -1,0 +1,26 @@
+{
+  "versions": {
+    "nvidia-cutlass-dsl": "4.6.3",
+    "nvidia-cutlass-dsl-libs-base": "4.6.3",
+    "nvidia-cutlass-dsl-libs-core": "4.6.3",
+    "nvidia-cutlass-dsl-libs-cu12": "4.6.3",
+    "nvidia-cutlass-dsl-libs-cu13": "4.6.3",
+    "nvidia-cuda-nvdisasm": "13.3.73",
+    "torch": "2.13.0"
+  },
+  "cutlass_version": "4.6.3",
+  "cutlass_file": "/tmp/glm53_sparse_mla_dev/compiler_envs/cutlass463/nvidia_cutlass_dsl/dsl_packages/cutlass/__init__.py",
+  "native_compiler": "/tmp/glm53_sparse_mla_dev/compiler_envs/cutlass463/nvidia_cutlass_dsl/dsl_packages/cutlass/_mlir/_mlir_libs/_cutlass_ir.cu13.cpython-312-x86_64-linux-gnu.so",
+  "sys_path": [
+    "",
+    "/tmp/glm53_sparse_mla_dev/compiler_envs/cutlass463/nvidia_cutlass_dsl/dsl_packages",
+    "/tmp/glm53_sparse_mla_dev/compiler_envs/cutlass463/nvidia_cutlass_dsl/dsl_packages",
+    "/tmp/glm53_sparse_mla_dev/compiler_envs/cutlass463",
+    "/tmp/glm53_sparse_mla_dev/compiler_envs/cutlass463/nvidia_cutlass_dsl/dsl_packages",
+    "/usr/lib/python312.zip",
+    "/usr/lib/python3.12",
+    "/usr/lib/python3.12/lib-dynload",
+    "/opt/sglang/lib/python3.12/site-packages",
+    "/tmp/glm53_sparse_mla_dev/compiler_envs/cutlass463/nvidia_cutlass_dsl/dsl_packages/cutlass/base_dsl"
+  ]
+}

@@ -1,0 +1,62 @@
+[
+  {
+    "version": "v194",
+    "compiler": "4.6.3",
+    "returncode": 0,
+    "device_kernel_launched": false,
+    "resources": "\nResource usage:\n Common:\n  GLOBAL:0\n Function kernel_cutlass_kernel_kernel_v194SparseMLA_object_at__tensorptrf8E4M3FNgmemalign16o819264576368645761_tensorptrf8E4M3FNgmemalign16o1310725765761_tensorptri32gmemalign16o8192204820481_tens_0:\n  REG:128 STACK:0 SHARED:1024 LOCAL:0 CONSTANT[2]:8 CONSTANT[0]:1008 TEXTURE:0 SURFACE:0 SAMPLER:0\n",
+    "static_counts": {
+      "SETMAXNREG": 0,
+      "SETMAX": 2,
+      "LDTM": 9,
+      "BRX": 1,
+      "ELECT": 4,
+      "BRA.U.ANY": 0
+    }
+  },
+  {
+    "version": "v195",
+    "compiler": "4.6.3",
+    "returncode": 0,
+    "device_kernel_launched": false,
+    "resources": "\nResource usage:\n Common:\n  GLOBAL:0\n Function kernel_cutlass_kernel_kernel_v195SparseMLA_object_at__tensorptrf8E4M3FNgmemalign16o819264576368645761_tensorptrf8E4M3FNgmemalign16o1310725765761_tensorptri32gmemalign16o8192204820481_tens_0:\n  REG:128 STACK:0 SHARED:1024 LOCAL:0 CONSTANT[2]:8 CONSTANT[0]:1008 TEXTURE:0 SURFACE:0 SAMPLER:0\n",
+    "static_counts": {
+      "SETMAXNREG": 0,
+      "SETMAX": 2,
+      "LDTM": 9,
+      "BRX": 1,
+      "ELECT": 4,
+      "BRA.U.ANY": 0
+    }
+  },
+  {
+    "version": "v196",
+    "compiler": "4.6.3",
+    "returncode": 0,
+    "device_kernel_launched": false,
+    "resources": "\nResource usage:\n Common:\n  GLOBAL:0\n Function kernel_cutlass_kernel_kernel_v196SparseMLA_object_at__tensorptrf8E4M3FNgmemalign16o819264576368645761_tensorptrf8E4M3FNgmemalign16o1310725765761_tensorptri32gmemalign16o8192204820481_tens_0:\n  REG:128 STACK:24 SHARED:1024 LOCAL:0 CONSTANT[2]:8 CONSTANT[0]:1008 TEXTURE:0 SURFACE:0 SAMPLER:0\n",
+    "static_counts": {
+      "SETMAXNREG": 0,
+      "SETMAX": 2,
+      "LDTM": 9,
+      "BRX": 1,
+      "ELECT": 4,
+      "BRA.U.ANY": 0
+    }
+  },
+  {
+    "version": "v197",
+    "compiler": "4.6.3",
+    "returncode": 0,
+    "device_kernel_launched": false,
+    "resources": "\nResource usage:\n Common:\n  GLOBAL:0\n Function kernel_cutlass_kernel_kernel_v197SparseMLA_object_at__tensorptrf8E4M3FNgmemalign16o819264576368645761_tensorptrf8E4M3FNgmemalign16o1310725765761_tensorptri32gmemalign16o8192204820481_tens_0:\n  REG:128 STACK:0 SHARED:1024 LOCAL:0 CONSTANT[2]:8 CONSTANT[0]:1008 TEXTURE:0 SURFACE:0 SAMPLER:0\n",
+    "static_counts": {
+      "SETMAXNREG": 0,
+      "SETMAX": 2,
+      "LDTM": 9,
+      "BRX": 1,
+      "ELECT": 4,
+      "BRA.U.ANY": 0
+    }
+  }
+]

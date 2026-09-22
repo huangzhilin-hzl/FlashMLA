@@ -1,0 +1,22 @@
+{"version": "v192", "device_launch": false, "cutlass_dsl": "4.6.3", "cutlass_module": "/tmp/glm53_sparse_mla_dev/compiler_envs/cutlass463/nvidia_cutlass_dsl/dsl_packages/cutlass/__init__.py", "cuda_context_initialized": true, "sha256": "a982edbc801fe5700c4b566885cfd07a987f9c75e435e0d4a32b54b2ba7d22d8"}
+[91merror:[0m PTX assembly failed: (C7600) Register allocation failed with register count of '192'. Compile the program with a higher register target
+
+  --> /tmp/glm53_sparse_mla_dev/kernel_v192.py:182:0
+      in function `[92m__call__[0m(...)`:
+   |
+  180 |                         grid=(q.shape[0], 1, 1), block=(512, 1, 1), min_blocks_per_mp=1, stream=stream)
+  181 | 
+> 182 |     @cute.kernel
+      | ^
+  183 |     def kernel(self, q: cute.Tensor, kv: cute.Tensor, idx: cute.Tensor,
+  184 |                lens: cute.Tensor, out: cute.Tensor, tensor_map: cute.Tensor, qk: cute.TiledMma,
+  [91merror:[0m ptxas rejected the PTX generated for this kernel while compiling it to SASS.
+  [94mnote:[0m target architecture: sm_103a
+  [94mnote:[0m ptxas log:
+        ptxas fatal   : (C7600) Register allocation failed with register count of '192'. Compile the
+        program with a higher register target
+        ptxas fatal   : Ptx assembly aborted due to errors
+  [92msuggestion:[0m the kernel needs more registers than its launch configuration allows; reduce register
+              pressure or shorten live ranges, reduce the CTA thread count, or, if the kernel uses
+              dynamic warpgroup register redistribution, relax or remove `warpgroup_reg_dealloc` or
+              use an appropriate `warpgroup_reg_alloc` scheme
