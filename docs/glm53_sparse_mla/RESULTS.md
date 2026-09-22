@@ -141,13 +141,16 @@ B300 physical GPU1; b8192, H64, D576/512, TopK2048, chunk3. Each row is a paired
 | v145 | 1781.79 | 1691.90 | 0.9496x | 98 | 0.00 / 0.00 | 42.79% | bitwise v128 full2seeds/short/masks; earlier higher precision |
 | v146 | 1628.10 | 1693.86 | 1.0404x | 123 | 0.00 / 0.00 | 31.78% | bitwise v138 full2seeds/short/masks; current fast path |
 | v147 | 1690.85 | 1693.54 | 1.0016x | 126 | 0.00 / 0.00 | 30.64% | bitwise v138 full seed1234/mask; correction prefetch slower |
-| v148 | 1749.12 | 1691.84 | 0.9673x | 98 | 0.00 / 0.00 | 43.65% | full2seeds/short/masks FP32 PASS; current higher precision |
+| v148 | 1749.12 | 1691.84 | 0.9673x | 98 | 0.00 / 0.00 | 43.65% | full2seeds/short/masks FP32 PASS; earlier higher precision |
 | v149 | 1771.74 | 1691.42 | 0.9547x | 100 | 0.00 / 0.00 | 42.96% | bitwise v145 full2seeds/short/masks; superseded by v148 |
 | v150 | 1624.38 | 1691.87 | 1.0415x | 123 | 0.00 / 0.00 | 31.84% | bitwise v146 full2seeds/short/masks; mixed scheduling gain |
 | v151 | 1628.03 | 1691.78 | 1.0392x | 123 | 0.00 / 0.00 | 31.92% | bitwise v146 full seed1234/masks; no short-run gain |
 | v152 | 1739.04 | 1691.84 | 0.9729x | 100 | 0.00 / 0.00 | 43.85% | bitwise v148 full2seeds/short/masks; warm gain, mixed cold |
-| v153 | 1734.72 | 1691.90 | 0.9753x | 100 | 0.00 / 0.00 | 44.00% | bitwise v152 full seed1234/masks; expanded audit pending |
+| v153 | 1734.72 | 1691.90 | 0.9753x | 100 | 0.00 / 0.00 | 44.00% | bitwise v152 full2seeds/short/masks; current higher precision |
 | v154 | 1743.71 | 1691.90 | 0.9703x | 100 | 0.00 / 0.00 | 43.82% | bitwise v152 full seed1234/masks; no short-run gain |
+| v155 | 1804.42 | 1691.90 | 0.9376x | 100 | 0.00 / 0.00 | 42.19% | bitwise v152 full seed1234/masks; alternate PV tiles slower |
+| v156 | 1753.18 | 1689.89 | 0.9639x | 100 | 0.00 / 0.00 | 43.62% | bitwise v152 full seed1234/masks; alternate PV tiles slower |
+| v157 | 1732.61 | 1691.62 | 0.9763x | 100 | 0.00 / 0.00 | 44.08% | bitwise v152 full seed1234/masks; packed scaling, expanded pending |
 
 Raw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. v090/v091/v094/v096/v097/v105/v108/v112/v125 have an observed sustained warm advantage in the extended eager-event, Graph and rotating-order runs, at baseline-level FP8 precision; v146 is the current fast path. Short five-event v125 tuning has a small observed advantage; v105 is near parity. Use the matching execution regime and retained distributions. v086 is near parity warm and its initial cold advantage does not reproduce in its rotating-order audit.
 
@@ -241,6 +244,8 @@ These are separate warm/cold runs with 20 warmups and 100 repeats; sampled row c
 | v150 | 512 | cold | 1700.02 | 1914.94 | 1.1264x |
 | v152 | 512 | warm | 1927.20 | 1876.02 | 0.9734x |
 | v152 | 512 | cold | 1900.50 | 1917.01 | 1.0087x |
+| v153 | 512 | warm | 1925.15 | 1873.78 | 0.9733x |
+| v153 | 512 | cold | 1898.61 | 1917.02 | 1.0097x |
 
 ## Extended eager CUDA-event runs
 
@@ -294,6 +299,8 @@ These are separate warm/cold runs with 20 warmups and 100 repeats; sampled row c
 | v150 | 512 | cold | 1719.23 | 1921.20 | 1.1175x |
 | v152 | 512 | warm | 1896.66 | 1888.08 | 0.9955x |
 | v152 | 512 | cold | 1884.37 | 1916.90 | 1.0173x |
+| v153 | 512 | warm | 1873.97 | 1880.13 | 1.0033x |
+| v153 | 512 | cold | 1900.54 | 1914.83 | 1.0075x |
 
 ## Same-process rotating-order audits
 
@@ -423,5 +430,11 @@ Ranges below are the minimum and maximum per-round medians or paired ratios, not
 | v148_v152_round_robin | cute-v148/native | cold | 3 | 1870.64–1871.87 | 0.9931–0.9957x |
 | v148_v152_round_robin | cute-v152/native | warm | 3 | 1872.91–1873.87 | 0.9973–1.0036x |
 | v148_v152_round_robin | cute-v152/native | cold | 3 | 1859.79–1872.13 | 0.9923–1.0021x |
+| v148_v152_v153_round_robin | cute-v148/native | warm | 4 | 1878.69–1882.10 | 0.9953–0.9998x |
+| v148_v152_v153_round_robin | cute-v148/native | cold | 4 | 1869.70–1873.94 | 0.9957–0.9981x |
+| v148_v152_v153_round_robin | cute-v152/native | warm | 4 | 1871.86–1876.05 | 0.9989–1.0039x |
+| v148_v152_v153_round_robin | cute-v152/native | cold | 4 | 1859.98–1873.84 | 0.9952–1.0041x |
+| v148_v152_v153_round_robin | cute-v153/native | warm | 4 | 1869.70–1871.78 | 1.0001–1.0055x |
+| v148_v152_v153_round_robin | cute-v153/native | cold | 4 | 1865.89–1867.68 | 0.9973–1.0001x |
 
 See [ITERATIONS.md](ITERATIONS.md) for changes, failed hypotheses, correctness limits and source references.

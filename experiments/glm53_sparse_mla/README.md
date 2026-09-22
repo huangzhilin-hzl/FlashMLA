@@ -39,10 +39,10 @@ export CUTE_DSL_ARCH=sm_103a
   --output-json artifacts/v146_accuracy512_graph.json
 
 # Higher precision, retaining the audited full-reference tolerance passes.
-/opt/sglang/bin/python bench.py --kernel-version v148 --block-k 128 \
+/opt/sglang/bin/python bench.py --kernel-version v153 --block-k 128 \
   --backends trtllm cute --scope native --check-rows 512 \
   --warmup-iters 20 --repeat-iters 100 --cache both --timing cuda-graph \
-  --output-json artifacts/v148_accuracy512_graph.json
+  --output-json artifacts/v153_accuracy512_graph.json
 
 # Short event-based tuning run, followed by one warmed NCU invocation.
 bash run_iteration.sh v146 128
@@ -89,7 +89,8 @@ The full 8192-row/seed1234 audit checks all 268,435,456 output elements:
 | v114, balanced denominator reduction | 0 on two full target seeds, full short case and masks | Earlier higher-precision path |
 | v128, direct256-bit output stores | Full bitwise equality to v114 on both seeds, short case and masks | Earlier higher-precision path |
 | v145, validity bitmaps | Full bitwise equality to v128 on both seeds, short case and masks | Earlier higher-precision path |
-| v148, immediate residual collector use | Independent full FP32 tolerance passes on two seeds, short case and masks | Current higher-precision path |
+| v148, immediate residual collector use | Independent full FP32 tolerance passes on two seeds, short case and masks | Earlier higher-precision path |
+| v153, early bitmap and PV stage release | Full bitwise equality through v152 to v148 on two seeds, short case and masks | Current higher-precision path |
 
 The earlier fast path v138 matches v125 bitwise on both full8192-row seeds,
 all1024 short-case rows and masked inputs, retaining the FP8 limits below.
@@ -120,7 +121,7 @@ versus v108 1712.34–1713.34 µs and TRT 1871.36–1876.06 µs; cold
 1857.46–1859.60 µs. It improves on v108 in each recorded ordering, although
 one warm pair differs by less than 1 µs. These are observed ranges of round
 medians with unlocked clocks, not confidence intervals. The baseline FP8
-precision limits remain; v148 is the current higher-precision option.
+precision limits remain; v153 is the current higher-precision option.
 
 Earlier fast path v108 matches v105 bitwise on both full 8192-row seeds,
 all 1024 short-case rows and the masked input; qualified b2 synccheck/b512
@@ -202,7 +203,7 @@ TRT 1886.18/1916.88 µs; Graph medians are 1806.54/1796.08 µs versus
 TRT 1869.81–1878.22 µs, improving on v094 in every ordering. It moves the
 read-only global index fetch before stage-reuse waiting while keeping shared
 publication after that wait. This preserves the documented FP8 precision limits;
-it does not establish an all-row FP32-reference pass. v148 is the current validated
+it does not establish an all-row FP32-reference pass. v153 is the current validated
 higher-precision option.
 
 v094 retains v091 output bits on both full8192-row seeds, the1024-row short
@@ -219,7 +220,7 @@ Eager-event warm/cold medians are1852.51/1851.06 µs versusTRT1886.94/1917.02 µ
 Graph medians1847.62/1832.43 µs versusTRT1863.94/1926.14 µs. Three rotated
 orders give warm v0911822.98–1824.83 µs versusTRT1869.98–1879.65 µs; it also
 improves on v090 in every ordering. These are the same baseline-precision
-outputs, including the failures documented below. v148 is the current higher-precision option on its audited inputs.
+outputs, including the failures documented below. v153 is the current higher-precision option on its audited inputs.
 
 v090 matches v086 bitwise on all8192 rows of both seeds and all1024 rows of
 the short case, in three repeats each. The mask case also matches v086 bitwise,
@@ -344,7 +345,7 @@ Neither version is promoted.
 For higher precision, `v133` is the analogous output evict-first experiment:
 full2seeds/short/mask bits matchv128, and qualified sanitizers pass. Its three
 rotated orders improve slightly, while separate eager warm timing regresses
-slightly. It remains slower than TRT; v148 is now the established default.
+slightly. It remains slower than TRT; v153 is now the established default.
 
 
 The earlier higher-precision default was **v145**. It replaces per-element validity
@@ -365,10 +366,21 @@ the fast-path tolerance failures. Separate eager warm timing is slightly worse;
 see the full evidence and execution-regime limits in the iteration log.
 
 
-The current higher-precision default is **v148**. Interleaving each high PV term
+The previous higher-precision default was **v148**. Interleaving each high PV term
 with its residual last-use changes FP32 accumulation order, so two full target
 seeds and the full short case were independently rechecked against FP32: zero
 original-tolerance failures, also zero on masks. Four rotated warm medians are
 1876.62–1880.00 us and cold1869.84–1876.03 us, improving on v145/v149 throughout.
 It remains slightly slower than paired TRT in these rotated tests. Qualified
 sanitizers pass, REG98/STACK0, and NCU local sectors are zero.
+
+
+The current higher-precision default is **v153**. It combines v148's immediate
+residual PV consumption with v152's early bitmap load, then removes the trailing
+compute barrier after PV completion. Both full seeds, the short case and masks
+match v148 through v152 bitwise; its independent full FP32 tolerance passes carry
+over on these audited inputs. Four rotated Graph orders give warm1869.70–1871.78 us
+versus v1481878.69–1882.10 us and TRT1869.87–1880.30 us. Cold results beat v148
+in all four orders, but have mixed wins against TRT and v152. Separate Graph
+warm1925.15 us still trails paired TRT1873.78 us. Preserve the timing regime and
+distributions; this is not a universal high-precision TRT lead.

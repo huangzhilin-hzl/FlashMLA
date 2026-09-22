@@ -106,7 +106,7 @@ for directory in sorted(root.glob("v[0-9][0-9][0-9]")):
     if version == "v147":
         status = "bitwise v138 full seed1234/mask; correction prefetch slower"
     if version == "v148":
-        status = "full2seeds/short/masks FP32 PASS; current higher precision"
+        status = "full2seeds/short/masks FP32 PASS; earlier higher precision"
     if version == "v149":
         status = "bitwise v145 full2seeds/short/masks; superseded by v148"
     if version == "v150":
@@ -116,9 +116,13 @@ for directory in sorted(root.glob("v[0-9][0-9][0-9]")):
     if version == "v152":
         status = "bitwise v148 full2seeds/short/masks; warm gain, mixed cold"
     if version == "v153":
-        status = "bitwise v152 full seed1234/masks; expanded audit pending"
+        status = "bitwise v152 full2seeds/short/masks; current higher precision"
     if version == "v154":
         status = "bitwise v152 full seed1234/masks; no short-run gain"
+    if version in ("v155", "v156"):
+        status = "bitwise v152 full seed1234/masks; alternate PV tiles slower"
+    if version == "v157":
+        status = "bitwise v152 full seed1234/masks; packed scaling, expanded pending"
     if version == "v142":
         status = "bitwise v138 full seed1234/mask; paired epilogue slower"
     if version == "v138":

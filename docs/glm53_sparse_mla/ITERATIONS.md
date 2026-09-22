@@ -4801,3 +4801,127 @@ than v152. NCU base/stable:100 registers,203112 shared bytes,occupancy19.343%,
 tensor43.822%,eligible0.470472,long-scoreboard6.163579,zero local sectors,
 aggregate shared conflicts6347528/2311928,diagnostic2.969344 ms.
 No expanded audit or promotion for this standalone synchronization change.
+
+
+## Iterations 155–156 — alternate independent PV output accumulators
+
+Based on v152, isolate issuer scheduling from the v153/v154 synchronization
+controls. v152 completes all four high/low K pairs for output tile0 before tile1.
+v155 makes K outermost and alternates output tiles after each adjacent high/low
+pair. v156 issues high0,high1,low0,low1 for each K, retaining two distinct live
+B collectors and alternating collector pairs between K slices. Every fill is
+last-used with the same V descriptor before that collector is reused.
+
+Both schedules retain the exact high(K0),low(K0),high(K1),low(K1),... arithmetic
+order for each output element. They keep all16 PV MMAs and the existing commit,
+wait, P conversion, stage-release and mask protocols. The hypothesis is that
+alternating independent accumulator regions may shorten back-to-back dependencies;
+this is not a claim about undocumented tensor-core microarchitecture. Bounded
+compile/safety/equivalence qualification precedes timing; v152 is the bitwise
+baseline. Resource or performance regressions will be recorded without promotion.
+
+
+## Iteration 157 — pack the pre-softmax score scaling
+
+The v148 unlocked SASS shows32 scalar FMUL score-scaling instructions per compute
+thread/tile followed by validity SEL instructions, whereas subsequent exponential
+shifts already use FADD2. This differs from the previously rejected explicit-FMA
+proposal, where the fast path was already packed. Based on v152, explicitly use
+16 mul_packed_f32x2 operations, then retain the exact per-element bitmap selection
+and -1e30 masked sentinel. Valid elements keep the same FP32 scaling operation;
+invalid elements are overwritten before maximum/exponential/reduction operations.
+
+[PTX mul documentation](https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#floating-point-instructions-mul)
+supports packed FP32 multiplication on sm100 and newer; this does not guarantee
+fewer executed instructions after register allocation. Inspect SASS and resource
+usage, then check full output bits/masks and qualified sanitizers. No probability,
+anchor, denominator or PV order change is intended. Baseline:v152.
+
+
+### Iteration 153 expanded result — promote the stage-release control
+
+Both full seeds and the full short/chunk0 case match v152 bitwise in three
+repeats each, preserving v148's independent FP32-reference passes on these
+inputs. Masks and qualified sanitizers pass. Eager20/100 warm/cold1873.97/1900.54 us
+versus TRT1880.13/1914.83 us; Graph1925.15/1898.61 us versus TRT1873.78/1917.02 us.
+The separate Graph warm median is effectively unchanged from v1481924.24 us;
+this is not an all-regime improvement. Four rotated Graph orders:
+
+| Cache | v148 us, rounds0–3 | v152 us, rounds0–3 | v153 us, rounds0–3 | TRT us, rounds0–3 |
+|---|---|---|---|---|
+| warm | 1878.69 / 1881.33 / 1880.77 / 1882.10 | 1871.97 / 1871.86 / 1873.01 / 1876.05 | 1869.70 / 1869.82 / 1870.02 / 1871.78 | 1869.87 / 1876.06 / 1880.30 / 1879.52 |
+| cold | 1869.70 / 1872.03 / 1869.90 / 1873.94 | 1861.06 / 1859.98 / 1871.73 / 1873.84 | 1865.89 / 1867.52 / 1867.68 / 1866.74 | 1866.11 / 1867.62 / 1862.70 / 1865.95 |
+
+v153 beats the established v148 default in all eight recorded orders, warm by
+8.99–11.51 us and cold by2.22–7.20 us. It also beats v152 in every warm order,
+while cold results versus v152 are mixed. Promote v153 as higher-precision default.
+The rotated warm TRT advantage ranges from near zero to0.55%; cold has two wins
+and two losses, and the separate Graph warm comparison still favors TRT. Do not
+claim a universal high-precision lead or merge these distinct timing regimes.
+
+
+## Iterations 158–159 — streaming Q cache priority
+
+At the fixed target, Q occupies288 MiB, KV72 MiB and output512 MiB. Each query
+CTA loads its Q tile once and reuses it from shared memory, while different CTAs
+reuse gathered KV from the common cache. Based on v146 (v158) and v153 (v159),
+attach a fractional L2 evict-first policy with fraction1.0 only to the five Q TMA
+loads. KV policy, output policy, tensor-map shapes, shared layout, arithmetic and
+all synchronization stay unchanged. This complements the prior output/KV policy
+controls; query TMA priority itself has not previously been changed.
+
+The documented cp.async.bulk.tensor L2 cache hint is advisory, not cache bypass
+or a correctness dependency. A smaller DRAM count would not by itself prove a
+latency improvement. Compile/resource inspection, exact output bits, masks and
+qualified sanitizers precede short and, if warranted, extended paired timing.
+Use v146 and v153 respectively as equivalence baselines; retain the fast-path
+precision limits and the distinction between warm/cold execution regimes.
+
+
+### Iterations 155–156 result — alternating output tiles does not help
+
+Both REG100/STACK0. Each matches v152 on full seed1234 in three repeats and on
+mask bits; masked FP32 checks and qualified b2 synccheck/b512 memcheck pass.
+Short v1551804.42 us versus TRT1691.90 us; v1561753.18 us versus TRT1689.89 us,
+respectively65.38/14.14 us slower than v152. No expanded audit or promotion.
+v155 also reuses a given B collector sooner between the two output tiles, so
+this experiment does not isolate accumulator-dependency cost from collector reuse.
+v156 separates the two live collectors but still fails to improve overall timing.
+
+NCU base/stable(v155/v156):203112 shared bytes,occupancy19.357%/19.344%,tensor
+42.189%/43.619%,eligible0.455346/0.474114,long-scoreboard6.417673/6.145557,
+zero local sectors,aggregate shared conflicts6563620/2385966 and6596272/2321443,
+diagnostic3.080480/2.992128 ms. Same register count and zero spills do not make
+a changed issue order beneficial.
+
+## Iteration 160 — combine packed score scaling and stage release
+
+Based on v153, transplant only v157's16 packed score multiplies before unchanged
+bitmap masking. Retain v153's stage-release protocol and all remaining arithmetic.
+v157's initial short gain over v152 motivates this interaction test; it does not
+guarantee an additive gain. Exact-equivalence baseline:v153. Inspect resources,
+then bounded smoke/sanitizers/full seed and masks before interpreting timing.
+
+
+### Iteration 153 unlocked source comparison
+
+Same unlocked SourceCounters/WarpStateStats recipe:675737258 dynamic instructions
+versus v148679841906; shared28663808 actual/ideal wavefronts with zero excessive.
+Executed BAR.SYNC count falls from5021696 to3973120, exactly1048576 fewer warp
+instructions (8192 CTAs ×16 stages ×8 compute warps), consistent with removing
+one per-stage compute barrier. Other schedule/address differences also contribute
+to the total instruction delta. Long-scoreboard samples71132 includePV24796,
+producer-empty16116 andQK14293. Sample counts are not duration shares.
+
+### Iteration 157 initial result — packed score scaling survives lowering
+
+REG100/STACK0. SASS audit of the first compute LDTM-to-BAR region finds16 FMUL2
+and zero scalar FMUL, versus v153's32 scalar FMUL and zero FMUL2. This is an
+actual instruction reduction in that region, not merely packed source notation.
+Full seed1234 matches v152 bitwise in three repeats; mask bits match, masked FP32
+checks and qualified b2 synccheck/b512 memcheck pass. Short1732.61 us versus
+TRT1691.62 us improves6.43 us from v152. Expanded validation is pending.
+NCU base/stable:100 registers,203112 shared bytes,occupancy19.330%,tensor44.079%,
+eligible0.433828,long-scoreboard6.405203,zero local sectors,aggregate shared
+conflicts6344405/2093303,diagnostic2.950208 ms. The higher long-scoreboard ratio
+coexists with faster timing; do not treat the ratio as a direct latency fraction.

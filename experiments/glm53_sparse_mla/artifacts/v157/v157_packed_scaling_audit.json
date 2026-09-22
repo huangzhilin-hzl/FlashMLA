@@ -1,0 +1,16 @@
+{
+  "purpose": "static score scaling instruction audit; not timing",
+  "baseline": "v153 source-profile SASS",
+  "candidate": "v157 offline SASS",
+  "region": "first compute LDTM.x32 to first compute BAR.SYNC, exclusive",
+  "counts": {
+    "v153": {
+      "FMUL": 32,
+      "FMUL2": 0
+    },
+    "v157": {
+      "FMUL": 0,
+      "FMUL2": 16
+    }
+  }
+}
