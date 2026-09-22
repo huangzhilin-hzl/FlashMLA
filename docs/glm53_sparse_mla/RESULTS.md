@@ -143,8 +143,13 @@ B300 physical GPU1; b8192, H64, D576/512, TopK2048, chunk3. Each row is a paired
 | v147 | 1690.85 | 1693.54 | 1.0016x | 126 | 0.00 / 0.00 | 30.64% | bitwise v138 full seed1234/mask; correction prefetch slower |
 | v148 | 1749.12 | 1691.84 | 0.9673x | 98 | 0.00 / 0.00 | 43.65% | full2seeds/short/masks FP32 PASS; current higher precision |
 | v149 | 1771.74 | 1691.42 | 0.9547x | 100 | 0.00 / 0.00 | 42.96% | bitwise v145 full2seeds/short/masks; superseded by v148 |
+| v150 | 1624.38 | 1691.87 | 1.0415x | 123 | 0.00 / 0.00 | 31.84% | bitwise v146 full2seeds/short/masks; mixed scheduling gain |
+| v151 | 1628.03 | 1691.78 | 1.0392x | 123 | 0.00 / 0.00 | 31.92% | bitwise v146 full seed1234/masks; no short-run gain |
+| v152 | 1739.04 | 1691.84 | 0.9729x | 100 | 0.00 / 0.00 | 43.85% | bitwise v148 full2seeds/short/masks; warm gain, mixed cold |
+| v153 | 1734.72 | 1691.90 | 0.9753x | 100 | 0.00 / 0.00 | 44.00% | bitwise v152 full seed1234/masks; expanded audit pending |
+| v154 | 1743.71 | 1691.90 | 0.9703x | 100 | 0.00 / 0.00 | 43.82% | bitwise v152 full seed1234/masks; no short-run gain |
 
-Raw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. v090/v091/v094/v096/v097/v105/v108/v112/v125 have an observed sustained warm advantage in the extended eager-event, Graph and rotating-order runs, at baseline-level FP8 precision; v125 is the current fast path. Short five-event v125 tuning has a small observed advantage; v105 is near parity. Use the matching execution regime and retained distributions. v086 is near parity warm and its initial cold advantage does not reproduce in its rotating-order audit.
+Raw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. v090/v091/v094/v096/v097/v105/v108/v112/v125 have an observed sustained warm advantage in the extended eager-event, Graph and rotating-order runs, at baseline-level FP8 precision; v146 is the current fast path. Short five-event v125 tuning has a small observed advantage; v105 is near parity. Use the matching execution regime and retained distributions. v086 is near parity warm and its initial cold advantage does not reproduce in its rotating-order audit.
 
 ## CUDA Graph validation runs
 
@@ -232,6 +237,10 @@ These are separate warm/cold runs with 20 warmups and 100 repeats; sampled row c
 | v148 | 512 | cold | 1894.53 | 1894.32 | 0.9999x |
 | v149 | 512 | warm | 1943.74 | 1865.90 | 0.9600x |
 | v149 | 512 | cold | 1914.74 | 1899.58 | 0.9921x |
+| v150 | 512 | warm | 1724.46 | 1867.81 | 1.0831x |
+| v150 | 512 | cold | 1700.02 | 1914.94 | 1.1264x |
+| v152 | 512 | warm | 1927.20 | 1876.02 | 0.9734x |
+| v152 | 512 | cold | 1900.50 | 1917.01 | 1.0087x |
 
 ## Extended eager CUDA-event runs
 
@@ -281,6 +290,10 @@ These are separate warm/cold runs with 20 warmups and 100 repeats; sampled row c
 | v148 | 512 | cold | 1892.50 | 1902.13 | 1.0051x |
 | v149 | 512 | warm | 1914.56 | 1869.23 | 0.9763x |
 | v149 | 512 | cold | 1912.61 | 1916.59 | 1.0021x |
+| v150 | 512 | warm | 1694.83 | 1866.38 | 1.1012x |
+| v150 | 512 | cold | 1719.23 | 1921.20 | 1.1175x |
+| v152 | 512 | warm | 1896.66 | 1888.08 | 0.9955x |
+| v152 | 512 | cold | 1884.37 | 1916.90 | 1.0173x |
 
 ## Same-process rotating-order audits
 
@@ -402,5 +415,13 @@ Ranges below are the minimum and maximum per-round medians or paired ratios, not
 | v145_v148_v149_round_robin | cute-v148/native | cold | 4 | 1869.84–1876.03 | 0.9892–0.9932x |
 | v145_v148_v149_round_robin | cute-v149/native | warm | 4 | 1888.26–1900.70 | 0.9849–0.9912x |
 | v145_v148_v149_round_robin | cute-v149/native | cold | 4 | 1882.27–1884.19 | 0.9848–0.9866x |
+| v146_v150_round_robin | cute-v146/native | warm | 3 | 1671.42–1693.89 | 1.1088–1.1249x |
+| v146_v150_round_robin | cute-v146/native | cold | 3 | 1665.14–1675.26 | 1.1101–1.1217x |
+| v146_v150_round_robin | cute-v150/native | warm | 3 | 1669.10–1690.75 | 1.1131–1.1264x |
+| v146_v150_round_robin | cute-v150/native | cold | 3 | 1662.98–1673.30 | 1.1113–1.1183x |
+| v148_v152_round_robin | cute-v148/native | warm | 3 | 1880.06–1882.24 | 0.9935–0.9992x |
+| v148_v152_round_robin | cute-v148/native | cold | 3 | 1870.64–1871.87 | 0.9931–0.9957x |
+| v148_v152_round_robin | cute-v152/native | warm | 3 | 1872.91–1873.87 | 0.9973–1.0036x |
+| v148_v152_round_robin | cute-v152/native | cold | 3 | 1859.79–1872.13 | 0.9923–1.0021x |
 
 See [ITERATIONS.md](ITERATIONS.md) for changes, failed hypotheses, correctness limits and source references.

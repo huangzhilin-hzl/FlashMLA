@@ -4700,3 +4700,104 @@ in addition to seed1234, masks and qualified sanitizers. Eager warm/cold1914.56/
 TRT1865.90/1899.58 us. Rotation improves on v145 in three of four warm orders
 and all four cold orders, but v148 is faster throughout. Retain as an independently
 validated input to the v152 combination, without making it the default.
+
+## Iterations 153–154 — isolate high-precision synchronization after the PV change
+
+Based on v152's interleaved residual PV and early bitmap pipeline, revisit the
+independent synchronization controls previously tested as v110/v111 on v106.
+The older results were not consistently beneficial; changed producer/compute
+work and collector ordering motivate two new bounded controls, not an assumed gain.
+
+v153 removes only the trailing 256-thread barrier after PV completion. The
+retained pre-P-ready barrier joins all compute reads of indices/scores/P; the PV
+completion then drains asynchronous KV reads before thread0 releases the stage.
+All threads still wait for PV and keep the TMEM fences. v154 instead retains
+that trailing barrier, replaces pre-P-ready CTA synchronization plus one arrival
+with256 per-thread arrivals, and retains per-thread TMEM/shared fences. The
+issuer's acquire waits for every compute thread's P-high/P-low/correction writes.
+
+Each variant preserves arithmetic and uses v152 as the exact-equivalence baseline.
+Qualification requires bounded smoke, synccheck, memcheck, full-seed output bits
+and masked FP32 checks before paired performance interpretation.
+
+
+### Iteration 150 result — combined producer changes have mixed sustained effects
+
+REG123/STACK0. Both full seeds1234/5678 and short/chunk0 seed5678 match v146
+bitwise in three repeats each; mask bits match, and qualified b2 synccheck/b512
+memcheck report zero errors. All fast-path FP8 tolerance limitations remain.
+Short1624.38 us versus TRT1691.87 us is3.72 us below v146. Eager20/100 warm/cold
+1694.83/1719.23 us versus TRT1866.38/1921.20 us; Graph1724.46/1700.02 us versus
+TRT1867.81/1914.94 us. Three rotated Graph orders:
+
+| Cache | v146 us, rounds0–2 | v150 us, rounds0–2 | TRT us, rounds0–2 |
+|---|---|---|---|
+| warm | 1693.89 / 1671.42 / 1673.42 | 1670.80 / 1669.10 / 1690.75 | 1878.11 / 1880.11 / 1882.02 |
+| cold | 1665.33 / 1675.26 / 1665.14 | 1673.22 / 1662.98 / 1673.30 | 1867.92 / 1859.65 / 1859.49 |
+
+Warm wins two of three orders; cold wins one. Retain all order outliers and
+keep v146 as default; the combination is a validated alternative, not a stable
+improvement. NCU base/stable:123 registers,194920 shared bytes,occupancy19.284%,
+tensor31.837%,eligible0.394969,long-scoreboard6.189487,zero local sectors,
+aggregate shared conflicts6687675/2065833,diagnostic2.777184 ms.
+
+### Iteration 151 result — removing the extra fence has no short-run gain
+
+Full seed1234 output matches v146 in three repeats; masks match and qualified
+b2 synccheck/b512 memcheck report zero errors. Short1628.03 us versus TRT1691.78 us
+is effectively unchanged from v1461628.10 us. No expanded audit or promotion.
+NCU base/stable:123 registers,194920 shared bytes,occupancy19.313%,tensor31.922%,
+eligible0.389618,long-scoreboard6.160951,zero local sectors,aggregate shared
+conflicts6361361/2099771,diagnostic2.781344 ms. A removed code-motion NOP and
+changed scheduling encodings do not establish a measurable latency improvement.
+
+### Iteration 152 result — validated warm improvement, mixed cold result
+
+REG100/STACK0. Full seeds1234/5678 and short/chunk0 seed5678 match v148 bitwise
+in three repeats each. Mask bits match and masked FP32 tolerance passes; qualified
+b2 synccheck/b512 memcheck report zero errors. The full-tolerance conclusions on
+these inputs therefore carry over from the independent v148 FP32 audits.
+Short1739.04 us versus TRT1691.84 us improves10.08 us from v148. Eager20/100
+warm/cold1896.66/1884.37 us versus TRT1888.08/1916.90 us; Graph1927.20/1900.50 us
+versus TRT1876.02/1917.01 us. Three rotated Graph orders:
+
+| Cache | v148 us, rounds0–2 | v152 us, rounds0–2 | TRT us, rounds0–2 |
+|---|---|---|---|
+| warm | 1880.06 / 1882.24 / 1882.14 | 1872.91 / 1873.79 / 1873.87 | 1867.92 / 1877.86 / 1880.69 |
+| cold | 1871.73 / 1870.64 / 1871.87 | 1859.79 / 1872.13 / 1869.86 | 1863.66 / 1857.71 / 1859.49 |
+
+v152 wins all warm orders by7.15–8.45 us and two of three cold orders; cold round1
+is1.49 us slower. Separate eager/Graph warm medians do not improve on v148.
+Retain v152 as a validated scheduling candidate and the basis for synchronization
+controls; keep the established v148 default pending further implementation evidence.
+TRT comparisons also vary with cache/order, so no universal high-precision lead.
+NCU base/stable:100 registers,203112 shared bytes,occupancy19.341%,tensor43.850%,
+eligible0.477152,long-scoreboard6.080971,zero local sectors,aggregate shared
+conflicts6368821/2289596,diagnostic2.970944 ms.
+
+### Iterations 153–154 compile qualification
+
+Both compile offline without a CUDA context at REG100/STACK0. Their source hashes
+are4d6ce7a0d9201fc52b99342a6b3083374545c8c618404bec980a95d4a9049a93 and
+27c33221ea1eabdc7edd3e199fadfb85786eb1c96a644701a0787a8635cbc819.
+No register redistribution or launch-footprint change is involved. Runtime
+qualification is separate from this compile result.
+
+
+### Iteration 153 initial result — a small stage-release improvement
+
+Full seed1234 matches v152 in three repeats, masked FP32 checks pass and mask
+bits match. Qualified b2 synccheck/b512 memcheck report zero errors. Short1734.72 us
+versus TRT1691.90 us is4.32 us below v152. NCU base/stable:100 registers,203112
+shared bytes,occupancy19.333%,tensor44.001%,eligible0.474625,long-scoreboard6.137062,
+zero local sectors,aggregate shared conflicts6425253/2135511,diagnostic2.955936 ms.
+Expanded equivalence and same-process rotated comparisons are pending.
+
+### Iteration 154 result — per-thread P release alone does not improve timing
+
+Full seed1234 and mask bits match v152; masked FP32 checks and qualified
+synccheck/memcheck pass. Short1743.71 us versus TRT1691.90 us is4.67 us slower
+than v152. NCU base/stable:100 registers,203112 shared bytes,occupancy19.343%,
+tensor43.822%,eligible0.470472,long-scoreboard6.163579,zero local sectors,
+aggregate shared conflicts6347528/2311928,diagnostic2.969344 ms.
+No expanded audit or promotion for this standalone synchronization change.

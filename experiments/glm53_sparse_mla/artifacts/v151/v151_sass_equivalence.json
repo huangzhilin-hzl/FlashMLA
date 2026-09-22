@@ -1,0 +1,8 @@
+{
+  "purpose": "offline machine instruction encoding comparison; no new latency measurement",
+  "instruction_encoding_words": {
+    "v146": 2880,
+    "v151": 2880
+  },
+  "identical": false
+}
