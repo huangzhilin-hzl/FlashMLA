@@ -5751,3 +5751,95 @@ v1941560.77 us is slower than v1831550.50, despite more compute registers. Do no
 ### Iterations 198–199 compile result
 
 Both native x64 candidates compile on4.6.2 and4.6.3 with REG128/STACK0, two LDTM.x64 and two STTM.x64 instructions, and no static local load/store instructions. The role-local allocation also resolves this x64 compilation pattern on the installed compiler; no toolchain upgrade is required for qualification. Keep the two compiler artifacts separate and use4.6.2 for runtime first.
+
+
+## Iterations 200–201 — isolate donor allowance from compute allowance
+
+Based on v194/v195, increase only donor registers32→64, retaining compute192.
+This distinguishes v197's faster64/176 result from both changed role budgets.
+The final budget is65536, exactly the512-thread CTA allocation at128 registers
+per thread. Do not launch if the compiler/driver reports a smaller initial
+allocation; the extra physical SM capacity alone would not avoid a pool stall.
+Both donor warpgroups remain complete and compute allocation remains inside
+its own branch. No arithmetic, cache hint, copy width or synchronization change.
+Compile and inspect first; runtime only after budget and spill checks.
+
+
+### Iterations 198–199 runtime result — native x64 does not improve these parents
+
+Installed4.6.2: guarded b2 smoke/b512 memcheck and b2 synccheck all pass. Both candidates match v183/v184 on full seed1234 for three repeats and on masked inputs; v199 retains the masked FP32 pass. No other full seeds or extended performance claimed for these candidates.
+
+v198 short: trtllm/native 1689.92 us, cute-v198/native 1573.95 us.
+
+v198 NCU base/stable: gpu__time_duration.sum=2.674272 ms, launch__registers_per_thread=128 register/thread, launch__shared_mem_per_block_dynamic=194.920000 Kbyte/block, sm__warps_active.avg.pct_of_peak_sustained_active=19.379767 %, sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed=33.076386 %, smsp__warps_eligible.avg.per_cycle_active=0.342405 warp, smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio=6.627931 inst, l1tex__t_sectors_pipe_lsu_mem_local_op_ld.sum=0 sector, l1tex__t_sectors_pipe_lsu_mem_local_op_st.sum=0 sector, l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum=6,620,837 , l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum=4,328,180 .
+
+v199 short: trtllm/native 1691.78 us, cute-v199/native 1673.44 us.
+
+v199 NCU base/stable: gpu__time_duration.sum=2.837824 ms, launch__registers_per_thread=128 register/thread, launch__shared_mem_per_block_dynamic=203.112000 Kbyte/block, sm__warps_active.avg.pct_of_peak_sustained_active=19.411569 %, sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed=45.875816 %, smsp__warps_eligible.avg.per_cycle_active=0.385690 warp, smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio=6.765491 inst, l1tex__t_sectors_pipe_lsu_mem_local_op_ld.sum=0 sector, l1tex__t_sectors_pipe_lsu_mem_local_op_st.sum=0 sector, l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum=6,939,983 , l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum=3,020,157 .
+
+v1981573.95 us regresses from v1941560.77 and v1831550.50. v1991673.44 is essentially unchanged from v1951673.41 and slower than v1971662.30. Reject native x64 as a speed optimization here, despite successfully removing the historical compile/spill barrier.
+
+### Iterations 195/197 extended result — promote higher-precision v197
+
+warm cute-v184/native: 1847.42/1847.36/1847.50/1847.36/1845.38 us.
+
+warm cute-v191/native: 1824.86/1824.86/1823.66/1826.94/1824.80 us.
+
+warm cute-v195/native: 1824.77/1824.64/1824.93/1824.82/1820.62 us.
+
+warm cute-v197/native: 1816.67/1810.59/1812.30/1811.50/1810.59 us.
+
+warm trtllm/native: 1867.94/1878.21/1884.11/1885.36/1886.96 us.
+
+cold cute-v184/native: 1825.44/1826.83/1825.02/1824.72/1822.72 us.
+
+cold cute-v191/native: 1822.51/1822.70/1824.83/1826.51/1822.62 us.
+
+cold cute-v195/native: 1808.51/1808.46/1808.59/1812.54/1814.29 us.
+
+cold cute-v197/native: 1795.65/1798.11/1798.56/1799.47/1796.32 us.
+
+cold trtllm/native: 1867.66/1868.27/1861.86/1865.62/1865.58 us.
+
+v195 cuda-event20/100: trtllm/native warm 1871.28 us, cute-v195/native warm 1837.02 us, trtllm/native cold 1916.48 us, cute-v195/native cold 1845.52 us.
+
+v195 cuda-graph20/100: trtllm/native warm 1867.74 us, cute-v195/native warm 1884.32 us, trtllm/native cold 1906.80 us, cute-v195/native cold 1847.44 us.
+
+v197 cuda-event20/100: trtllm/native warm 1873.04 us, cute-v197/native warm 1821.74 us, trtllm/native cold 1917.09 us, cute-v197/native cold 1833.15 us.
+
+v197 cuda-graph20/100: trtllm/native warm 1884.29 us, cute-v197/native warm 1811.97 us, trtllm/native cold 1918.93 us, cute-v197/native cold 1836.06 us.
+
+Both candidates match v184 in the second full seed5678 and1024-row chunk0/seed5678 short case, three repeats each; earlier full seed1234/mask and guarded checks remain valid. v197 beats current v191, its v184 parent and v195 in all ten warm/cold rotating-order comparisons. Its standalone Graph warm/cold1811.97/1836.06 us also beat pairedTRT1884.29/1918.93. Promote v197 as the higher-precision experimental default; fast default remainsv190. This changes the evidence relative to earlier standalone warm regressions, without promising all workloads or clock regimes.
+
+Unlocked source:v195629565014 issued instructions versusv197599875543, a4.72% reduction. The latter is still slightly above v184596787377, so total instruction count is not by itself the performance explanation. Both have shared actual=ideal28663808 and zero excessive. Long-scoreboard sample totals70468/69999:PV24586/24069, producer-empty16205/16516,QK13863/13000; these are sample counts, not latency shares.
+
+The opcode audit records18 static MOV.SPILL and18 R2UR.FILL in v195, each with2359296 issued warp instructions; none remain in v197. The operands visibly move values between UR and R registers, not local memory, consistent with both kernels reporting zero local sectors. The two types account for4.72 million of the29.69 million total instruction reduction; do not attribute the entire gain to these pairs. UTCQMMA.WS and indexed BRX counts are preserved.
+
+### Iterations 200–201 compile result
+
+Both compile on4.6.2 with REG128/STACK0, satisfying the initial65536-register pool required by final64/192 allocation. v200 retains6 MOV.SPILL/R2UR.FILL pairs; v201 has none. Native code differs from v197, so qualify and measure instead of treating the changed budget as a no-op.
+
+
+## Iteration 202 — combine output eviction hint with the higher-precision register path
+
+Based on validated v197. Add only output L2 evict-first, as in v191, retaining
+64/176 role budgets, x32 TMEM copies and all arithmetic/synchronization. The
+hint reduced DRAM reads and helped rotated cold latency on v184/v191, but
+did not improve profiled warm duration. Re-evaluate the actual latency on this
+new parent; do not assume the earlier benefit is additive. Compile and inspect
+SASS/resources, then memory/sync and equivalence checks before paired timing.
+
+
+### Iterations 200–201 result — maximum 64/192 budget adds no default-path gain
+
+Guarded b2 smoke/b512 memcheck, b2 synccheck and full seed1234 three-repeat exact equivalence pass. Both mask comparisons match v183/v184; v201 passes masked FP32. These runtime results confirm the recorded initial65536-register CTA pool supports the exact65536 requested budget. No extended equivalence/timing is claimed for these candidates.
+
+v200 short: trtllm/native 1691.62 us, cute-v200/native 1553.50 us.
+
+v200 NCU base/stable: gpu__time_duration.sum=2.644160 ms, launch__registers_per_thread=128 register/thread, launch__shared_mem_per_block_dynamic=194.920000 Kbyte/block, sm__warps_active.avg.pct_of_peak_sustained_active=19.381442 %, sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed=33.426260 %, smsp__warps_eligible.avg.per_cycle_active=0.351607 warp, smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio=6.548784 inst, l1tex__t_sectors_pipe_lsu_mem_local_op_ld.sum=0 sector, l1tex__t_sectors_pipe_lsu_mem_local_op_st.sum=0 sector, l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum=6,551,573 , l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum=4,205,063 .
+
+v201 short: trtllm/native 1692.22 us, cute-v201/native 1665.22 us.
+
+v201 NCU base/stable: gpu__time_duration.sum=2.826272 ms, launch__registers_per_thread=128 register/thread, launch__shared_mem_per_block_dynamic=203.112000 Kbyte/block, sm__warps_active.avg.pct_of_peak_sustained_active=19.403410 %, sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed=46.039772 %, smsp__warps_eligible.avg.per_cycle_active=0.380690 warp, smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio=6.910416 inst, l1tex__t_sectors_pipe_lsu_mem_local_op_ld.sum=0 sector, l1tex__t_sectors_pipe_lsu_mem_local_op_st.sum=0 sector, l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum=7,253,624 , l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum=3,016,140 .
+
+v2001553.50 us improves its32/192 parent v1941560.77 but remains above v1831550.50 and current v1901549.06. v2011665.22 improves v1951673.41 but is slower than v1971662.30. No default change. The donor64 result supports keeping more registers for producer/issuer roles; compute192 over176 does not improve the observed high-precision short case.

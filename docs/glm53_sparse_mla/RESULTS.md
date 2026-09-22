@@ -169,10 +169,14 @@ B300 physical GPU1; b8192, H64, D576/512, TopK2048, chunk3. Each row is a paired
 | v185 | 1549.28 | 1691.74 | 1.0920x | 123 | 0.00 / 0.00 | 33.54% | full2seeds/short/masks bitwise; mixed small gain; validated alternative |
 | v186 | 1689.79 | 1691.81 | 1.0012x | 122 | 0.00 / 0.00 | 45.24% | full2seeds/short/masks bitwise; mixed small gain; validated alternative |
 | v190 | 1549.06 | 1691.94 | 1.0922x | 123 | 0.00 / 0.00 | 33.52% | bitwise v183 full2seeds/short/masks; current fast path |
-| v191 | 1691.84 | 1691.71 | 0.9999x | 122 | 0.00 / 0.00 | 45.21% | bitwise v184 full2seeds/short/masks; current higher precision |
+| v191 | 1691.84 | 1691.71 | 0.9999x | 122 | 0.00 / 0.00 | 45.21% | bitwise v184 full2seeds/short/masks; earlier higher precision |
 | v194 | 1560.77 | 1690.82 | 1.0833x | 128 | 0.00 / 0.00 | 33.29% | guarded checks/full seed1234/mask bits pass; register redistribution slower |
-| v195 | 1673.41 | 1691.71 | 1.0109x | 128 | 0.00 / 0.00 | 45.82% | guarded checks/full seed1234/mask bits pass; register redistribution gain, extended pending |
-| v197 | 1662.30 | 1691.94 | 1.0178x | 128 | 0.00 / 0.00 | 46.15% | guarded checks/full seed1234/mask bits pass; register redistribution gain, extended pending |
+| v195 | 1673.41 | 1691.71 | 1.0109x | 128 | 0.00 / 0.00 | 45.82% | full2seeds/short/masks bitwise; register redistribution gain, superseded |
+| v197 | 1662.30 | 1691.94 | 1.0178x | 128 | 0.00 / 0.00 | 46.15% | bitwise v184 full2seeds/short/masks; current higher precision |
+| v198 | 1573.95 | 1689.92 | 1.0737x | 128 | 0.00 / 0.00 | 33.08% | guarded checks/full seed1234/mask bits pass; native x64 no gain |
+| v199 | 1673.44 | 1691.78 | 1.0110x | 128 | 0.00 / 0.00 | 45.88% | guarded checks/full seed1234/mask bits pass; native x64 no gain |
+| v200 | 1553.50 | 1691.62 | 1.0889x | 128 | 0.00 / 0.00 | 33.43% | guarded/full seed1234/mask checks pass; maximal role budget no default gain |
+| v201 | 1665.22 | 1692.22 | 1.0162x | 128 | 0.00 / 0.00 | 46.04% | guarded/full seed1234/mask checks pass; maximal role budget no default gain |
 
 Raw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. v090/v091/v094/v096/v097/v105/v108/v112/v125 have an observed sustained warm advantage in the extended eager-event, Graph and rotating-order runs, at baseline-level FP8 precision; v190 is the current fast path. Short five-event v125 tuning has a small observed advantage; v105 is near parity. Use the matching execution regime and retained distributions. v086 is near parity warm and its initial cold advantage does not reproduce in its rotating-order audit.
 

@@ -1,0 +1,56 @@
+{
+  "v195": {
+    "MOV.SPILL": {
+      "static_rows": 18,
+      "issued": 2359296.0,
+      "pred_on_threads": 75497472.0
+    },
+    "R2UR.FILL": {
+      "static_rows": 18,
+      "issued": 2359296.0,
+      "pred_on_threads": 75497472.0
+    },
+    "USETMAXREG": {
+      "static_rows": 2,
+      "issued": 131072.0,
+      "pred_on_threads": 4194304.0
+    },
+    "UTCQMMA.WS": {
+      "static_rows": 34,
+      "issued": 4456448.0,
+      "pred_on_threads": 142606336.0
+    },
+    "BRX": {
+      "static_rows": 1,
+      "issued": 1048576.0,
+      "pred_on_threads": 33554432.0
+    }
+  },
+  "v197": {
+    "MOV.SPILL": {
+      "static_rows": 0,
+      "issued": 0,
+      "pred_on_threads": 0
+    },
+    "R2UR.FILL": {
+      "static_rows": 0,
+      "issued": 0,
+      "pred_on_threads": 0
+    },
+    "USETMAXREG": {
+      "static_rows": 2,
+      "issued": 131072.0,
+      "pred_on_threads": 4194304.0
+    },
+    "UTCQMMA.WS": {
+      "static_rows": 34,
+      "issued": 4456448.0,
+      "pred_on_threads": 142606336.0
+    },
+    "BRX": {
+      "static_rows": 1,
+      "issued": 1048576.0,
+      "pred_on_threads": 33554432.0
+    }
+  }
+}

@@ -1,0 +1,1826 @@
+{
+  "source": "artifacts/v197_source_unlocked.csv",
+  "purpose": "sample attribution; not a speedup estimate",
+  "totals": {
+    "stall_long_sb": 69999.0,
+    "stall_short_sb": 3018.0,
+    "stall_barrier": 2848.0,
+    "stall_mio": 4066.0,
+    "stall_wait": 10194.0,
+    "stall_no_inst": 1222.0,
+    "stall_not_selected": 2998.0,
+    "L1 Wavefronts Shared Excessive": 0.0,
+    "L1 Wavefronts Shared": 28663808.0,
+    "L1 Wavefronts Shared Ideal": 28663808.0,
+    "Instructions Executed": 599875543.0
+  },
+  "top": {
+    "stall_long_sb": [
+      {
+        "address": "0x7ffa135b2680",
+        "sass": "@!P1  BRA 0x7ffa135b38d0",
+        "value": 24069.0,
+        "share_of_metric_sum": 0.34384776925384647,
+        "context": [
+          {
+            "address": "0x7ffa135b2640",
+            "sass": "FADD R0, R0, R71"
+          },
+          {
+            "address": "0x7ffa135b2650",
+            "sass": "FFMA R99, R99, R100, R0"
+          },
+          {
+            "address": "0x7ffa135b2660",
+            "sass": "@!P0  SYNCS.ARRIVE.TRANS64.A1T0 RZ, [UR4+0x31930], RZ"
+          },
+          {
+            "address": "0x7ffa135b2670",
+            "sass": "SYNCS.PHASECHK.TRANS64.TRYWAIT P1, [UR4+0x31928], R105"
+          },
+          {
+            "address": "0x7ffa135b2680",
+            "sass": "@!P1  BRA 0x7ffa135b38d0"
+          },
+          {
+            "address": "0x7ffa135b2690",
+            "sass": "UIADD3 UR6, UPT, UPT, UR11, 0x1, URZ"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135ae380",
+        "sass": "@!P2  BRA 0x7ffa135b3630",
+        "value": 16516.0,
+        "share_of_metric_sum": 0.23594622780325433,
+        "context": [
+          {
+            "address": "0x7ffa135ae340",
+            "sass": "UIADD3 UR5, UPT, UPT, UR6, -UR5, URZ"
+          },
+          {
+            "address": "0x7ffa135ae350",
+            "sass": "MOV R7, UR5"
+          },
+          {
+            "address": "0x7ffa135ae360",
+            "sass": "SHF.L.U32 R7, R7, 0x1f, RZ"
+          },
+          {
+            "address": "0x7ffa135ae370",
+            "sass": "SYNCS.PHASECHK.TRANS64.TRYWAIT P2, [UR7+0x31958], R7"
+          },
+          {
+            "address": "0x7ffa135ae380",
+            "sass": "@!P2  BRA 0x7ffa135b3630"
+          },
+          {
+            "address": "0x7ffa135ae390",
+            "sass": "ULEA UR31, UR23, UR4, 0x9"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135b0e30",
+        "sass": "@!P0  BRA 0x7ffa135b3870",
+        "value": 13000.0,
+        "share_of_metric_sum": 0.18571693881341161,
+        "context": [
+          {
+            "address": "0x7ffa135b0df0",
+            "sass": "ULEA UR5, UR5, UR4, 0x2"
+          },
+          {
+            "address": "0x7ffa135b0e00",
+            "sass": "SHF.L.U32 R105, R0, 0x1f, RZ"
+          },
+          {
+            "address": "0x7ffa135b0e10",
+            "sass": "LDS R0, [UR5+0x31900]"
+          },
+          {
+            "address": "0x7ffa135b0e20",
+            "sass": "SYNCS.PHASECHK.TRANS64.TRYWAIT P0, [UR4+0x31920], R105"
+          },
+          {
+            "address": "0x7ffa135b0e30",
+            "sass": "@!P0  BRA 0x7ffa135b3870"
+          },
+          {
+            "address": "0x7ffa135b0e40",
+            "sass": "ISETP.NE.U32.AND P0, PT, R0, -0x1, PT"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135b04b0",
+        "sass": "@!P0  BRA 0x7ffa135b3750",
+        "value": 3544.0,
+        "share_of_metric_sum": 0.050629294704210064,
+        "context": [
+          {
+            "address": "0x7ffa135b0470",
+            "sass": "UTCQMMA.WS gdesc[UR48], gdesc[UR18], tmem[UR26], tmem[UR50], idesc[UR51], UPT"
+          },
+          {
+            "address": "0x7ffa135b0480",
+            "sass": "UTCQMMA.WS gdesc[UR72], gdesc[UR6], tmem[UR26], tmem[UR50], idesc[UR51], UPT"
+          },
+          {
+            "address": "0x7ffa135b0490",
+            "sass": "UTCBAR [UR5], URZ"
+          },
+          {
+            "address": "0x7ffa135b04a0",
+            "sass": "SYNCS.PHASECHK.TRANS64.TRYWAIT P0, [UR4+0x31930], R4"
+          },
+          {
+            "address": "0x7ffa135b04b0",
+            "sass": "@!P0  BRA 0x7ffa135b3750"
+          },
+          {
+            "address": "0x7ffa135b04c0",
+            "sass": "USHF.R.U32.HI UR5, URZ, 0x4, UR70"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135b0d80",
+        "sass": "@!P0  BRA 0x7ffa135b3810",
+        "value": 3074.0,
+        "share_of_metric_sum": 0.04391491307018672,
+        "context": [
+          {
+            "address": "0x7ffa135b0d40",
+            "sass": "MOV R104, UR5"
+          },
+          {
+            "address": "0x7ffa135b0d50",
+            "sass": "UIADD3 UR5, UPT, UPT, UR4, UR5, URZ"
+          },
+          {
+            "address": "0x7ffa135b0d60",
+            "sass": "SHF.L.U32 R3, R0, 0x1f, RZ"
+          },
+          {
+            "address": "0x7ffa135b0d70",
+            "sass": "SYNCS.PHASECHK.TRANS64.TRYWAIT P0, [R104+UR4+0x31948], R3"
+          },
+          {
+            "address": "0x7ffa135b0d80",
+            "sass": "@!P0  BRA 0x7ffa135b3810"
+          },
+          {
+            "address": "0x7ffa135b0d90",
+            "sass": "USHF.L.U32 UR5, UR8, 0x2, URZ"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135b0880",
+        "sass": "@!P0  BRA 0x7ffa135b37b0",
+        "value": 2424.0,
+        "share_of_metric_sum": 0.034629066129516134,
+        "context": [
+          {
+            "address": "0x7ffa135b0840",
+            "sass": "USETMAXREG.TRY_ALLOC.CTAPOOL UP0, 0xb0"
+          },
+          {
+            "address": "0x7ffa135b0850",
+            "sass": "BRA.U !UP0, 0x7ffa135b0830"
+          },
+          {
+            "address": "0x7ffa135b0860",
+            "sass": "SHF.L.U32 R3, RZ, 0x1f, RZ"
+          },
+          {
+            "address": "0x7ffa135b0870",
+            "sass": "SYNCS.PHASECHK.TRANS64.TRYWAIT P0, [UR4+0x31938], R3"
+          },
+          {
+            "address": "0x7ffa135b0880",
+            "sass": "@!P0  BRA 0x7ffa135b37b0"
+          },
+          {
+            "address": "0x7ffa135b0890",
+            "sass": "LDCU.64 UR6, c[0x0][0x398]"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135ae3c0",
+        "sass": "ISETP.GT.AND P2, PT, R9, -0x1, PT",
+        "value": 913.0,
+        "share_of_metric_sum": 0.013043043472049601,
+        "context": [
+          {
+            "address": "0x7ffa135ae380",
+            "sass": "@!P2  BRA 0x7ffa135b3630"
+          },
+          {
+            "address": "0x7ffa135ae390",
+            "sass": "ULEA UR31, UR23, UR4, 0x9"
+          },
+          {
+            "address": "0x7ffa135ae3a0",
+            "sass": "@P1   BRA 0x7ffa135ae450"
+          },
+          {
+            "address": "0x7ffa135ae3b0",
+            "sass": "S2R R6, SR_TID.X"
+          },
+          {
+            "address": "0x7ffa135ae3c0",
+            "sass": "ISETP.GT.AND P2, PT, R9, -0x1, PT"
+          },
+          {
+            "address": "0x7ffa135ae3d0",
+            "sass": "IMAD.U32 R4, RZ, RZ, UR23"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135b30a0",
+        "sass": "FMUL2 R68, R0.F32, R36.F32x2.HI_LO",
+        "value": 680.0,
+        "share_of_metric_sum": 0.009714424491778454,
+        "context": [
+          {
+            "address": "0x7ffa135b3060",
+            "sass": "F2FP.BF16.F32.PACK_AB R42, R41, R40"
+          },
+          {
+            "address": "0x7ffa135b3070",
+            "sass": "FMUL2 R46, R0.F32, R46.F32x2.HI_LO"
+          },
+          {
+            "address": "0x7ffa135b3080",
+            "sass": "F2FP.BF16.F32.PACK_AB R41, R51, R50"
+          },
+          {
+            "address": "0x7ffa135b3090",
+            "sass": "FMUL2 R44, R0.F32, R44.F32x2.HI_LO"
+          },
+          {
+            "address": "0x7ffa135b30a0",
+            "sass": "FMUL2 R68, R0.F32, R36.F32x2.HI_LO"
+          },
+          {
+            "address": "0x7ffa135b30b0",
+            "sass": "F2FP.BF16.F32.PACK_AB R37, R63, R62"
+          }
+        ]
+      }
+    ],
+    "stall_short_sb": [
+      {
+        "address": "0x7ffa135b0ec0",
+        "sass": "FMUL2 R62, R10.F32x2.HI_LO, 0.090168438851833343506",
+        "value": 652.0,
+        "share_of_metric_sum": 0.21603711066931744,
+        "context": [
+          {
+            "address": "0x7ffa135b0e80",
+            "sass": "SHF.L.U32 R68, R69, 0x2, RZ"
+          },
+          {
+            "address": "0x7ffa135b0e90",
+            "sass": "LDC R68, c[0x2][R68]"
+          },
+          {
+            "address": "0x7ffa135b0ea0",
+            "sass": "LDTM.STAT.x32.MAX.F32.NAN R66, R4, tmem[UR5+0x100]"
+          },
+          {
+            "address": "0x7ffa135b0eb0",
+            "sass": "NOP"
+          },
+          {
+            "address": "0x7ffa135b0ec0",
+            "sass": "FMUL2 R62, R10.F32x2.HI_LO, 0.090168438851833343506"
+          },
+          {
+            "address": "0x7ffa135b0ed0",
+            "sass": "SHF.R.S32.HI R69, RZ, 0x1f, R68"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135b07e0",
+        "sass": "@!P0  EXIT",
+        "value": 422.0,
+        "share_of_metric_sum": 0.13982770046388338,
+        "context": [
+          {
+            "address": "0x7ffa135b07a0",
+            "sass": "USEL UR6, UR6, URZ, UP0"
+          },
+          {
+            "address": "0x7ffa135b07b0",
+            "sass": "IMAD.U32 R5, RZ, RZ, UR6"
+          },
+          {
+            "address": "0x7ffa135b07c0",
+            "sass": "@UP0  UIADD3 UR5, UPT, UPT, UR52, URZ, URZ"
+          },
+          {
+            "address": "0x7ffa135b07d0",
+            "sass": "UMOV UR52, UR5"
+          },
+          {
+            "address": "0x7ffa135b07e0",
+            "sass": "@!P0  EXIT"
+          },
+          {
+            "address": "0x7ffa135b07f0",
+            "sass": "BRA 0x7ffa135afdb0"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135b1420",
+        "sass": "FMNMX R6, R9, R6, !PT",
+        "value": 353.0,
+        "share_of_metric_sum": 0.11696487740225314,
+        "context": [
+          {
+            "address": "0x7ffa135b13e0",
+            "sass": "LDS R6, [R101+UR4+0x31400]"
+          },
+          {
+            "address": "0x7ffa135b13f0",
+            "sass": "LDS R8, [R101+UR4+0x31100]"
+          },
+          {
+            "address": "0x7ffa135b1400",
+            "sass": "LDS R7, [R101+UR4+0x31200]"
+          },
+          {
+            "address": "0x7ffa135b1410",
+            "sass": "S2R R117, SR_TID.X"
+          },
+          {
+            "address": "0x7ffa135b1420",
+            "sass": "FMNMX R6, R9, R6, !PT"
+          },
+          {
+            "address": "0x7ffa135b1430",
+            "sass": "FMNMX3 R6, R8, R7, R6, !PT"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135b1430",
+        "sass": "FMNMX3 R6, R8, R7, R6, !PT",
+        "value": 315.0,
+        "share_of_metric_sum": 0.10437375745526839,
+        "context": [
+          {
+            "address": "0x7ffa135b13f0",
+            "sass": "LDS R8, [R101+UR4+0x31100]"
+          },
+          {
+            "address": "0x7ffa135b1400",
+            "sass": "LDS R7, [R101+UR4+0x31200]"
+          },
+          {
+            "address": "0x7ffa135b1410",
+            "sass": "S2R R117, SR_TID.X"
+          },
+          {
+            "address": "0x7ffa135b1420",
+            "sass": "FMNMX R6, R9, R6, !PT"
+          },
+          {
+            "address": "0x7ffa135b1430",
+            "sass": "FMNMX3 R6, R8, R7, R6, !PT"
+          },
+          {
+            "address": "0x7ffa135b1440",
+            "sass": "FSETP.GTU.AND P0, PT, R6, R0, PT"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135b3460",
+        "sass": "LOP3.LUT R0, R0, UR4, RZ, 0xc0, !PT",
+        "value": 188.0,
+        "share_of_metric_sum": 0.062292909211398274,
+        "context": [
+          {
+            "address": "0x7ffa135b3420",
+            "sass": "LDS R0, [UR6+0x14]"
+          },
+          {
+            "address": "0x7ffa135b3430",
+            "sass": "UMOV UR4, 0xffff"
+          },
+          {
+            "address": "0x7ffa135b3440",
+            "sass": "USHF.L.U32 UR4, UR4, UR5, URZ"
+          },
+          {
+            "address": "0x7ffa135b3450",
+            "sass": "SHF.L.U32 R3, R3, UR5, RZ"
+          },
+          {
+            "address": "0x7ffa135b3460",
+            "sass": "LOP3.LUT R0, R0, UR4, RZ, 0xc0, !PT"
+          },
+          {
+            "address": "0x7ffa135b3470",
+            "sass": "ISETP.NE.AND P0, PT, R0, UR4, PT"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135ae3e0",
+        "sass": "LOP3.LUT P3, RZ, R6, 0x1f, RZ, 0xc0, !PT",
+        "value": 187.0,
+        "share_of_metric_sum": 0.06196156394963552,
+        "context": [
+          {
+            "address": "0x7ffa135ae3a0",
+            "sass": "@P1   BRA 0x7ffa135ae450"
+          },
+          {
+            "address": "0x7ffa135ae3b0",
+            "sass": "S2R R6, SR_TID.X"
+          },
+          {
+            "address": "0x7ffa135ae3c0",
+            "sass": "ISETP.GT.AND P2, PT, R9, -0x1, PT"
+          },
+          {
+            "address": "0x7ffa135ae3d0",
+            "sass": "IMAD.U32 R4, RZ, RZ, UR23"
+          },
+          {
+            "address": "0x7ffa135ae3e0",
+            "sass": "LOP3.LUT P3, RZ, R6, 0x1f, RZ, 0xc0, !PT"
+          },
+          {
+            "address": "0x7ffa135ae3f0",
+            "sass": "LEA R6, R6, UR31, 0x2"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135b0320",
+        "sass": "R2UR UR40, R16",
+        "value": 149.0,
+        "share_of_metric_sum": 0.04937044400265076,
+        "context": [
+          {
+            "address": "0x7ffa135b02e0",
+            "sass": "R2UR UR10, R22"
+          },
+          {
+            "address": "0x7ffa135b02f0",
+            "sass": "R2UR UR11, R23"
+          },
+          {
+            "address": "0x7ffa135b0300",
+            "sass": "R2UR UR42, R18"
+          },
+          {
+            "address": "0x7ffa135b0310",
+            "sass": "R2UR UR43, R19"
+          },
+          {
+            "address": "0x7ffa135b0320",
+            "sass": "R2UR UR40, R16"
+          },
+          {
+            "address": "0x7ffa135b0330",
+            "sass": "R2UR UR41, R17"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135ad9e0",
+        "sass": "ULEA UR4, UR5, UR4, 0x18",
+        "value": 99.0,
+        "share_of_metric_sum": 0.032803180914512925,
+        "context": [
+          {
+            "address": "0x7ffa135ad9a0",
+            "sass": "S2UR UR5, SR_CgaCtaId"
+          },
+          {
+            "address": "0x7ffa135ad9b0",
+            "sass": "UMOV UR4, 0x400"
+          },
+          {
+            "address": "0x7ffa135ad9c0",
+            "sass": "BSSY.RECONVERGENT B0, 0x7ffa135adb70"
+          },
+          {
+            "address": "0x7ffa135ad9d0",
+            "sass": "S2UR UR28, SR_CTAID.X"
+          },
+          {
+            "address": "0x7ffa135ad9e0",
+            "sass": "ULEA UR4, UR5, UR4, 0x18"
+          },
+          {
+            "address": "0x7ffa135ad9f0",
+            "sass": "UIADD3 UR7, UPT, UPT, UR4, 0x31920, URZ"
+          }
+        ]
+      }
+    ],
+    "stall_barrier": [
+      {
+        "address": "0x7ffa135b13c0",
+        "sass": "NOP",
+        "value": 717.0,
+        "share_of_metric_sum": 0.2517556179775281,
+        "context": [
+          {
+            "address": "0x7ffa135b1380",
+            "sass": "STS [R112+0x31100], R11"
+          },
+          {
+            "address": "0x7ffa135b1390",
+            "sass": "NOP"
+          },
+          {
+            "address": "0x7ffa135b13a0",
+            "sass": "FADD R0, R67, 4.5"
+          },
+          {
+            "address": "0x7ffa135b13b0",
+            "sass": "BAR.SYNC.DEFER_BLOCKING 0x1, 0x100"
+          },
+          {
+            "address": "0x7ffa135b13c0",
+            "sass": "NOP"
+          },
+          {
+            "address": "0x7ffa135b13d0",
+            "sass": "LDS R9, [R101+UR4+0x31300]"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135addb0",
+        "sass": "BRA.U !UP1, 0x7ffa135adde0",
+        "value": 539.0,
+        "share_of_metric_sum": 0.1892556179775281,
+        "context": [
+          {
+            "address": "0x7ffa135add70",
+            "sass": "ULEA UR6, UR5, UR6, 0x18"
+          },
+          {
+            "address": "0x7ffa135add80",
+            "sass": "@P0   STS.U8 [UR6+0x1c], R3"
+          },
+          {
+            "address": "0x7ffa135add90",
+            "sass": "BAR.SYNC.DEFER_BLOCKING 0x0"
+          },
+          {
+            "address": "0x7ffa135adda0",
+            "sass": "UISETP.GE.AND UP1, UPT, UR56, 0x8, UPT"
+          },
+          {
+            "address": "0x7ffa135addb0",
+            "sass": "BRA.U !UP1, 0x7ffa135adde0"
+          },
+          {
+            "address": "0x7ffa135addc0",
+            "sass": "NOP"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135b3390",
+        "sass": "NOP",
+        "value": 389.0,
+        "share_of_metric_sum": 0.1365870786516854,
+        "context": [
+          {
+            "address": "0x7ffa135b3350",
+            "sass": "STG.E.NA.ENL2.256 desc[UR58][R88.64+0xc0], R8, R20"
+          },
+          {
+            "address": "0x7ffa135b3360",
+            "sass": "STG.E.NA.ENL2.256 desc[UR58][R88.64+0xe0], R24, R16"
+          },
+          {
+            "address": "0x7ffa135b3370",
+            "sass": "NOP"
+          },
+          {
+            "address": "0x7ffa135b3380",
+            "sass": "BAR.SYNC.DEFER_BLOCKING 0x1, 0x100"
+          },
+          {
+            "address": "0x7ffa135b3390",
+            "sass": "NOP"
+          },
+          {
+            "address": "0x7ffa135b33a0",
+            "sass": "@P0   EXIT"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135b25a0",
+        "sass": "NOP",
+        "value": 336.0,
+        "share_of_metric_sum": 0.11797752808988764,
+        "context": [
+          {
+            "address": "0x7ffa135b2560",
+            "sass": "FADD R84, R84, R83"
+          },
+          {
+            "address": "0x7ffa135b2570",
+            "sass": "FADD R79, R80, R79"
+          },
+          {
+            "address": "0x7ffa135b2580",
+            "sass": "FADD R76, R76, R75"
+          },
+          {
+            "address": "0x7ffa135b2590",
+            "sass": "FADD R71, R72, R71"
+          },
+          {
+            "address": "0x7ffa135b25a0",
+            "sass": "NOP"
+          },
+          {
+            "address": "0x7ffa135b25b0",
+            "sass": "MEMBAR.ALL.CTA"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135af5d0",
+        "sass": "UMOV UR39, UR5",
+        "value": 316.0,
+        "share_of_metric_sum": 0.11095505617977527,
+        "context": [
+          {
+            "address": "0x7ffa135af590",
+            "sass": "ISETP.NE.U32.AND P0, PT, RZ, UR50, PT"
+          },
+          {
+            "address": "0x7ffa135af5a0",
+            "sass": "UIADD3 UR47, UPT, UPT, UR47, 0x1, URZ"
+          },
+          {
+            "address": "0x7ffa135af5b0",
+            "sass": "USEL UR51, UR6, URZ, UP0"
+          },
+          {
+            "address": "0x7ffa135af5c0",
+            "sass": "@UP0  UIADD3 UR5, UPT, UPT, UR39, URZ, URZ"
+          },
+          {
+            "address": "0x7ffa135af5d0",
+            "sass": "UMOV UR39, UR5"
+          },
+          {
+            "address": "0x7ffa135af5e0",
+            "sass": "@!P0  EXIT"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135ae460",
+        "sass": "BSSY.RECONVERGENT B0, 0x7ffa135af520",
+        "value": 221.0,
+        "share_of_metric_sum": 0.07759831460674158,
+        "context": [
+          {
+            "address": "0x7ffa135ae420",
+            "sass": "VOTE.ANY R4, PT, P2"
+          },
+          {
+            "address": "0x7ffa135ae430",
+            "sass": "@!P3  LEA R7, R7, UR4, 0x2"
+          },
+          {
+            "address": "0x7ffa135ae440",
+            "sass": "@!P3  STS [R7+0x31900], R4"
+          },
+          {
+            "address": "0x7ffa135ae450",
+            "sass": "BAR.SYNC.DEFER_BLOCKING 0x2, 0x80"
+          },
+          {
+            "address": "0x7ffa135ae460",
+            "sass": "BSSY.RECONVERGENT B0, 0x7ffa135af520"
+          },
+          {
+            "address": "0x7ffa135ae470",
+            "sass": "@!P0  SYNCS.ARRIVE.TRANS64 RZ, [UR7+0x31948], R5"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135b29a0",
+        "sass": "S2R R3, SR_TID.X",
+        "value": 166.0,
+        "share_of_metric_sum": 0.05828651685393258,
+        "context": [
+          {
+            "address": "0x7ffa135b2960",
+            "sass": "IADD3 R102, PT, PT, R103, UR13, R102"
+          },
+          {
+            "address": "0x7ffa135b2970",
+            "sass": "IMAD.U32 R71, RZ, RZ, UR14"
+          },
+          {
+            "address": "0x7ffa135b2980",
+            "sass": "ISETP.NE.U32.AND P0, PT, RZ, UR56, PT"
+          },
+          {
+            "address": "0x7ffa135b2990",
+            "sass": "R2UR UR5, R102"
+          },
+          {
+            "address": "0x7ffa135b29a0",
+            "sass": "S2R R3, SR_TID.X"
+          },
+          {
+            "address": "0x7ffa135b29b0",
+            "sass": "S2R R2, SR_CTAID.X"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135ae4a0",
+        "sass": "@!P0  BRA 0x7ffa135af500",
+        "value": 163.0,
+        "share_of_metric_sum": 0.05723314606741573,
+        "context": [
+          {
+            "address": "0x7ffa135ae460",
+            "sass": "BSSY.RECONVERGENT B0, 0x7ffa135af520"
+          },
+          {
+            "address": "0x7ffa135ae470",
+            "sass": "@!P0  SYNCS.ARRIVE.TRANS64 RZ, [UR7+0x31948], R5"
+          },
+          {
+            "address": "0x7ffa135ae480",
+            "sass": "BAR.SYNC.DEFER_BLOCKING 0x2, 0x80"
+          },
+          {
+            "address": "0x7ffa135ae490",
+            "sass": "ELECT P0, URZ, PT"
+          },
+          {
+            "address": "0x7ffa135ae4a0",
+            "sass": "@!P0  BRA 0x7ffa135af500"
+          },
+          {
+            "address": "0x7ffa135ae4b0",
+            "sass": "ULEA UR15, UR56, UR31, 0x7"
+          }
+        ]
+      }
+    ],
+    "stall_mio": [
+      {
+        "address": "0x7ffa135b06e0",
+        "sass": "UTCQMMA.WS gdesc[UR58], gdesc[UR14].B_REUSE.BUFFER2, tmem[UR47], tmem[UR22], idesc[UR23], UPT",
+        "value": 237.0,
+        "share_of_metric_sum": 0.05828824397442204,
+        "context": [
+          {
+            "address": "0x7ffa135b06a0",
+            "sass": "UTCQMMA.WS gdesc[UR66], gdesc[UR6].B_REUSE, tmem[UR47], tmem[UR22], idesc[UR23], UPT"
+          },
+          {
+            "address": "0x7ffa135b06b0",
+            "sass": "UTCQMMA.WS gdesc[UR64], gdesc[UR16].B_KEEP.BUFFER1, tmem[UR47], tmem[UR22], idesc[UR23], UPT"
+          },
+          {
+            "address": "0x7ffa135b06c0",
+            "sass": "UTCQMMA.WS gdesc[UR62], gdesc[UR16].B_REUSE.BUFFER1, tmem[UR47], tmem[UR22], idesc[UR23], UPT"
+          },
+          {
+            "address": "0x7ffa135b06d0",
+            "sass": "UTCQMMA.WS gdesc[UR60], gdesc[UR14].B_KEEP.BUFFER2, tmem[UR47], tmem[UR22], idesc[UR23], UPT"
+          },
+          {
+            "address": "0x7ffa135b06e0",
+            "sass": "UTCQMMA.WS gdesc[UR58], gdesc[UR14].B_REUSE.BUFFER2, tmem[UR47], tmem[UR22], idesc[UR23], UPT"
+          },
+          {
+            "address": "0x7ffa135b06f0",
+            "sass": "UTCQMMA.WS gdesc[UR56], gdesc[UR12].B_KEEP.BUFFER3, tmem[UR47], tmem[UR22], idesc[UR23], UPT"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135b06a0",
+        "sass": "UTCQMMA.WS gdesc[UR66], gdesc[UR6].B_REUSE, tmem[UR47], tmem[UR22], idesc[UR23], UPT",
+        "value": 227.0,
+        "share_of_metric_sum": 0.0558288243974422,
+        "context": [
+          {
+            "address": "0x7ffa135b0660",
+            "sass": "UIADD3.64 UR12, UPT, UPT, UR6, 0x300, URZ"
+          },
+          {
+            "address": "0x7ffa135b0670",
+            "sass": "UTCQMMA.WS gdesc[UR56], gdesc[UR18].B_KEEP.BUFFER3, tmem[UR46], tmem[UR22], idesc[UR23], UPT"
+          },
+          {
+            "address": "0x7ffa135b0680",
+            "sass": "UTCQMMA.WS gdesc[UR54], gdesc[UR18].B_REUSE.BUFFER3, tmem[UR46], tmem[UR22], idesc[UR23], UPT"
+          },
+          {
+            "address": "0x7ffa135b0690",
+            "sass": "UTCQMMA.WS gdesc[UR68], gdesc[UR6].B_KEEP, tmem[UR47], tmem[UR22], idesc[UR23], UP0"
+          },
+          {
+            "address": "0x7ffa135b06a0",
+            "sass": "UTCQMMA.WS gdesc[UR66], gdesc[UR6].B_REUSE, tmem[UR47], tmem[UR22], idesc[UR23], UPT"
+          },
+          {
+            "address": "0x7ffa135b06b0",
+            "sass": "UTCQMMA.WS gdesc[UR64], gdesc[UR16].B_KEEP.BUFFER1, tmem[UR47], tmem[UR22], idesc[UR23], UPT"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135b0680",
+        "sass": "UTCQMMA.WS gdesc[UR54], gdesc[UR18].B_REUSE.BUFFER3, tmem[UR46], tmem[UR22], idesc[UR23], UPT",
+        "value": 219.0,
+        "share_of_metric_sum": 0.05386128873585834,
+        "context": [
+          {
+            "address": "0x7ffa135b0640",
+            "sass": "UTCQMMA.WS gdesc[UR60], gdesc[UR20].B_KEEP.BUFFER2, tmem[UR46], tmem[UR22], idesc[UR23], UPT"
+          },
+          {
+            "address": "0x7ffa135b0650",
+            "sass": "UTCQMMA.WS gdesc[UR58], gdesc[UR20].B_REUSE.BUFFER2, tmem[UR46], tmem[UR22], idesc[UR23], UPT"
+          },
+          {
+            "address": "0x7ffa135b0660",
+            "sass": "UIADD3.64 UR12, UPT, UPT, UR6, 0x300, URZ"
+          },
+          {
+            "address": "0x7ffa135b0670",
+            "sass": "UTCQMMA.WS gdesc[UR56], gdesc[UR18].B_KEEP.BUFFER3, tmem[UR46], tmem[UR22], idesc[UR23], UPT"
+          },
+          {
+            "address": "0x7ffa135b0680",
+            "sass": "UTCQMMA.WS gdesc[UR54], gdesc[UR18].B_REUSE.BUFFER3, tmem[UR46], tmem[UR22], idesc[UR23], UPT"
+          },
+          {
+            "address": "0x7ffa135b0690",
+            "sass": "UTCQMMA.WS gdesc[UR68], gdesc[UR6].B_KEEP, tmem[UR47], tmem[UR22], idesc[UR23], UP0"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135b0700",
+        "sass": "UTCQMMA.WS gdesc[UR54], gdesc[UR12].B_REUSE.BUFFER3, tmem[UR47], tmem[UR22], idesc[UR23], UPT",
+        "value": 200.0,
+        "share_of_metric_sum": 0.04918839153959666,
+        "context": [
+          {
+            "address": "0x7ffa135b06c0",
+            "sass": "UTCQMMA.WS gdesc[UR62], gdesc[UR16].B_REUSE.BUFFER1, tmem[UR47], tmem[UR22], idesc[UR23], UPT"
+          },
+          {
+            "address": "0x7ffa135b06d0",
+            "sass": "UTCQMMA.WS gdesc[UR60], gdesc[UR14].B_KEEP.BUFFER2, tmem[UR47], tmem[UR22], idesc[UR23], UPT"
+          },
+          {
+            "address": "0x7ffa135b06e0",
+            "sass": "UTCQMMA.WS gdesc[UR58], gdesc[UR14].B_REUSE.BUFFER2, tmem[UR47], tmem[UR22], idesc[UR23], UPT"
+          },
+          {
+            "address": "0x7ffa135b06f0",
+            "sass": "UTCQMMA.WS gdesc[UR56], gdesc[UR12].B_KEEP.BUFFER3, tmem[UR47], tmem[UR22], idesc[UR23], UPT"
+          },
+          {
+            "address": "0x7ffa135b0700",
+            "sass": "UTCQMMA.WS gdesc[UR54], gdesc[UR12].B_REUSE.BUFFER3, tmem[UR47], tmem[UR22], idesc[UR23], UPT"
+          },
+          {
+            "address": "0x7ffa135b0710",
+            "sass": "UTCBAR [UR24], URZ"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135b06c0",
+        "sass": "UTCQMMA.WS gdesc[UR62], gdesc[UR16].B_REUSE.BUFFER1, tmem[UR47], tmem[UR22], idesc[UR23], UPT",
+        "value": 191.0,
+        "share_of_metric_sum": 0.046974913920314804,
+        "context": [
+          {
+            "address": "0x7ffa135b0680",
+            "sass": "UTCQMMA.WS gdesc[UR54], gdesc[UR18].B_REUSE.BUFFER3, tmem[UR46], tmem[UR22], idesc[UR23], UPT"
+          },
+          {
+            "address": "0x7ffa135b0690",
+            "sass": "UTCQMMA.WS gdesc[UR68], gdesc[UR6].B_KEEP, tmem[UR47], tmem[UR22], idesc[UR23], UP0"
+          },
+          {
+            "address": "0x7ffa135b06a0",
+            "sass": "UTCQMMA.WS gdesc[UR66], gdesc[UR6].B_REUSE, tmem[UR47], tmem[UR22], idesc[UR23], UPT"
+          },
+          {
+            "address": "0x7ffa135b06b0",
+            "sass": "UTCQMMA.WS gdesc[UR64], gdesc[UR16].B_KEEP.BUFFER1, tmem[UR47], tmem[UR22], idesc[UR23], UPT"
+          },
+          {
+            "address": "0x7ffa135b06c0",
+            "sass": "UTCQMMA.WS gdesc[UR62], gdesc[UR16].B_REUSE.BUFFER1, tmem[UR47], tmem[UR22], idesc[UR23], UPT"
+          },
+          {
+            "address": "0x7ffa135b06d0",
+            "sass": "UTCQMMA.WS gdesc[UR60], gdesc[UR14].B_KEEP.BUFFER2, tmem[UR47], tmem[UR22], idesc[UR23], UPT"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135aef10",
+        "sass": "UTMALDG.2D.GATHER4 [UR8], [UR52]",
+        "value": 181.0,
+        "share_of_metric_sum": 0.044515494343334974,
+        "context": [
+          {
+            "address": "0x7ffa135aeed0",
+            "sass": "UMOV UR13, UR45"
+          },
+          {
+            "address": "0x7ffa135aeee0",
+            "sass": "UMOV UR14, UR46"
+          },
+          {
+            "address": "0x7ffa135aeef0",
+            "sass": "UTMALDG.2D.GATHER4 [UR24], [UR48]"
+          },
+          {
+            "address": "0x7ffa135aef00",
+            "sass": "UTMALDG.2D.GATHER4 [UR16], [UR48]"
+          },
+          {
+            "address": "0x7ffa135aef10",
+            "sass": "UTMALDG.2D.GATHER4 [UR8], [UR52]"
+          },
+          {
+            "address": "0x7ffa135aef20",
+            "sass": "UIADD3 UR40, UPT, UPT, UR5, 0x9a00, URZ"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135aed20",
+        "sass": "UTMALDG.2D.GATHER4 [UR8], [UR52]",
+        "value": 155.0,
+        "share_of_metric_sum": 0.03812100344318741,
+        "context": [
+          {
+            "address": "0x7ffa135aece0",
+            "sass": "UMOV UR13, UR45"
+          },
+          {
+            "address": "0x7ffa135aecf0",
+            "sass": "UMOV UR14, UR46"
+          },
+          {
+            "address": "0x7ffa135aed00",
+            "sass": "UTMALDG.2D.GATHER4 [UR24], [UR48]"
+          },
+          {
+            "address": "0x7ffa135aed10",
+            "sass": "UTMALDG.2D.GATHER4 [UR16], [UR48]"
+          },
+          {
+            "address": "0x7ffa135aed20",
+            "sass": "UTMALDG.2D.GATHER4 [UR8], [UR52]"
+          },
+          {
+            "address": "0x7ffa135aed30",
+            "sass": "UIADD3 UR40, UPT, UPT, UR5, 0x9800, URZ"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135af100",
+        "sass": "UTMALDG.2D.GATHER4 [UR8], [UR52]",
+        "value": 154.0,
+        "share_of_metric_sum": 0.03787506148548942,
+        "context": [
+          {
+            "address": "0x7ffa135af0c0",
+            "sass": "UMOV UR13, UR45"
+          },
+          {
+            "address": "0x7ffa135af0d0",
+            "sass": "UMOV UR14, UR46"
+          },
+          {
+            "address": "0x7ffa135af0e0",
+            "sass": "UTMALDG.2D.GATHER4 [UR24], [UR48]"
+          },
+          {
+            "address": "0x7ffa135af0f0",
+            "sass": "UTMALDG.2D.GATHER4 [UR16], [UR48]"
+          },
+          {
+            "address": "0x7ffa135af100",
+            "sass": "UTMALDG.2D.GATHER4 [UR8], [UR52]"
+          },
+          {
+            "address": "0x7ffa135af110",
+            "sass": "UIADD3 UR40, UPT, UPT, UR5, 0x9c00, URZ"
+          }
+        ]
+      }
+    ],
+    "stall_wait": [
+      {
+        "address": "0x7ffa135b1aa0",
+        "sass": "MUFU.EX2 R80, R80",
+        "value": 144.0,
+        "share_of_metric_sum": 0.014125956444967627,
+        "context": [
+          {
+            "address": "0x7ffa135b1a60",
+            "sass": "HADD2.F32 R16, -RZ, R16.H0_H0"
+          },
+          {
+            "address": "0x7ffa135b1a70",
+            "sass": "MUFU.EX2 R3, R3"
+          },
+          {
+            "address": "0x7ffa135b1a80",
+            "sass": "HADD2.F32 R10, -RZ, R10.H0_H0"
+          },
+          {
+            "address": "0x7ffa135b1a90",
+            "sass": "FADD2 R16, R88.F32x2.HI_LO, -R16.F32x2.HI_LO"
+          },
+          {
+            "address": "0x7ffa135b1aa0",
+            "sass": "MUFU.EX2 R80, R80"
+          },
+          {
+            "address": "0x7ffa135b1ab0",
+            "sass": "F2FP.SATFINITE.E4M3.F32.PACK_AB_MERGE_C R18, R77, R76, RZ"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135b1a70",
+        "sass": "MUFU.EX2 R3, R3",
+        "value": 142.0,
+        "share_of_metric_sum": 0.013929762605454189,
+        "context": [
+          {
+            "address": "0x7ffa135b1a30",
+            "sass": "F2FP.SATFINITE.E4M3.F32.PACK_AB_MERGE_C R35, R23, R22, RZ"
+          },
+          {
+            "address": "0x7ffa135b1a40",
+            "sass": "MUFU.EX2 R2, R2"
+          },
+          {
+            "address": "0x7ffa135b1a50",
+            "sass": "F2FP.SATFINITE.E4M3.F32.PACK_AB_MERGE_C R25, R75, R74, RZ"
+          },
+          {
+            "address": "0x7ffa135b1a60",
+            "sass": "HADD2.F32 R16, -RZ, R16.H0_H0"
+          },
+          {
+            "address": "0x7ffa135b1a70",
+            "sass": "MUFU.EX2 R3, R3"
+          },
+          {
+            "address": "0x7ffa135b1a80",
+            "sass": "HADD2.F32 R10, -RZ, R10.H0_H0"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135b1770",
+        "sass": "MUFU.EX2 R93, R93",
+        "value": 138.0,
+        "share_of_metric_sum": 0.01353737492642731,
+        "context": [
+          {
+            "address": "0x7ffa135b1730",
+            "sass": "MUFU.EX2 R92, R92"
+          },
+          {
+            "address": "0x7ffa135b1740",
+            "sass": "F2FP.SATFINITE.E4M3.F32.PACK_AB_MERGE_C R33, R33, R32, RZ"
+          },
+          {
+            "address": "0x7ffa135b1750",
+            "sass": "HADD2.F32 R35, -RZ, R34.H1_H1"
+          },
+          {
+            "address": "0x7ffa135b1760",
+            "sass": "F2FP.SATFINITE.E4M3.F32.PACK_AB_MERGE_C R15, R83, R82, RZ"
+          },
+          {
+            "address": "0x7ffa135b1770",
+            "sass": "MUFU.EX2 R93, R93"
+          },
+          {
+            "address": "0x7ffa135b1780",
+            "sass": "FADD2 R10, R90.F32x2.HI_LO, -R10.F32x2.HI_LO"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135b1570",
+        "sass": "MUFU.EX2 R91, R91",
+        "value": 134.0,
+        "share_of_metric_sum": 0.013144987247400432,
+        "context": [
+          {
+            "address": "0x7ffa135b1530",
+            "sass": "MUFU.EX2 R90, R90"
+          },
+          {
+            "address": "0x7ffa135b1540",
+            "sass": "FADD2 R78, R56.F32x2.HI_LO, R4.F32"
+          },
+          {
+            "address": "0x7ffa135b1550",
+            "sass": "FSETP.NEU.AND P0, PT, R100, 1, PT"
+          },
+          {
+            "address": "0x7ffa135b1560",
+            "sass": "FADD2 R74, R54.F32x2.HI_LO, R4.F32"
+          },
+          {
+            "address": "0x7ffa135b1570",
+            "sass": "MUFU.EX2 R91, R91"
+          },
+          {
+            "address": "0x7ffa135b1580",
+            "sass": "FADD2 R76, R36.F32x2.HI_LO, R4.F32"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135b18b0",
+        "sass": "MUFU.EX2 R78, R78",
+        "value": 133.0,
+        "share_of_metric_sum": 0.013046890327643713,
+        "context": [
+          {
+            "address": "0x7ffa135b1870",
+            "sass": "MUFU.EX2 R89, R89"
+          },
+          {
+            "address": "0x7ffa135b1880",
+            "sass": "PRMT R13, R22, 0x5410, R13"
+          },
+          {
+            "address": "0x7ffa135b1890",
+            "sass": "HADD2.F32 R25, -RZ, R24.H1_H1"
+          },
+          {
+            "address": "0x7ffa135b18a0",
+            "sass": "F2FP.F16.E4M3.UNPACK_B R22, R22"
+          },
+          {
+            "address": "0x7ffa135b18b0",
+            "sass": "MUFU.EX2 R78, R78"
+          },
+          {
+            "address": "0x7ffa135b18c0",
+            "sass": "HADD2.F32 R24, -RZ, R24.H0_H0"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135b1730",
+        "sass": "MUFU.EX2 R92, R92",
+        "value": 129.0,
+        "share_of_metric_sum": 0.012654502648616834,
+        "context": [
+          {
+            "address": "0x7ffa135b16f0",
+            "sass": "MUFU.EX2 R85, R85"
+          },
+          {
+            "address": "0x7ffa135b1700",
+            "sass": "F2FP.F16.E4M3.UNPACK_B R34, R12"
+          },
+          {
+            "address": "0x7ffa135b1710",
+            "sass": "HADD2.F32 R10, -RZ, R10.H0_H0"
+          },
+          {
+            "address": "0x7ffa135b1720",
+            "sass": "PRMT R12, R15, 0x5410, R12"
+          },
+          {
+            "address": "0x7ffa135b1730",
+            "sass": "MUFU.EX2 R92, R92"
+          },
+          {
+            "address": "0x7ffa135b1740",
+            "sass": "F2FP.SATFINITE.E4M3.F32.PACK_AB_MERGE_C R33, R33, R32, RZ"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135b1f00",
+        "sass": "STS.128 [R107], R16",
+        "value": 126.0,
+        "share_of_metric_sum": 0.012360211889346674,
+        "context": [
+          {
+            "address": "0x7ffa135b1ec0",
+            "sass": "F2FP.SATFINITE.E4M3.F32.PACK_AB_MERGE_C R31, R31, R30, RZ"
+          },
+          {
+            "address": "0x7ffa135b1ed0",
+            "sass": "PRMT R16, R11, 0x5410, R116"
+          },
+          {
+            "address": "0x7ffa135b1ee0",
+            "sass": "STS.128 [R108], R20"
+          },
+          {
+            "address": "0x7ffa135b1ef0",
+            "sass": "PRMT R18, R31, 0x5410, R10"
+          },
+          {
+            "address": "0x7ffa135b1f00",
+            "sass": "STS.128 [R107], R16"
+          },
+          {
+            "address": "0x7ffa135b1f10",
+            "sass": "@P1   BRA 0x7ffa135b2410"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135b0e10",
+        "sass": "LDS R0, [UR5+0x31900]",
+        "value": 125.0,
+        "share_of_metric_sum": 0.012262114969589955,
+        "context": [
+          {
+            "address": "0x7ffa135b0dd0",
+            "sass": "UIADD3 UR5, UPT, UPT, UR12, UR5, URZ"
+          },
+          {
+            "address": "0x7ffa135b0de0",
+            "sass": "MOV R0, UR6"
+          },
+          {
+            "address": "0x7ffa135b0df0",
+            "sass": "ULEA UR5, UR5, UR4, 0x2"
+          },
+          {
+            "address": "0x7ffa135b0e00",
+            "sass": "SHF.L.U32 R105, R0, 0x1f, RZ"
+          },
+          {
+            "address": "0x7ffa135b0e10",
+            "sass": "LDS R0, [UR5+0x31900]"
+          },
+          {
+            "address": "0x7ffa135b0e20",
+            "sass": "SYNCS.PHASECHK.TRANS64.TRYWAIT P0, [UR4+0x31920], R105"
+          }
+        ]
+      }
+    ],
+    "stall_no_inst": [
+      {
+        "address": "0x7ffa135b0ce0",
+        "sass": "ULEA.HI UR5, UR9, UR9, URZ, 0x1",
+        "value": 276.0,
+        "share_of_metric_sum": 0.22585924713584288,
+        "context": [
+          {
+            "address": "0x7ffa135b0ca0",
+            "sass": "LOP3.LUT R110, R5, 0x30, R110, 0x78, !PT"
+          },
+          {
+            "address": "0x7ffa135b0cb0",
+            "sass": "LOP3.LUT R108, R3, 0x30, R108, 0x78, !PT"
+          },
+          {
+            "address": "0x7ffa135b0cc0",
+            "sass": "LOP3.LUT R109, R2, 0x30, R109, 0x78, !PT"
+          },
+          {
+            "address": "0x7ffa135b0cd0",
+            "sass": "LOP3.LUT R107, R0, 0x30, R107, 0x78, !PT"
+          },
+          {
+            "address": "0x7ffa135b0ce0",
+            "sass": "ULEA.HI UR5, UR9, UR9, URZ, 0x1"
+          },
+          {
+            "address": "0x7ffa135b0cf0",
+            "sass": "USHF.L.U32 UR7, UR8, 0x3, URZ"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135b2410",
+        "sass": "NOP",
+        "value": 223.0,
+        "share_of_metric_sum": 0.18248772504091654,
+        "context": [
+          {
+            "address": "0x7ffa135b23d0",
+            "sass": "FMUL2 R32, R32.F32x2.HI_LO, R100.F32"
+          },
+          {
+            "address": "0x7ffa135b23e0",
+            "sass": "FMUL2 R34, R34.F32x2.HI_LO, R100.F32"
+          },
+          {
+            "address": "0x7ffa135b23f0",
+            "sass": "STTM.x32 tmem[UR5+0x60], R4"
+          },
+          {
+            "address": "0x7ffa135b2400",
+            "sass": "FENCE.VIEW.ASYNC.T"
+          },
+          {
+            "address": "0x7ffa135b2410",
+            "sass": "NOP"
+          },
+          {
+            "address": "0x7ffa135b2420",
+            "sass": "BAR.SYNC.DEFER_BLOCKING 0x1, 0x100"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135b1380",
+        "sass": "STS [R112+0x31100], R11",
+        "value": 156.0,
+        "share_of_metric_sum": 0.1276595744680851,
+        "context": [
+          {
+            "address": "0x7ffa135b1340",
+            "sass": "FMNMX3.NAN R9, R11, R10, R9, !PT"
+          },
+          {
+            "address": "0x7ffa135b1350",
+            "sass": "FMNMX3.NAN R0, R0, R5, R4, !PT"
+          },
+          {
+            "address": "0x7ffa135b1360",
+            "sass": "FMNMX3.NAN R6, R8, R7, R6, !PT"
+          },
+          {
+            "address": "0x7ffa135b1370",
+            "sass": "FMNMX3.NAN R11, R9, R6, R0, !PT"
+          },
+          {
+            "address": "0x7ffa135b1380",
+            "sass": "STS [R112+0x31100], R11"
+          },
+          {
+            "address": "0x7ffa135b1390",
+            "sass": "NOP"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135ae280",
+        "sass": "MOV R9, 0xffffffff",
+        "value": 94.0,
+        "share_of_metric_sum": 0.07692307692307693,
+        "context": [
+          {
+            "address": "0x7ffa135ae240",
+            "sass": "LDC.64 R4, c[0x0][0x390]"
+          },
+          {
+            "address": "0x7ffa135ae250",
+            "sass": "VIADD R6, R0, 0xffffff00"
+          },
+          {
+            "address": "0x7ffa135ae260",
+            "sass": "ISETP.NE.U32.AND P0, PT, R8, RZ, PT"
+          },
+          {
+            "address": "0x7ffa135ae270",
+            "sass": "UISETP.GE.U32.AND UP0, UPT, UR47, 0x2, UPT"
+          },
+          {
+            "address": "0x7ffa135ae280",
+            "sass": "MOV R9, 0xffffffff"
+          },
+          {
+            "address": "0x7ffa135ae290",
+            "sass": "ISETP.GE.OR P1, PT, R6, UR55, P1"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135b0d00",
+        "sass": "ULOP3.LUT UR5, UR5, 0xfffffffe, URZ, 0xc0, !UPT",
+        "value": 73.0,
+        "share_of_metric_sum": 0.05973813420621931,
+        "context": [
+          {
+            "address": "0x7ffa135b0cc0",
+            "sass": "LOP3.LUT R109, R2, 0x30, R109, 0x78, !PT"
+          },
+          {
+            "address": "0x7ffa135b0cd0",
+            "sass": "LOP3.LUT R107, R0, 0x30, R107, 0x78, !PT"
+          },
+          {
+            "address": "0x7ffa135b0ce0",
+            "sass": "ULEA.HI UR5, UR9, UR9, URZ, 0x1"
+          },
+          {
+            "address": "0x7ffa135b0cf0",
+            "sass": "USHF.L.U32 UR7, UR8, 0x3, URZ"
+          },
+          {
+            "address": "0x7ffa135b0d00",
+            "sass": "ULOP3.LUT UR5, UR5, 0xfffffffe, URZ, 0xc0, !UPT"
+          },
+          {
+            "address": "0x7ffa135b0d10",
+            "sass": "UIADD3 UR6, UPT, UPT, -UR5, UR9, URZ"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135ae230",
+        "sass": "S2R R10, SR_TID.X",
+        "value": 57.0,
+        "share_of_metric_sum": 0.046644844517184945,
+        "context": [
+          {
+            "address": "0x7ffa135ae1f0",
+            "sass": "UMOV UR47, URZ"
+          },
+          {
+            "address": "0x7ffa135ae200",
+            "sass": "UIADD3.64 UR52, UPT, UPT, UR52, 0x80, URZ"
+          },
+          {
+            "address": "0x7ffa135ae210",
+            "sass": "IMAD R2, R2, 0x800, R4"
+          },
+          {
+            "address": "0x7ffa135ae220",
+            "sass": "VIADD R2, R2, 0xffffff00"
+          },
+          {
+            "address": "0x7ffa135ae230",
+            "sass": "S2R R10, SR_TID.X"
+          },
+          {
+            "address": "0x7ffa135ae240",
+            "sass": "LDC.64 R4, c[0x0][0x390]"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135b2500",
+        "sass": "FADD R71, R70, R71",
+        "value": 52.0,
+        "share_of_metric_sum": 0.0425531914893617,
+        "context": [
+          {
+            "address": "0x7ffa135b24c0",
+            "sass": "FADD R79, R78, R79"
+          },
+          {
+            "address": "0x7ffa135b24d0",
+            "sass": "FADD R76, R76, R77"
+          },
+          {
+            "address": "0x7ffa135b24e0",
+            "sass": "FADD R75, R74, R75"
+          },
+          {
+            "address": "0x7ffa135b24f0",
+            "sass": "FADD R72, R72, R73"
+          },
+          {
+            "address": "0x7ffa135b2500",
+            "sass": "FADD R71, R70, R71"
+          },
+          {
+            "address": "0x7ffa135b2510",
+            "sass": "FADD R68, R68, R69"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135b2580",
+        "sass": "FADD R76, R76, R75",
+        "value": 42.0,
+        "share_of_metric_sum": 0.03436988543371522,
+        "context": [
+          {
+            "address": "0x7ffa135b2540",
+            "sass": "FADD R92, R92, R91"
+          },
+          {
+            "address": "0x7ffa135b2550",
+            "sass": "FADD R87, R88, R87"
+          },
+          {
+            "address": "0x7ffa135b2560",
+            "sass": "FADD R84, R84, R83"
+          },
+          {
+            "address": "0x7ffa135b2570",
+            "sass": "FADD R79, R80, R79"
+          },
+          {
+            "address": "0x7ffa135b2580",
+            "sass": "FADD R76, R76, R75"
+          },
+          {
+            "address": "0x7ffa135b2590",
+            "sass": "FADD R71, R72, R71"
+          }
+        ]
+      }
+    ],
+    "stall_not_selected": [
+      {
+        "address": "0x7ffa135b0ec0",
+        "sass": "FMUL2 R62, R10.F32x2.HI_LO, 0.090168438851833343506",
+        "value": 188.0,
+        "share_of_metric_sum": 0.06270847231487658,
+        "context": [
+          {
+            "address": "0x7ffa135b0e80",
+            "sass": "SHF.L.U32 R68, R69, 0x2, RZ"
+          },
+          {
+            "address": "0x7ffa135b0e90",
+            "sass": "LDC R68, c[0x2][R68]"
+          },
+          {
+            "address": "0x7ffa135b0ea0",
+            "sass": "LDTM.STAT.x32.MAX.F32.NAN R66, R4, tmem[UR5+0x100]"
+          },
+          {
+            "address": "0x7ffa135b0eb0",
+            "sass": "NOP"
+          },
+          {
+            "address": "0x7ffa135b0ec0",
+            "sass": "FMUL2 R62, R10.F32x2.HI_LO, 0.090168438851833343506"
+          },
+          {
+            "address": "0x7ffa135b0ed0",
+            "sass": "SHF.R.S32.HI R69, RZ, 0x1f, R68"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135b1c60",
+        "sass": "MUFU.EX2 R73, R73",
+        "value": 86.0,
+        "share_of_metric_sum": 0.028685790527018012,
+        "context": [
+          {
+            "address": "0x7ffa135b1c20",
+            "sass": "MUFU.EX2 R72, R72"
+          },
+          {
+            "address": "0x7ffa135b1c30",
+            "sass": "F2FP.SATFINITE.E4M3.F32.PACK_AB_MERGE_C R22, R69, R68, RZ"
+          },
+          {
+            "address": "0x7ffa135b1c40",
+            "sass": "HADD2.F32 R17, -RZ, R16.H1_H1"
+          },
+          {
+            "address": "0x7ffa135b1c50",
+            "sass": "FADD2 R18, R76.F32x2.HI_LO, -R18.F32x2.HI_LO"
+          },
+          {
+            "address": "0x7ffa135b1c60",
+            "sass": "MUFU.EX2 R73, R73"
+          },
+          {
+            "address": "0x7ffa135b1c70",
+            "sass": "PRMT R27, R22, 0x5410, R27"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135ae360",
+        "sass": "SHF.L.U32 R7, R7, 0x1f, RZ",
+        "value": 84.0,
+        "share_of_metric_sum": 0.028018679119412943,
+        "context": [
+          {
+            "address": "0x7ffa135ae320",
+            "sass": "ULEA.HI UR5, UR6, UR6, URZ, 0x1"
+          },
+          {
+            "address": "0x7ffa135ae330",
+            "sass": "ULOP3.LUT UR5, UR5, 0xfffffffe, URZ, 0xc0, !UPT"
+          },
+          {
+            "address": "0x7ffa135ae340",
+            "sass": "UIADD3 UR5, UPT, UPT, UR6, -UR5, URZ"
+          },
+          {
+            "address": "0x7ffa135ae350",
+            "sass": "MOV R7, UR5"
+          },
+          {
+            "address": "0x7ffa135ae360",
+            "sass": "SHF.L.U32 R7, R7, 0x1f, RZ"
+          },
+          {
+            "address": "0x7ffa135ae370",
+            "sass": "SYNCS.PHASECHK.TRANS64.TRYWAIT P2, [UR7+0x31958], R7"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135ae350",
+        "sass": "MOV R7, UR5",
+        "value": 78.0,
+        "share_of_metric_sum": 0.02601734489659773,
+        "context": [
+          {
+            "address": "0x7ffa135ae310",
+            "sass": "UIADD3 UR6, UPT, UPT, UR39, -0x1, URZ"
+          },
+          {
+            "address": "0x7ffa135ae320",
+            "sass": "ULEA.HI UR5, UR6, UR6, URZ, 0x1"
+          },
+          {
+            "address": "0x7ffa135ae330",
+            "sass": "ULOP3.LUT UR5, UR5, 0xfffffffe, URZ, 0xc0, !UPT"
+          },
+          {
+            "address": "0x7ffa135ae340",
+            "sass": "UIADD3 UR5, UPT, UPT, UR6, -UR5, URZ"
+          },
+          {
+            "address": "0x7ffa135ae350",
+            "sass": "MOV R7, UR5"
+          },
+          {
+            "address": "0x7ffa135ae360",
+            "sass": "SHF.L.U32 R7, R7, 0x1f, RZ"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135b1e40",
+        "sass": "FADD2 R20, R70.F32x2.HI_LO, -R20.F32x2.HI_LO",
+        "value": 76.0,
+        "share_of_metric_sum": 0.025350233488992662,
+        "context": [
+          {
+            "address": "0x7ffa135b1e00",
+            "sass": "PRMT R22, R113, 0x5410, R66"
+          },
+          {
+            "address": "0x7ffa135b1e10",
+            "sass": "FADD2 R10, R80.F32x2.HI_LO, -R10.F32x2.HI_LO"
+          },
+          {
+            "address": "0x7ffa135b1e20",
+            "sass": "PRMT R23, R115, 0x5410, R114"
+          },
+          {
+            "address": "0x7ffa135b1e30",
+            "sass": "HADD2.F32 R31, -RZ, R30.H1_H1"
+          },
+          {
+            "address": "0x7ffa135b1e40",
+            "sass": "FADD2 R20, R70.F32x2.HI_LO, -R20.F32x2.HI_LO"
+          },
+          {
+            "address": "0x7ffa135b1e50",
+            "sass": "HADD2.F32 R30, -RZ, R30.H0_H0"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135b2410",
+        "sass": "NOP",
+        "value": 76.0,
+        "share_of_metric_sum": 0.025350233488992662,
+        "context": [
+          {
+            "address": "0x7ffa135b23d0",
+            "sass": "FMUL2 R32, R32.F32x2.HI_LO, R100.F32"
+          },
+          {
+            "address": "0x7ffa135b23e0",
+            "sass": "FMUL2 R34, R34.F32x2.HI_LO, R100.F32"
+          },
+          {
+            "address": "0x7ffa135b23f0",
+            "sass": "STTM.x32 tmem[UR5+0x60], R4"
+          },
+          {
+            "address": "0x7ffa135b2400",
+            "sass": "FENCE.VIEW.ASYNC.T"
+          },
+          {
+            "address": "0x7ffa135b2410",
+            "sass": "NOP"
+          },
+          {
+            "address": "0x7ffa135b2420",
+            "sass": "BAR.SYNC.DEFER_BLOCKING 0x1, 0x100"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135b2580",
+        "sass": "FADD R76, R76, R75",
+        "value": 73.0,
+        "share_of_metric_sum": 0.024349566377585057,
+        "context": [
+          {
+            "address": "0x7ffa135b2540",
+            "sass": "FADD R92, R92, R91"
+          },
+          {
+            "address": "0x7ffa135b2550",
+            "sass": "FADD R87, R88, R87"
+          },
+          {
+            "address": "0x7ffa135b2560",
+            "sass": "FADD R84, R84, R83"
+          },
+          {
+            "address": "0x7ffa135b2570",
+            "sass": "FADD R79, R80, R79"
+          },
+          {
+            "address": "0x7ffa135b2580",
+            "sass": "FADD R76, R76, R75"
+          },
+          {
+            "address": "0x7ffa135b2590",
+            "sass": "FADD R71, R72, R71"
+          }
+        ]
+      },
+      {
+        "address": "0x7ffa135b1c20",
+        "sass": "MUFU.EX2 R72, R72",
+        "value": 65.0,
+        "share_of_metric_sum": 0.021681120747164776,
+        "context": [
+          {
+            "address": "0x7ffa135b1be0",
+            "sass": "MUFU.EX2 R71, R71"
+          },
+          {
+            "address": "0x7ffa135b1bf0",
+            "sass": "F2FP.F16.E4M3.UNPACK_B R10, R17"
+          },
+          {
+            "address": "0x7ffa135b1c00",
+            "sass": "HADD2.F32 R18, -RZ, R18.H0_H0"
+          },
+          {
+            "address": "0x7ffa135b1c10",
+            "sass": "PRMT R24, R17, 0x5410, R26"
+          },
+          {
+            "address": "0x7ffa135b1c20",
+            "sass": "MUFU.EX2 R72, R72"
+          },
+          {
+            "address": "0x7ffa135b1c30",
+            "sass": "F2FP.SATFINITE.E4M3.F32.PACK_AB_MERGE_C R22, R69, R68, RZ"
+          }
+        ]
+      }
+    ],
+    "L1 Wavefronts Shared Excessive": []
+  }
+}
