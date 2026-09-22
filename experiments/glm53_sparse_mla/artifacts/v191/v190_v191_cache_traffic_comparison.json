@@ -1,0 +1,26 @@
+{
+  "v183": {
+    "dram__bytes_read.sum": "1.561872",
+    "dram__bytes_write.sum": "527.141632",
+    "lts__t_sector_hit_rate.pct": "75.304519",
+    "gpu__time_duration.sum": "1.545024"
+  },
+  "v190": {
+    "dram__bytes_read.sum": "1.427949",
+    "dram__bytes_write.sum": "525.975552",
+    "lts__t_sector_hit_rate.pct": "76.874009",
+    "gpu__time_duration.sum": "1.546144"
+  },
+  "v184": {
+    "dram__bytes_read.sum": "1.562872",
+    "dram__bytes_write.sum": "526.805248",
+    "lts__t_sector_hit_rate.pct": "75.296663",
+    "gpu__time_duration.sum": "1.688832"
+  },
+  "v191": {
+    "dram__bytes_read.sum": "1.427605",
+    "dram__bytes_write.sum": "526.225152",
+    "lts__t_sector_hit_rate.pct": "76.890635",
+    "gpu__time_duration.sum": "1.689056"
+  }
+}

@@ -33,19 +33,19 @@ export CUTE_DSL_ARCH=sm_103a
 
 # Fast single-P path with closely matching TRTLLM precision; see all-row limits below.
 /opt/sglang/bin/python bench.py \
-  --kernel-version v183 --block-k 128 \
+  --kernel-version v190 --block-k 128 \
   --backends trtllm cute --scope native --check-rows 512 \
   --warmup-iters 20 --repeat-iters 100 --cache both --timing cuda-graph \
-  --output-json artifacts/v183_accuracy512_graph.json
+  --output-json artifacts/v190_accuracy512_graph.json
 
 # Higher precision, retaining the audited full-reference tolerance passes.
-/opt/sglang/bin/python bench.py --kernel-version v184 --block-k 128 \
+/opt/sglang/bin/python bench.py --kernel-version v191 --block-k 128 \
   --backends trtllm cute --scope native --check-rows 512 \
   --warmup-iters 20 --repeat-iters 100 --cache both --timing cuda-graph \
-  --output-json artifacts/v184_accuracy512_graph.json
+  --output-json artifacts/v191_accuracy512_graph.json
 
 # Short event-based tuning run, followed by one warmed NCU invocation.
-bash run_iteration.sh v183 128
+bash run_iteration.sh v190 128
 ```
 
 `run_iteration.sh` saves raw JSON, logs, NCU details/CSV and an immutable per-run
@@ -79,7 +79,8 @@ The full 8192-row/seed1234 audit checks all 268,435,456 output elements:
 | v125, direct256-bit output stores | Full bitwise equality to v112 on both seeds, short case and masks | Earlier fast path |
 | v138, paired x32 correction loads | Full bitwise equality to v125 on both seeds, short case and masks | Earlier fast path |
 | v146, early bitmap acquisition | Full bitwise equality to v138 on both seeds, short case and masks | Earlier fast path |
-| v183, hardware max with indexed mask fallback | Full bitwise equality to v146 on both seeds, short case and masks | Current fast path |
+| v183, hardware max with indexed mask fallback | Full bitwise equality to v146 on both seeds, short case and masks | Earlier fast path |
+| v190, output evict-first | Full bitwise equality to v183 on both seeds, short case and masks | Current fast path |
 | v049, P scale256 | 11 | Earlier timing reference |
 | v053, residual FP8 | 0 | Original higher-precision path |
 | v065, residual FP8 with V collector reuse | 0 via full bitwise equivalence to v053 | Exact-equivalence optimization |
@@ -93,7 +94,8 @@ The full 8192-row/seed1234 audit checks all 268,435,456 output elements:
 | v148, immediate residual collector use | Independent full FP32 tolerance passes on two seeds, short case and masks | Earlier higher-precision path |
 | v153, early bitmap and PV stage release | Full bitwise equality through v152 to v148 on two seeds, short case and masks | Earlier higher-precision path |
 | v160, packed score scaling | Full bitwise equality to v153 on two seeds, short case and masks | Earlier higher-precision path |
-| v184, hardware max with indexed mask fallback | Full bitwise equality to v160 on two seeds, short case and masks | Current higher-precision path |
+| v184, hardware max with indexed mask fallback | Full bitwise equality to v160 on two seeds, short case and masks | Earlier higher-precision path |
+| v191, output evict-first | Full bitwise equality to v184 on both seeds, short case and masks | Current higher-precision path |
 
 The earlier fast path v138 matches v125 bitwise on both full8192-row seeds,
 all1024 short-case rows and masked inputs, retaining the FP8 limits below.
@@ -124,7 +126,7 @@ versus v108 1712.34–1713.34 µs and TRT 1871.36–1876.06 µs; cold
 1857.46–1859.60 µs. It improves on v108 in each recorded ordering, although
 one warm pair differs by less than 1 µs. These are observed ranges of round
 medians with unlocked clocks, not confidence intervals. The baseline FP8
-precision limits remain; v184 is the current higher-precision option.
+precision limits remain; v191 is the current higher-precision option.
 
 Earlier fast path v108 matches v105 bitwise on both full 8192-row seeds,
 all 1024 short-case rows and the masked input; qualified b2 synccheck/b512
@@ -206,7 +208,7 @@ TRT 1886.18/1916.88 µs; Graph medians are 1806.54/1796.08 µs versus
 TRT 1869.81–1878.22 µs, improving on v094 in every ordering. It moves the
 read-only global index fetch before stage-reuse waiting while keeping shared
 publication after that wait. This preserves the documented FP8 precision limits;
-it does not establish an all-row FP32-reference pass. v184 is the current validated
+it does not establish an all-row FP32-reference pass. v191 is the current validated
 higher-precision option.
 
 v094 retains v091 output bits on both full8192-row seeds, the1024-row short
@@ -223,7 +225,7 @@ Eager-event warm/cold medians are1852.51/1851.06 µs versusTRT1886.94/1917.02 µ
 Graph medians1847.62/1832.43 µs versusTRT1863.94/1926.14 µs. Three rotated
 orders give warm v0911822.98–1824.83 µs versusTRT1869.98–1879.65 µs; it also
 improves on v090 in every ordering. These are the same baseline-precision
-outputs, including the failures documented below. v184 is the current higher-precision option on its audited inputs.
+outputs, including the failures documented below. v191 is the current higher-precision option on its audited inputs.
 
 v090 matches v086 bitwise on all8192 rows of both seeds and all1024 rows of
 the short case, in three repeats each. The mask case also matches v086 bitwise,
@@ -330,7 +332,7 @@ evict-first. Full2seeds/short/mask bitwise equivalence and qualified sanitizers
 pass. Two rotating-order audits favor it in8/10 warm and9/10 cold round medians,
 but the gain is small and includes regressions in individual orders. Hardware
 counters show about8.8% less DRAM read traffic in the recorded warmed profile.
-It is a validated experimental alternative; v183 is now the established default.
+It is a validated experimental alternative; v190 is now the established default.
 KV evict-last (`v130`) has no consistent gain. Mandatory future-QK lookahead
 (`v131`) delays PV and regresses to2.038ms; readiness-conditional lookahead
 (`v132`) recovers to1.661ms but still does not improvev125. See the iteration log
@@ -348,7 +350,7 @@ Neither version is promoted.
 For higher precision, `v133` is the analogous output evict-first experiment:
 full2seeds/short/mask bits matchv128, and qualified sanitizers pass. Its three
 rotated orders improve slightly, while separate eager warm timing regresses
-slightly. It remains slower than TRT; v184 is now the established default.
+slightly. It remains slower than TRT; v191 is now the established default.
 
 
 The earlier higher-precision default was **v145**. It replaces per-element validity
@@ -399,7 +401,7 @@ of four orders, with a3.84 us regression in the first. Separate Graph warm
 reporting the faster rotated measurements.
 
 
-The current experimental defaults are **v183 (fast)** and **v184 (higher
+The previous experimental defaults were **v183 (fast)** and **v184 (higher
 precision)**. Both use SM103 TMEM load/max and an indexed uniform branch to
 actually skip mask/software-max instructions on all-valid bitmap words. Partial
 words retain the complete masked fallback. Both full seeds, the short case and
@@ -411,3 +413,23 @@ v1461671.46–1673.57 us andTRT1868.93–1880.30 us;v1841847.36–1849.23 us ver
 v1601861.76–1880.06 us andTRT1874.16–1887.41 us. Both beat their previous
 defaults in all eight warm/cold comparisons. Separate high-precision Graph
 warm1901.55 us still trailsTRT1867.89 us; timing-regime limits remain.
+
+
+The current experimental defaults are **v190 (fast)** and **v191 (higher precision)**.
+They add output L2 evict-first to v183/v184 and match their predecessors bitwise
+on both full seeds, short-case rows and masks. Qualified memory and sync checks
+pass. All fast-path tolerance limitations remain; exact equivalence is not an
+independent FP32 accuracy pass.
+
+Both candidates beat their predecessor in all eight same-run rotating Graph
+comparisons. Warm v1901609.73–1611.78 us versus v1831611.98–1613.86 and
+TRT1866.80–1869.84; cold v1901593.52–1595.57 versus v1831601.47–1616.19.
+Warm v1911820.77–1822.96 versus v1841825.20–1828.99 andTRT1862.38–1869.58;
+cold v1911807.89–1812.46 versus v1841822.62–1824.83.
+
+Independent20/100 Graph warm/cold:v1901642.51/1632.22 us versus
+TRT1861.62/1896.26;v1911884.24/1851.68 versus1859.55/1895.54. The higher
+precision standalone warm case still trailsTRT, and its cold time is slightly
+worse than the older independent v184 record. Unlocked NCU reports about8.6%
+less DRAM read traffic but no latency gain in that profiled regime. This is a
+small cache-policy improvement, not an8.6% speedup or a universal lead.

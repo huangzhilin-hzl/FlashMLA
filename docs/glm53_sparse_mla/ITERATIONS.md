@@ -5591,3 +5591,74 @@ These improve the corresponding v183/v184 short records by1.22/4.10 us.
 Rotated comparisons have regressions, and separate event/Graph comparisons
 against previous extended records are mixed. Keep these as validated
 alternatives instead of replacing v183/v184 with a small regime-dependent gain.
+
+
+## Compiler control — isolated CuTeDSL 4.6.3
+
+Official release notes for4.6.3 and4.7.1 report the setmaxnreg/warp-specialized
+compilation fix, and the maintainer confirms issue3420 was fixed in both:
+https://github.com/NVIDIA/cutlass/releases/tag/v4.6.3
+https://github.com/NVIDIA/cutlass/issues/3420#issuecomment-5433964668
+
+Test4.6.3 as the smallest patch over installed4.6.2. Install matching DSL,base,
+core,cu12 andcu13 wheels into a task-local compiler_envs directory, selected
+only by the current process PYTHONPATH. Leave /opt/sglang untouched. Record all
+package versions and loaded paths. First compile unchanged v183/v184 and the
+previously failing v124/v137; inspect register, stack and SASS differences.
+Compilation success is not a runtime validation or a speedup.
+
+The Pod's configured mirror timed out; its external network is unavailable and
+its global pip constraint pins4.6.2. Download wheels locally from official PyPI,
+verify published SHA256, transfer into the task directory and install offline
+with process-local constraints disabled. Preserve download metadata and logs.
+
+## Iterations 192–193 — retry complete-warpgroup register redistribution
+
+Based on v183/v184. Launch512 threads so both donor warpgroups are complete;
+warps8–15 decrease to32 registers and compute warps0–7 increase to192.
+Producer warps8–11 and issuer warp12 keep their existing work; warps13–15
+only donate registers. v193 explicitly restricts its compute branch towarp<8.
+Require min_blocks_per_mp=1 and inspect the compiler's initial allocation
+before launch. Final requested budget is57344 registers, below65536/SM.
+
+This reopens v137's failed lowering experiment after an official compiler fix,
+on the current load/max/indexed-mask implementation. No TMEM extent, arithmetic,
+barrier or pipeline change is intended. More registers could improve scheduling
+even without baseline spills; no gain is assumed. Compile first, verify complete
+warpgroup control and register budget, then guarded smoke/memcheck, synccheck,
+full/masked equivalence and paired measurements under the same compiler.
+
+
+### Iterations 190–191 result — small cache-policy gain with mixed execution regimes
+
+REG123/122 and STACK0; output SASS changes to STG.E.NA.EFL2.256. Ordinary b2 smoke, b512 memcheck and b2 synccheck pass with zero errors. Full seeds1234/5678 and the1024-row short case match v183/v184 bitwise for three repeats, as do masked inputs. v190 inherits fast-path tolerance failures; v191 retains the audited higher-precision passes.
+
+Short v190: trtllm/native 1691.94 us, cute-v190/native 1549.06 us.
+
+v190 warm: cute-v190/native 1609.73/1611.47/1610.88/1611.78 us; cute-v183/native 1611.98/1612.06/1612.86/1613.86 us; trtllm/native 1866.80/1867.92/1869.84/1867.87 us.
+
+v190 cold: cute-v190/native 1595.39/1595.57/1593.52/1595.42 us; cute-v183/native 1616.19/1601.47/1616.10/1607.73 us; trtllm/native 1853.26/1855.31/1857.30/1857.36 us.
+
+v190 cuda-event20/100: trtllm/native warm 1863.14 us, cute-v190/native warm 1630.27 us, trtllm/native cold 1896.74 us, cute-v190/native cold 1646.05 us.
+
+v190 cuda-graph20/100: trtllm/native warm 1861.62 us, cute-v190/native warm 1642.51 us, trtllm/native cold 1896.26 us, cute-v190/native cold 1632.22 us.
+
+v190 NCU base/stable: launch__registers_per_thread=123 register/thread, launch__shared_mem_per_block_dynamic=194.920000 Kbyte/block, sm__warps_active.avg.pct_of_peak_sustained_active=19.282596 %, sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed=33.524179 %, smsp__warps_eligible.avg.per_cycle_active=0.368032 warp, smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio=6.424515 inst, l1tex__t_sectors_pipe_lsu_mem_local_op_ld.sum=0 sector, l1tex__t_sectors_pipe_lsu_mem_local_op_st.sum=0 sector, l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum=6,474,622 , l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum=3,831,716 , gpu__time_duration.sum=2.637696 ms.
+
+Short v191: trtllm/native 1691.71 us, cute-v191/native 1691.84 us.
+
+v191 warm: cute-v191/native 1820.82/1820.77/1822.32/1822.96 us; cute-v184/native 1825.20/1826.05/1828.99/1825.65 us; trtllm/native 1862.38/1867.87/1867.86/1869.58 us.
+
+v191 cold: cute-v191/native 1807.89/1808.30/1810.43/1812.46 us; cute-v184/native 1822.66/1822.62/1822.90/1824.83 us; trtllm/native 1850.88/1855.60/1855.74/1857.47 us.
+
+v191 cuda-event20/100: trtllm/native warm 1869.94 us, cute-v191/native warm 1826.70 us, trtllm/native cold 1901.58 us, cute-v191/native cold 1853.47 us.
+
+v191 cuda-graph20/100: trtllm/native warm 1859.55 us, cute-v191/native warm 1884.24 us, trtllm/native cold 1895.54 us, cute-v191/native cold 1851.68 us.
+
+v191 NCU base/stable: launch__registers_per_thread=122 register/thread, launch__shared_mem_per_block_dynamic=203.112000 Kbyte/block, sm__warps_active.avg.pct_of_peak_sustained_active=19.320824 %, sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed=45.208293 %, smsp__warps_eligible.avg.per_cycle_active=0.377666 warp, smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio=6.964201 inst, l1tex__t_sectors_pipe_lsu_mem_local_op_ld.sum=0 sector, l1tex__t_sectors_pipe_lsu_mem_local_op_st.sum=0 sector, l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum=6,526,396 , l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum=2,618,748 , gpu__time_duration.sum=2.878272 ms.
+
+Unlocked/dynamic NCU with cache-control none, after10 warmups: v183/v190 DRAM reads1.561872/1.427949 GB, writes527.141632/525.975552 MB, L2 hit75.304519%/76.874009%, diagnostic1.545024/1.546144 ms. v184/v191 reads1.562872/1.427605 GB, writes526.805248/526.225152 MB, hit75.296663%/76.890635%, diagnostic1.688832/1.689056 ms. Read traffic falls8.57%/8.65%, with no improvement in these profiled durations.
+
+Both versions win all eight same-run rotating-order comparisons, with the larger benefit under cold cache. This supports a small cache-policy improvement, not a proportional8.6% speedup. v191 standalone Graph warm remains1884.24 us versusTRT1859.55 us; its cold1851.68 us also does not beat the previous independently measured v1841849.60 us. Preserve regime dependence and unlocked-clock distributions.
+
+Promote v190/v191 as experimental defaults based on the eight paired wins and complete recorded equivalence audits. Retain all standalone-regime limitations above. v192/v193 deliberately compare to their unchanged v183/v184 parents to isolate compiler/register effects from this cache hint.
