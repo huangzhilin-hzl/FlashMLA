@@ -6250,3 +6250,32 @@ Native v214 has eight main-gather loops with7 instructions in the first loop and
 v214 issues635349655 instructions versus v197599875543, an increase of5.91%. UMOV falls76,144,640→46,260,224 (−29,884,416), but UIADD3 rises38,461,440→63,102,976 (+24,641,536), the new loop comparison issues16,777,216 times, and BRA.U rises2,334,720→19,111,936 (+16,777,216). MOV also rises8,706,722→10,437,899. Gather4 requests remain20,971,520 and MMA4,456,448. The final total includes additional changes, including sampled wait-loop execution, so it is not exactly the sum of those selected opcodes.
 
 Source shared wavefronts remain28,663,808 actual=ideal withzero excessive. Long/short-scoreboard samples65,807/5,355 and wait16,275 are diagnostic samples, not latency fractions. The core hypothesis of tuple reuse succeeds locally, but the loop's executed control/address work more than erases the desired issue saving. Do not pursue two-way unrolling solely because the static kernel is smaller; this evidence favors retaining the unrolled default and investigating another bottleneck.
+
+
+## Iterations 215–216 — packed low-term construction on the current residual pipeline
+
+The v197 source profile issues33,554,432 HADD2.F32 instructions while reconstructing high FP8 probabilities through FP16 into scalar FP32, followed by packed FP32 subtraction and low FP8 quantization. Investigate replacing the low-term subtraction/reconstruction with packed FP16 arithmetic while retaining original FP32 exp2 and denominator accumulation. Q/KV and both PV operands stay FP8; maps, layouts and synchronization remain unchanged.
+
+v215 retains high FP8 quantization directly from FP32 probabilities, then rounds probabilities to FP16 solely for subtraction of the exactly representable high FP8 value and converts that residual to low FP8. v216 also forms high FP8 from the rounded FP16 probabilities, porting the old v081 arithmetic as a control onto v197's optimized pipeline and64/176 role register allocation. v081 previously passed both full seeds with slightly higher error and no speed gain; its result is a warning, not a new performance or accuracy claim. The present profile provides a concrete repeated conversion cost to measure under the newer scheduling/allocation.
+
+Both candidates change probability rounding and therefore must undergo independent FP32-reference audits; they cannot inherit v197's bitwise accuracy scope. Preserve original0.01/0.05 tolerances and separately record short/hole cases. Compile/native conversion counts first; guarded memory/sync and at least one full reference seed plus masks precede timing. If the compile or timing gain is absent, do not continue parameter sweeps solely to find a favorable result.
+
+
+### Iterations 215–216 compile result
+
+Both compile with128 registers andzero stack, reducing static instructions1600→1584. The32 scalar HADD2.F32 reconstruction sites disappear; each candidate adds16 FP32→FP16 packed conversions and uses packed half residual arithmetic. v215 retains16 high-term E4M3-from-FP32 conversions and uses16 low-term E4M3-from-FP16 conversions; v216 uses32 E4M3-from-FP16 sites. Packed FP32 FADD2 sites fall32→16. The retained native counts include all other arithmetic/control changes; this is not yet a measured dynamic instruction or latency reduction.
+
+Original benchmark SHA256 remainsd843320fb5147a807135282a1b87bb4c247cdd7a6a16b9107d546c48c8a8fb66 in both the user's source and the local experiment copy.
+
+
+### Iterations 215–216 runtime — packed residual conversion does not improve the current kernel
+
+v215: full seed1234 passes all268435456 elements with0 mismatches, maxabs0.005918741226, relativeRMSE0.001750561591. Mask reference passes with maxabs0.004001855850. Guarded b2/b512 memory and b2 sync checks pass. No full second-seed or short-sequence accuracy claim.
+Short timing: trtllm/native 1691.84us, cute-v215/native 1667.04us.
+NCU base/stable: gpu__time_duration.sum=2.825632 ms, launch__registers_per_thread=128 register/thread, launch__shared_mem_per_block_dynamic=203.112000 Kbyte/block, sm__warps_active.avg.pct_of_peak_sustained_active=19.408055 %, sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed=46.075676 %, smsp__warps_eligible.avg.per_cycle_active=0.369652 warp, smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio=7.047772 inst, l1tex__t_sectors_pipe_lsu_mem_local_op_ld.sum=0 sector, l1tex__t_sectors_pipe_lsu_mem_local_op_st.sum=0 sector, l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum=6,940,132 , l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum=2,855,601 .
+
+v216: full seed1234 passes all268435456 elements with0 mismatches, maxabs0.005918741226, relativeRMSE0.001750537724. Mask reference passes with maxabs0.004001855850. Guarded b2/b512 memory and b2 sync checks pass. No full second-seed or short-sequence accuracy claim.
+Short timing: trtllm/native 1691.74us, cute-v216/native 1673.38us.
+NCU base/stable: gpu__time_duration.sum=2.840288 ms, launch__registers_per_thread=128 register/thread, launch__shared_mem_per_block_dynamic=203.112000 Kbyte/block, sm__warps_active.avg.pct_of_peak_sustained_active=19.394107 %, sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed=45.830213 %, smsp__warps_eligible.avg.per_cycle_active=0.367605 warp, smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio=7.094404 inst, l1tex__t_sectors_pipe_lsu_mem_local_op_ld.sum=0 sector, l1tex__t_sectors_pipe_lsu_mem_local_op_st.sum=0 sector, l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum=6,977,759 , l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum=2,862,024 .
+
+v2151667.04us andv2161673.38us are slower than v1971662.30us under the existing short tuning protocol; base/stable NCU durations2.825632/2.840288ms also exceed v1972.817632ms. Eligible warps decline despite fewer static operations and zero local sectors. The first-seed relativeRMSE is slightly higher than v197, so neither accuracy nor measured short performance justifies promotion. Retain these independently checked experiments; do not claim broad reference qualification or expand testing solely to seek a favorable timing. Defaults remain v190/v197.

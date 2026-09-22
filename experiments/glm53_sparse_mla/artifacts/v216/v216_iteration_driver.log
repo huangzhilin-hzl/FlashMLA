@@ -1,0 +1,14 @@
+  }
+}
+[CHECK] trtllm/native: PASS {"rows": [0, 8191, 511, 512, 1170, 2340, 3510, 4680], "max_abs": 0.00764106959104538, "rmse": 0.0013537678169086576, "relative_rmse": 0.015046226091400083, "atol": 0.01, "rtol": 0.05}
+[CHECK] cute-v216/native: PASS {"rows": [0, 8191, 511, 512, 1170, 2340, 3510, 4680], "max_abs": 0.002465546131134033, "rmse": 0.00015759900270495564, "relative_rmse": 0.0017516077697080695, "atol": 0.01, "rtol": 0.05}
+[BENCH] profiler=off; API elapsed time; timing=cuda-event
+Eager Events include host launch gaps; Graph replay changes that execution regime.
+warm=repeated input reuse; cold=best-effort L2 eviction before each call.
+native excludes adapters; adapted converts FULL Q and KV on EVERY call.
+FlashMLA APIs allocate output/auxiliary tensors; TRTLLM reuses its output.
+
+case                           cache   median/us      p05/us      p95/us   TRT/this
+trtllm/native                  warm      1691.74     1689.86     1764.30     1.000x
+cute-v216/native               warm      1673.38     1669.66     1682.27     1.011x
+[RESULT] /tmp/glm53_sparse_mla_dev/artifacts/v216_full_event.json

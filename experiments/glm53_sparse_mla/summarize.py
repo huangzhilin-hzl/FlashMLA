@@ -169,6 +169,8 @@ for directory in sorted(root.glob("v[0-9][0-9][0-9]")):
         status = "guarded/full seed1234/mask checks pass; packed half-trees improve previous packing, still slower"
     if version in ("v213", "v214"):
         status = "guarded/full seed1234/mask checks pass; looped TMA coordinate reuse slower"
+    if version in ("v215", "v216"):
+        status = "full seed1234/masked FP32 and guarded checks pass; half residual conversion slower"
     if version == "v142":
         status = "bitwise v138 full seed1234/mask; paired epilogue slower"
     if version == "v138":

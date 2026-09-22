@@ -1,0 +1,47 @@
+{
+  "purpose": "accuracy only; no latency claim",
+  "args": {
+    "kernel_versions": [
+      "v215",
+      "v216"
+    ],
+    "include_trtllm": false,
+    "block_k": 128,
+    "local_tokens": 8192,
+    "chunk": 3,
+    "seed": 1234,
+    "batch_rows": 256,
+    "output_json": "artifacts/half_residual_full1234.json"
+  },
+  "benchmark_sha256": "d843320fb5147a807135282a1b87bb4c247cdd7a6a16b9107d546c48c8a8fb66",
+  "atol": 0.01,
+  "rtol": 0.05,
+  "cases": {
+    "v215": {
+      "kernel_sha256": "ceff95a4eaa9087e491c5891e672ba9f08399acd98f3abb3d64d43ae21a2a804",
+      "finite": true,
+      "mismatches": 0,
+      "max_abs": 0.005918741226196289,
+      "squared_error_sum": 6.790970644390868,
+      "examples": [],
+      "checked_rows": 8192,
+      "checked_elements": 268435456,
+      "rmse": 0.00015905450970874404,
+      "relative_rmse": 0.0017505615908579633,
+      "pass": true
+    },
+    "v216": {
+      "kernel_sha256": "ffac5e00520c1e3f083968e0f3ade77a5c4f063cf0536ca63f1eed42a748b3c0",
+      "finite": true,
+      "mismatches": 0,
+      "max_abs": 0.005918741226196289,
+      "squared_error_sum": 6.790785475313404,
+      "examples": [],
+      "checked_rows": 8192,
+      "checked_elements": 268435456,
+      "rmse": 0.00015905234122804072,
+      "relative_rmse": 0.0017505377244549502,
+      "pass": true
+    }
+  }
+}
