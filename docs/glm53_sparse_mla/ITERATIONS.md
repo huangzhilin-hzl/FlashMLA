@@ -4457,3 +4457,120 @@ the bounded anchor, residual FP8 arithmetic, balanced sums, strict barriers and
 single x32 correction unchanged. This revisits bitmap cost after the dedicated
 issuer and newer register allocation; the older v092 result does not establish
 its effect in this schedule. Require bitwise v128 equivalence and mask accuracy.
+
+## Iteration 146 — acquire the compute bitmap earlier
+
+Based on v138, move the single shared bitmap load to immediately after acquiring
+the stage-full barrier and before waiting for QK completion. Retain both waits and
+all fences. The producer has published the bitmap by full acquisition; QK does
+not write it. This tests whether its shared-load dependency can overlap the QK
+wait. Verify SASS placement: source motion alone does not establish an executed
+instruction change. Arithmetic, masks, and the pipeline protocol are unchanged.
+
+## Iteration 147 — prefetch correction registers during probability math
+
+Based on v138, issue the first pair of x32 output-correction loads just after
+computing the correction factor, before probability exponentials, reduction and
+FP8 conversion. Keep the original warp-uniform identity test and block>0 guard;
+wait before consuming the prefetched registers at the original correction point.
+The second pair remains demand-loaded. Previous PV is already complete before
+this iteration starts. This trades a longer 64-register live range for potential
+load/math overlap; compile resources and actual spills may reject it. No numerical
+operation is changed, and a successful compile is not a runtime result.
+
+### Iterations 143–144 result — small synchronization effects, retain default
+
+Both compile with REG123/STACK0. Full seeds1234/5678 and short/chunk0 seed5678
+match v138 bitwise in three repeats each; masks match, qualified b2 synccheck and
+b512 memcheck report zero errors. Short medians: v143 1636.42 us versus TRT
+1691.78 us; v144 1636.48 us versus TRT 1689.89 us. Four rotated Graph orders:
+
+| Cache | v138 us, rounds0–3 | v143 us, rounds0–3 | v144 us, rounds0–3 | TRT us, rounds0–3 |
+|---|---|---|---|---|
+| warm | 1682.51 / 1681.68 / 1681.79 / 1681.57 | 1679.49 / 1683.46 / 1679.74 / 1679.55 | 1679.46 / 1679.42 / 1681.65 / 1679.34 | 1868.32 / 1879.98 / 1877.84 / 1876.13 |
+| cold | 1677.20 / 1681.44 / 1682.32 / 1677.31 | 1681.55 / 1675.49 / 1672.99 / 1675.09 | 1673.12 / 1675.01 / 1682.56 / 1673.18 | 1859.49 / 1859.81 / 1864.32 / 1859.70 |
+
+v143 has mixed warm/cold wins. v144 wins all four warm orders by 0.14–3.05 us,
+but one cold order is 0.24 us slower. These small effects do not warrant another
+default change yet; retain both as validated scheduling alternatives.
+
+NCU base/stable (v143 / v144): 194920 shared bytes; occupancy 19.281% / 19.303%;
+tensor 31.603% / 31.654%; eligible 0.399988 / 0.401802; long-scoreboard 6.185871 /
+6.229347; zero local sectors in both; shared-conflict aggregates 6836608/1896738
+and 6618725/1928820; diagnostic durations 2.797216 / 2.796064 ms. These aggregate
+counts are not evidence of a changed shared-memory layout or excessive conflicts.
+
+### Iteration 145 initial result — bitmap benefit returns in the newer schedule
+
+REG98/STACK0, versus v128 REG122. Full seed1234 matches v128 bitwise in three
+repeats; masked original-tolerance checks pass and masked output bits match.
+Qualified b2 synccheck and b512 memcheck report zero errors. Short 1781.79 us
+versus TRT 1691.90 us improves about 20.58 us from v128. NCU base/stable:
+98 registers, 203112 shared bytes, occupancy 19.337%, tensor 42.787%, eligible
+0.449606, long-scoreboard 6.364198, zero local sectors, aggregate shared conflicts
+6443889/2243835, diagnostic 3.040896 ms. Expanded validation is pending; the
+register reduction does not raise CTA residency with this shared/TMEM footprint.
+
+## Iteration 148 — consume residual PV collectors immediately
+
+Based on v145, change each PV output tile from hi(K0..K3), lo(K0..K3) to
+hi(K0), lo(K0), hi(K1), lo(K1), and so on. Each high operation fills its original
+B collector and the following residual operation last-uses it; both still share
+exactly the same V tile. This shortens collector lifetimes while retaining the
+same number of FP8 MMA operations and shared loads. It may instead serialize
+issue or lose useful scheduling freedom, so performance is empirical.
+
+The probability values and mathematical expression are unchanged, but FP32
+accumulation order changes. Do not inherit bitwise equivalence or full-tolerance
+results from v145. Begin with qualified sanitizers, masked FP32 checks and the
+original sampled benchmark; if the timing merits further work, run independent
+full-reference audits before promotion. No change to the benchmark or tolerance.
+
+### Iteration 145 expanded result — promote the higher-precision bitmap path
+
+Both full seeds and the full short case match v128 bitwise in three repeats;
+masked FP32 checks pass and masks match v128 bits. Thus the documented original
+full-tolerance passes are retained on these audited inputs. Eager 20/100 warm/cold
+1921.14/1922.64 us versus TRT 1880.14/1914.94 us; Graph 1955.74/1922.10 us versus
+TRT 1867.89/1915.04 us. Four same-process rotated Graph orders:
+
+| Cache | v128 us, rounds0–3 | v133 us, rounds0–3 | v145 us, rounds0–3 | TRT us, rounds0–3 |
+|---|---|---|---|---|
+| warm | 1923.07 / 1925.25 / 1923.30 / 1923.12 | 1925.15 / 1925.78 / 1924.94 / 1923.06 | 1898.85 / 1899.25 / 1900.48 / 1900.75 | 1813.65 / 1879.89 / 1877.92 / 1876.10 |
+| cold | 1918.86 / 1916.77 / 1918.99 / 1916.94 | 1912.77 / 1915.12 / 1914.67 / 1914.93 | 1896.50 / 1896.43 / 1896.66 / 1906.70 | 1865.63 / 1867.76 / 1863.73 / 1863.76 |
+
+v145 beats both higher-precision predecessors in every recorded order. Promote
+v145, while explicitly retaining TRT's lead. The unusual first TRT warm median
+is retained as measured, not dropped. Unlocked source counters: 673569020 dynamic
+instructions, 28663808 actual/ideal shared wavefronts, zero excessive. Long-scoreboard
+samples73515 include PV26090, producer-empty17173 and QK14184. No same-mode
+v128 source profile has yet been collected, so these totals alone do not quantify
+the bitmap's instruction reduction relative to v128.
+
+## Iteration 149 — early bitmap load on the higher-precision path
+
+Move v145's bitmap read after full-stage acquisition and before QK completion
+wait, matching v146's dependency experiment. Keep scaled-score math, residual P,
+strict barriers and all validity semantics unchanged. The first fast-path tuning
+result motivates this separate test, but does not establish a high-precision gain.
+
+### Iteration 146 initial result — early bitmap load improves short timing
+
+REG123/STACK0. Full seed1234 and masks match v138 bitwise; qualified b2 synccheck
+and b512 memcheck report zero errors. Short 1628.10 us versus TRT 1693.86 us is
+about 11.36 us below v138. NCU base/stable: 123 registers, 194920 shared bytes,
+occupancy 19.287%, tensor 31.782%, eligible 0.389984, long-scoreboard 6.146301,
+zero local sectors, aggregate shared conflicts 6319524/2098529, diagnostic
+2.781248 ms. Expanded validation, rotation and source placement inspection are
+pending; do not attribute the whole difference to shared-load latency yet.
+
+### Iteration 147 result — correction prefetch hurts without spilling
+
+REG126/STACK0. Full seed1234 output and mask bits match v138; qualified b2
+synccheck and b512 memcheck report zero errors. Short 1690.85 us versus TRT
+1693.54 us is 51.39 us slower than v138. NCU base/stable: 126 registers,
+194920 shared bytes, occupancy 19.327%, tensor 30.640%, eligible 0.414074,
+long-scoreboard 5.930648, zero local sectors, aggregate shared conflicts
+6334422/1762472, diagnostic 2.896416 ms. Reduced aggregate long-scoreboard ratio
+is not a speedup: the changed register lifetimes and schedule regress overall.
+No expanded audit or promotion for this prefetch placement.

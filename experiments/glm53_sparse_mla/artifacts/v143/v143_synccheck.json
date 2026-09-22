@@ -1,0 +1,146 @@
+{
+  "configuration": {
+    "gpu": "NVIDIA B300 SXM6 AC",
+    "capability": [
+      10,
+      3
+    ],
+    "versions": {
+      "torch": "2.13.0+cu130",
+      "cuda": "13.0",
+      "flashinfer-python": "0.6.18",
+      "flash-mla": "not installed as a distribution",
+      "flashmla_source_revision": "unreported"
+    },
+    "args": {
+      "mode": "bench",
+      "backends": [
+        "cute"
+      ],
+      "scope": "native",
+      "chunk": 3,
+      "rank": 0,
+      "seed": 1234,
+      "warmup_iters": 1,
+      "repeat_iters": 3,
+      "profile_iters": 20,
+      "timing": "cuda-event",
+      "cache": "warm",
+      "check_rows": 2,
+      "check_atol": 0.01,
+      "check_rtol": 0.05,
+      "trace_path": null,
+      "output_json": "artifacts/v143_synccheck.json",
+      "with_stack": false
+    },
+    "workload": {
+      "local_tokens": 2,
+      "cp": 4,
+      "context_len": 131072,
+      "heads": 64,
+      "qk_dim": 576,
+      "v_dim": 512,
+      "topk": 2048,
+      "page_size": 64,
+      "softmax_scale": 0.0625,
+      "bmm2_scale": 1.0,
+      "synthetic": true,
+      "enable_dcp": false
+    },
+    "tensors": {
+      "query": {
+        "shape": [
+          2,
+          1,
+          64,
+          576
+        ],
+        "dtype": "torch.float8_e4m3fn",
+        "stride": [
+          36864,
+          36864,
+          576,
+          1
+        ]
+      },
+      "kv_cache": {
+        "shape": [
+          2048,
+          1,
+          64,
+          576
+        ],
+        "dtype": "torch.float8_e4m3fn",
+        "stride": [
+          36864,
+          36864,
+          576,
+          1
+        ]
+      },
+      "block_tables": {
+        "shape": [
+          2,
+          1,
+          2048
+        ],
+        "dtype": "torch.int32",
+        "stride": [
+          2048,
+          2048,
+          1
+        ]
+      },
+      "seq_lens": {
+        "shape": [
+          2
+        ],
+        "dtype": "torch.int32",
+        "stride": [
+          1
+        ]
+      }
+    },
+    "cases": {
+      "cute-v143/native": "FP8 Q/KV; preallocated BF16 output; block_k=128"
+    },
+    "candidate": {
+      "version": "v143",
+      "block_k": 128,
+      "file_sha256": "39b8cc983ce69d6197212a218d910a36295d4659d1ace03c52bcc2af24e11089",
+      "cutlass_dsl": "4.6.2",
+      "original_benchmark_sha256": "d843320fb5147a807135282a1b87bb4c247cdd7a6a16b9107d546c48c8a8fb66"
+    }
+  },
+  "correctness": {
+    "cute-v143/native": {
+      "rows": [
+        0,
+        1
+      ],
+      "max_abs": 0.007722437381744385,
+      "rmse": 0.0013866935623809695,
+      "relative_rmse": 0.015080918176442314,
+      "atol": 0.01,
+      "rtol": 0.05
+    }
+  },
+  "benchmarks": [
+    {
+      "case": "cute-v143/native",
+      "cache": "warm",
+      "timing": "cuda-event",
+      "mean_us": 753.7600000699362,
+      "median_us": 707.7760100364685,
+      "p05_us": 701.987212896347,
+      "p95_us": 837.7215802669525,
+      "samples_us": [
+        852.1599769592285,
+        701.3440132141113,
+        707.7760100364685
+      ],
+      "l2_flush_bytes": 0,
+      "speedup_vs_trtllm": null
+    }
+  ]
+}
