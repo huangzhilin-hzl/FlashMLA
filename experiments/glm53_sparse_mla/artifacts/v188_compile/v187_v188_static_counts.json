@@ -1,0 +1,30 @@
+{
+  "v187": {
+    "baseline": "v183",
+    "identical_encoding_words": false,
+    "counts": {
+      "BSSY.RECONVERGENT": 4,
+      "BSYNC.RECONVERGENT": 4,
+      "ELECT": 4,
+      "UTCQMMA.WS": 26,
+      "FMNMX": 2,
+      "BRX": 1,
+      "FMNMX3.NAN": 16,
+      "FMNMX3": 1
+    }
+  },
+  "v188": {
+    "baseline": "v184",
+    "identical_encoding_words": false,
+    "counts": {
+      "BSSY.RECONVERGENT": 4,
+      "BSYNC.RECONVERGENT": 4,
+      "ELECT": 4,
+      "UTCQMMA.WS": 34,
+      "FMNMX": 2,
+      "BRX": 1,
+      "FMNMX3.NAN": 16,
+      "FMNMX3": 1
+    }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "baseline": "v184",
+  "candidate": "v189",
+  "encoding_words_baseline": 3200,
+  "encoding_words_candidate": 3200,
+  "identical_encoding_words": false,
+  "differing_words_same_length": 32
+}

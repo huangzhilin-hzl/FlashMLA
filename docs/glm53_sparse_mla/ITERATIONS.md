@@ -5489,3 +5489,105 @@ with zero excessive. v183 long-scoreboard62208 includesPV16824,producer-empty
 15589,QK12951;v18472229 includesPV24358,producer-empty17207,QK13805. These
 sample counts are not latency shares. The fallback MAX issue audit is retained
 in v183_mask_issue_audit.json to distinguish actual skipping from predication.
+
+
+### Iterations 185–186 compile result
+
+REG123/122 and zero stack; one BRX remains, with4 ELECT and no per-MMA
+BRA.U.ANY. Encoding words differ from v183/v184, so qualify rather than
+assuming equality. The original thread-ID role predicates no longer recreate
+the prior issuer loop when fallback control is inside the PTX helper.
+
+## Iterations 187–188 — reduce temporary registers in the masked maximum
+
+Based on corrected v183/v184, retain the same indexed branch and exact masking,
+but reduce33 values with a single dependent accumulator rather than a
+16-temporary tree. Both use16 ternary max.NaN instructions. This does not
+change finite maximum values; full/masked bitwise checks remain required.
+
+The goal is to lower peak register pressure from the fallback even when the
+all-valid workload skips it, particularly v184's122 registers. The tradeoff is
+a longer dependency chain when a partial word actually executes the fallback.
+Compile first; if register pressure is unchanged, do not infer an improvement
+from fewer source-level temporaries. No promotion without actual measurements.
+
+
+### Iterations 187–188 compile result — fewer declared temporaries, same registers
+
+Both compile with the same123/122 registers and zero stack as v183/v184.
+The16-maximum instruction count is unchanged. The proposed register-pressure
+benefit did not materialize, while the fallback dependency chain became longer.
+Reject before GPU launch; no correctness or runtime result is claimed.
+
+## Iteration 189 — in-place packed score scaling in the higher-precision helper
+
+Based on v184. Move the16 packed score multiplies into the existing assembly
+helper before the indexed branch, using tied raw-score inputs and scaled-score
+outputs. Explicit mul.rn.f32x2 uses the same FP32 constant bit pattern
+0x3db8aa3b in both halves, with no FTZ modifier. Early-clobber constraints keep
+late-read bitmap and rowmax inputs separate. Hardware maximum scaling, masking,
+reduction and subsequent softmax/PV arithmetic stay unchanged.
+
+SASS in v184 writes scaled scores to a separate32-register range from the
+TMEM-loaded scores. This tests in-place register reuse without changing packed
+arithmetic count or rounding. Inspect resource usage and emitted FMUL2/BRX
+before guarded qualification and full/masked bitwise comparisons to v184.
+
+
+### Iteration 189 compile result — no in-place allocation benefit
+
+REG122/STACK0 and the separate raw/scaled32-register ranges remain. Of3200
+encoding words, only32 differ:16 later FADD2 instructions exchange commutative
+operands and corresponding reuse flags. The intended score-allocation change
+did not occur. Reject before runtime; no GPU launch or correctness/performance
+claim. Detailed comparison is retained in v189_sass_difference.json.
+
+## Iterations 190–191 — output cache policy after removing mask issue work
+
+Based on v183/v184, add L2 evict-first only to the existing256-bit output stores,
+as in earlier validated v141/v133. Output layout/alignment, arithmetic and
+synchronization are unchanged. The objective is to reduce competition from
+512 MiB of output stores with gathered KV reuse. Earlier cache-policy results
+were small and mixed; they are not assumed to transfer to this implementation.
+
+The new fast path removes about10% of v146's issued instructions. Retest whether
+this makes the previously observed DRAM-traffic reduction useful on its shorter
+critical path. Use paired latency and compare hardware DRAM byte metrics, not
+just aggregate L2 hit rate. Compile, qualify, then measure.
+
+
+### Iterations 185–186 result — validated alternatives, defaults unchanged
+
+Guarded b2 smoke/b512 memcheck and b2 synccheck report zero errors. Both full
+seeds and the short case match v183/v184 bitwise in three repeats, and masks
+also match; v186 retains the higher-precision masked FP32 pass.
+
+v185 warm: candidate1611.70/1616.08/1620.61/1612.16 us; v1831614.00/1613.92/1632.37/1621.14 us; TRT1858.27/1874.08/1876.10/1874.59 us.
+
+v185 cold: candidate1615.82/1597.46/1615.89/1616.00 us; v1831618.06/1617.82/1618.90/1618.51 us; TRT1857.74/1859.55/1859.55/1866.96 us.
+
+v185 wins7/8 same-run comparisons against v183.
+
+v185 cuda-event: trtllm/native warm 1876.00 us, cute-v185/native warm 1642.66 us, trtllm/native cold 1918.11 us, cute-v185/native cold 1651.09 us.
+
+v185 cuda-graph: trtllm/native warm 1870.08 us, cute-v185/native warm 1660.54 us, trtllm/native cold 1909.81 us, cute-v185/native cold 1646.61 us.
+
+v185 NCU base/stable: launch__registers_per_thread=123 register/thread, launch__shared_mem_per_block_dynamic=194.920000 Kbyte/block, sm__warps_active.avg.pct_of_peak_sustained_active=19.279593 %, sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed=33.543216 %, smsp__warps_eligible.avg.per_cycle_active=0.367543 warp, smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio=6.442222 inst, l1tex__t_sectors_pipe_lsu_mem_local_op_ld.sum=0 sector, l1tex__t_sectors_pipe_lsu_mem_local_op_st.sum=0 sector, l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum=6,358,042 , l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum=3,580,654 , gpu__time_duration.sum=2.636736 ms.
+
+v186 warm: candidate1843.42/1844.46/1845.30/1844.00 us; v1841824.91/1847.47/1849.41/1847.47 us; TRT1870.80/1878.19/1880.30/1878.11 us.
+
+v186 cold: candidate1824.14/1824.66/1824.67/1826.67 us; v1841828.83/1825.73/1828.30/1825.01 us; TRT1865.62/1867.87/1865.86/1866.67 us.
+
+v186 wins6/8 same-run comparisons against v184.
+
+v186 cuda-event: trtllm/native warm 1872.48 us, cute-v186/native warm 1840.64 us, trtllm/native cold 1914.90 us, cute-v186/native cold 1849.36 us.
+
+v186 cuda-graph: trtllm/native warm 1869.90 us, cute-v186/native warm 1888.46 us, trtllm/native cold 1914.94 us, cute-v186/native cold 1851.14 us.
+
+v186 NCU base/stable: launch__registers_per_thread=122 register/thread, launch__shared_mem_per_block_dynamic=203.112000 Kbyte/block, sm__warps_active.avg.pct_of_peak_sustained_active=19.314710 %, sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed=45.240755 %, smsp__warps_eligible.avg.per_cycle_active=0.375969 warp, smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio=6.946855 inst, l1tex__t_sectors_pipe_lsu_mem_local_op_ld.sum=0 sector, l1tex__t_sectors_pipe_lsu_mem_local_op_st.sum=0 sector, l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum=6,336,957 , l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum=2,699,212 , gpu__time_duration.sum=2.872736 ms.
+
+Short paired v1851549.28 us versus TRT1691.74 us;v1861689.79 versus1691.81.
+These improve the corresponding v183/v184 short records by1.22/4.10 us.
+Rotated comparisons have regressions, and separate event/Graph comparisons
+against previous extended records are mixed. Keep these as validated
+alternatives instead of replacing v183/v184 with a small regime-dependent gain.

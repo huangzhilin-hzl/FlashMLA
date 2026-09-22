@@ -143,6 +143,8 @@ for directory in sorted(root.glob("v[0-9][0-9][0-9]")):
         status = "bitwise v146 full2seeds/short/masks; current fast path"
     if version == "v184":
         status = "bitwise v160 full2seeds/short/masks; current higher precision"
+    if version in ("v185", "v186"):
+        status = "full2seeds/short/masks bitwise; mixed small gain; validated alternative"
     if version == "v142":
         status = "bitwise v138 full seed1234/mask; paired epilogue slower"
     if version == "v138":
