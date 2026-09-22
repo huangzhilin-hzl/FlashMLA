@@ -5029,3 +5029,58 @@ v161 REG123/STACK0; v162 REG101/STACK0. Both lower to
 LDTM.STAT.x32.MAX.F32.NAN, with the expected PTX tcgen05.ld.red and retained
 wait::ld. The installed compiler therefore supports the requested SM103 operation.
 Compile-only success is not a runtime, guardrail or output-equivalence result.
+
+
+## Iterations 163–164 — fold mask work into the fused-load fallback
+
+Based on v161/v162, move the existing per-score mask loop inside the already
+required non-full-bitmap branch. All-valid words use unchanged loaded/scaled
+scores and the hardware maximum; words containing any hole execute the original
+mask loop and software reduction. The bitmap word is uniform across each warp
+under the retained mapping. No unconditional masked fast path is introduced.
+
+The old v093 all-valid specialization regressed. The new fused-load variants
+already require a max fallback branch, so merging mask work into that same branch
+has a different instruction/control-flow tradeoff. Inspect code and registers;
+only proceed after the parent load/max versions pass guarded qualification.
+Exact baselines:v161/v162, with inherited precision limits checked explicitly.
+
+
+## Iterations 165–166 — isolate the all-valid branch from hardware max
+
+v165/v166 start from v146/v160 and bypass only per-element masking when the
+acquired bitmap word is all ones. Always retain the ordinary Ld32x32b and
+software MAX reduction. These are controls for v163/v164: a win from combining
+an all-valid branch with hardware max cannot be attributed to the load reduction
+without checking the branch alone. The old v093 branch result remains a negative
+precedent, not proof of performance on today's packed/scoring pipeline.
+
+They preserve every finite input's selected score values and the original MAX
+operation; masked words follow the unmodified loop. Compile/resource, safety,
+bitwise and paired timing qualification remain required. Baselines:v146/v160.
+
+
+### Iterations 161–162 result — fused loading alone is slower
+
+Both guarded b2 smoke and qualified guarded b512 memcheck pass with zero reported
+device errors; ordinary b2 synccheck also reports zero. Full seed1234 matches
+v146/v160 respectively in three repeats; masks match. v162's masked FP32 check
+passes, while v161 retains the documented fast-path tolerance failures.
+Short v1611634.46 us versus TRT1691.84 us is6.36 us slower than v146;
+v1621730.69 us versus TRT1691.94 us is6.15 us slower than v160.
+No expanded audit or promotion for the standalone load/max replacement.
+
+NCU base/stable(v161/v162):registers123/101,shared194920/203112 bytes,
+occupancy19.293%/19.312%,tensor31.635%/44.089%,eligible0.395876/0.424030,
+long-scoreboard6.255671/6.531636,zero local sectors,aggregate shared conflicts
+6315071/2039868 and6285841/1996486,diagnostic2.793152/2.951360 ms.
+Hardware support and fewer explicit MAX operations do not by themselves reduce
+latency; the new load and fallback control flow must be evaluated together.
+
+### Iterations 163–164 compile qualification
+
+The combined mask fallback compiles at REG109/STACK0 for v163, versus v161123;
+v164 uses REG107/STACK0, versus v162101. This lowers fast-path register pressure
+but raises it on higher precision. Both retain512 TMEM columns, so no increased
+CTA residency is inferred. Parent guarded qualification passed; the children now
+require their own guarded and bitwise checks.
