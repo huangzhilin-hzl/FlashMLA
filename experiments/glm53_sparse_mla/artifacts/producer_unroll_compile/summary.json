@@ -1,0 +1,18 @@
+{
+  "v235": {
+    "kernel_sha256": "781325835a0d7685d89e79e95394297239ae8c024d415c0e7590b313027f13ac",
+    "static_instructions": 2312,
+    "registers": 123,
+    "stack_bytes": 0,
+    "local_load_sites": 0,
+    "local_store_sites": 0
+  },
+  "v236": {
+    "kernel_sha256": "d812ecc7dc9149ed43ee3cc928df70df79c1533c874d5419d6bd83707ef1afb5",
+    "static_instructions": 2600,
+    "registers": 128,
+    "stack_bytes": 128,
+    "local_load_sites": 32,
+    "local_store_sites": 32
+  }
+}

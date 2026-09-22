@@ -6592,3 +6592,64 @@ v234 unlocked source issues714715863 instructions,20127744 actual/ideal shared w
 Based on current fast190/strict197,add unroll=2 only to the dynamic producer tile loop. Leave the issuer andcompute loops,all TMA requests,barriers,register budgets,shared layout andarithmetic unchanged. The two-stage cadence may simplify stage-address andphase control,but duplicated producer code can increase code size orregister pressure. The installed4.6.2 DSL exposes the explicit unroll factor;inspect native output/resources rather than assume this changes code favorably. No constant2048-length specialization is introduced.
 
 If code changes,require guarded memory/sync,full seed1234 andthe short1024/chunk0/seed5678 exact-parent checks. The short fixture covers odd tile counts andis relevant to unrolled-loop remainder handling;default mask tests remain required. No precision waiver orperformance claim before those checks.
+
+v235 compiles with123 registers/zero stack and2312 static instructions (versus1901448). v236 has128 registers/128-byte stack and2600 static instructions;32 STL and32 LDL sites appear in the expanded producer region after donor64 andbefore compute176. No v236 GPU launch orlatency result. The compiler metadata confirms4.6.2 despite the inherited stale >=4.6.3 comment;v237 corrects that comment.
+
+## Iteration237 — increase producer register budget for the unrolled strict path
+
+Based on236,raise donor/producer allocation64 to80 andretain compute176. Initial128*512 andfinal256*80+256*176 both equal65536 registers,so this uses the existing CTA pool without a larger initial launch allocation. Inspect native local-memory instructions/resources before qualification. This tests a concrete spill response,not a claim that larger register counts automatically improve performance. Preserve236 as the failed compile-resource control.
+
+v235 passes guarded b2 smoke,b512 memcheck andb2 synccheck. Three full8192/seed1234 repeats andthree short1024/chunk0/seed5678 repeats exactly matchv190,covering the relevant odd/partial loop counts. The masked fixture also matches,including inherited86 fast-path tolerance failures. No second full-seed qualification yet. Proceed tostandard paired short timing andNCU;larger static code is not itself a latency result.
+
+v237 retains128 registers butstilluses64 stack bytes. Raising donor64→80 halves the reported spill frame without changing compute176;it is not launched.
+
+## Iteration238 —96/160 role budget after remaining producer spills
+
+Based on237,raise donor80→96 andlower compute176→160,keeping the exact65536-register total256*(96+160). This is the next bounded compile control for the producer spill deficit. Inspect both producer andcompute local-memory sites;reducing compute allocation could introduce a different spill. Do not launch if the compile-resource regression persists. All unrolled-loop andnumerical behavior is otherwise unchanged.
+
+v235 short1550.240us versusTRT1690.144us is effectively unchanged fromv1901549.06us;no improvement demonstrated. NCU base/stable2.637952ms versusv1902.637696ms,REG123,dynamic shared194920B,occupancy19.287230%,tensor33.517738%,eligible0.366939,long-scoreboard6.314451,zero local traffic,aggregate shared conflicts5821125/3825537. The larger native instruction footprint does not translate into a meaningful timing change on this fixture. No promotion orexpanded long timing solely to seek a win;retain the already completed short-input correctness audit because it validates remainder handling.
+
+
+v238 compiles with REG128/STACK8 and 2488 static instructions. Six local-memory sites remain in the producer region: two scalar spill slots, before compute's increase to160. It is not launched. The shrinking stack from236 to238 supports a producer register deficit, not a compute spill claim.
+
+## Iteration239 — separate complete-warpgroup producer and issuer budgets
+
+Based on237, retain unroll2 and compute176, raise the complete producer warpgroup (warps8–11) to104 and reduce the complete issuer/idle warpgroup (warps12–15) to56. The final256*176+128*104+128*56 equals the initial128*512=65536 registers. No partial warpgroup participates in different setmaxnreg instructions. PTX requires all warps of a warpgroup to execute the same instruction: https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#miscellaneous-instructions-setmaxnreg . Each role calls setmaxnreg once.
+
+This isolates a resource response to the remaining producer spills without lowering compute allocation. Inspect initial pool, stack and actual LDL/STL sites, including issuer code, before launch. UR/R transfer instructions are not local-memory spill traffic. Keep all loops, arithmetic, layouts and barriers unchanged. If the resource check passes, require guarded memory/sync, full seed1234 and short1024/chunk0/seed5678 exact-parent checks plus masked FP32 validation before paired timing. No performance claim yet.
+
+
+v239 compiles with REG128/STACK160,2624 static instructions and40 LDL/40 STL sites,all in the producer section. Both donor decreases are emitted (104 and56),but they reconverge before the role dispatch. The unexpected producer spilling is consistent with a conservative smaller allocation after reconvergence;this is a compiler-control-flow hypothesis,not a proven compiler defect. No launch or performance claim.
+
+## Iteration240 — move each donor allocation into its actual complete-warpgroup role
+
+Based on239, move decrease104 to the producer branch and decrease56 to an outer issuer/idle branch covering all warps12–15,with the existing issuer code nested under warp12. Compute increase176 remains inside its original role. All complete warpgroups still execute one uniform allocation instruction,and the total stays65536. Preserve common setup,all arithmetic,loop unrolling andbarriers. Inspect resources before any launch;this distinguishes branch placement from nominal budget size without assuming the compiler's behavior.
+
+
+v240 source586f4a8b8aca56d9ace295d881d1065cbb0272194c16bfc0e776ce416543459c compiles with REG128/STACK0 and2472 static instructions. The104/56/176 allocations are emitted inside their role branches,withzero LDL/STL sites. Unlike239,the local spills disappear without changing the nominal budgets,which supports the branch-placement explanation. There are36 UR/R transfer sites;these are not local spills andmay still cost instructions. Resource checks pass;guarded/full/short/masked qualification follows before any performance claim.
+
+
+v240 guarded b2 smoke,b512 memcheck andb2 synccheck pass withzero sanitizer errors. Full8192/seed1234 andshort1024/chunk0/seed5678 eachmatch197 bit-for-bit across three repeats. Masked outputs also match197 andpass original FP32 tolerances. This is bounded equivalence qualification,not a second full-seed audit. Proceed to standard short paired timing andNCU.
+
+## Iteration241 — retain issuer64 within the split role budget
+
+Based on240, keep producer104 and role-local allocation, raise the complete issuer/idle warpgroup56 to64 andlower both compute warpgroups176 to168. Final256*168+128*104+128*64=65536. This targets the36 UR/R transfer sites observed in240;the previous238 compute160 region hadno local spills,but that does not prove168 will work under a different control flow. Inspect all native resource andtransfer sites before qualification. Preserve arithmetic,barriers andproducer unroll2. A zero-spill result alone is not a speed claim.
+
+
+v240 short1673.376us versusTRT1691.904us loses197's1662.30us tuning result. NCU base/stable2.834048ms,REG128,dynamic shared203112B,occupancy19.406587%,tensor45.934049%,eligible0.384860,long-scoreboard6.638677,zero local read/write sectors,aggregate shared conflicts6224126/3012166. The branch-placement fix removes spills andpasses qualification,but does not demonstrate an end-to-end improvement. Retain the resource control without default promotion orlong timing;241 tests the observed UR/R transfer cost within the same65536-register pool.
+
+
+v241 sourcea60ce5d46f16d76413d747165de92bbf8b5ac6f31aed0a062059de539e97f263 compiles with REG128/STACK0 and2480 static instructions. Actual104/64/168 allocations are verified andLDL/STL remain absent,but UR/R transfer sites increase36 to44. The intended instruction reduction is not supported by this compile result. Complete the bounded guarded/equivalence checks andpaired short measurement to evaluate the final candidate;do not infer dynamic cost orlatency directly from site counts.
+
+
+v241 guarded b2 smoke,b512 memcheck andb2 synccheck pass. Full8192/seed1234 andshort1024/chunk0/seed5678 eachmatch197 across three exact repeats. The masked fixture also matches197 andpasses original FP32 tolerances. No second full-seed audit.
+
+v241 short1673.408us versusTRT1691.968us is unchanged from240 andslower than197. NCU base/stable2.828768ms,REG128,dynamic shared203112B,occupancy19.408725%,tensor45.983276%,eligible0.387768,long-scoreboard6.588862,zero local read/write,aggregate shared conflicts6250705/2997245. No promotion orlong timing. The producer-unroll resource controls establish the importance of role-local register allocation,but not an end-to-end gain.
+
+## Iterations242–243 — hardware PV completion publishes KV-stage reuse
+
+Based on current190/197 respectively, add tcgen05.commit(empty+stage) immediately after the existing PV-done commit in the dedicated issuer. Remove only tid0's manual empty arrival from the compute branch. Retain every compute warp's PV wait, its post-wait fences, all arithmetic, probability storage, register budgets and QK/PV issue order. This isolates the producer notification path; it does not claim additional score/softmax overlap.
+
+P-ready already joins every compute read of the current index/score state and all P stores/O correction. Completed PV drains the issuer's remaining KV reads. Thus producer reuse can be released directly by that completion, while compute still waits PV before reusing the single P buffer or advancing its output. The original one-arrival empty barrier and per-stage phases stay unchanged. PTX commit tracks all prior asynchronous operations of the issuing thread: https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#tcgen05-instructions-tcgen05-commit . Guarded memory/sync plus uninstrumented full, short and masked parent comparisons are required before timing.
+
+Earlier017/018/043 used hardware empty commits together with different QK ordering and extra P buffers,andwere slower. They are not an isolated test of this notification on the current dedicated-issuer pipeline. Current197 source samples concentrate on PV waiting andproducer-empty waiting;those samples identify sites,not latency fractions or a promised speedup. SFU emulation was reconsidered,but this source profile hasonly1047 math-throttle samples versus69999 long-scoreboard samples,anddoes not establish SFU saturation. Prioritize the concrete release dependency before adding approximate exponent arithmetic.
