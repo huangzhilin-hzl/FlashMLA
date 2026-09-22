@@ -189,6 +189,17 @@ B300 physical GPU1; b8192, H64, D576/512, TopK2048, chunk3. Each row is a paired
 | v215 | 1667.04 | 1691.84 | 1.0149x | 128 | 0.00 / 0.00 | 46.08% | full seed1234/masked FP32 and guarded checks pass; half residual conversion slower |
 | v216 | 1673.38 | 1691.74 | 1.0110x | 128 | 0.00 / 0.00 | 45.83% | full seed1234/masked FP32 and guarded checks pass; half residual conversion slower |
 | v217 | 1666.24 | 1693.98 | 1.0167x | 128 | 0.00 / 0.00 | 46.03% | guarded/full seed1234/mask equivalence pass; intermediate register budget no short gain |
+| v219 | 1634.46 | 1693.60 | 1.0362x | 123 | 0.00 / 0.00 | 31.70% | guarded checks/full seed1234/mask parent equivalence; slower than defaults |
+| v220 | 1736.93 | 1691.84 | 0.9740x | 128 | 0.00 / 0.00 | 44.13% | guarded checks/full seed1234/mask parent equivalence; slower than defaults |
+| v221 | 1627.20 | 1689.73 | 1.0384x | 123 | 0.00 / 0.00 | 31.85% | guarded checks/full seed1234/mask parent equivalence; slower than defaults |
+| v222 | 1720.67 | 1691.78 | 0.9832x | 128 | 0.00 / 0.00 | 44.64% | guarded checks/full seed1234/mask parent equivalence; slower than defaults |
+| v223 | 1557.70 | 1691.49 | 1.0859x | 123 | 0.00 / 0.00 | 33.48% | guarded checks/full seed1234/mask parent equivalence; slower than defaults |
+| v224 | 1674.18 | 1693.41 | 1.0115x | 128 | 0.00 / 0.00 | 45.88% | guarded checks/full seed1234/mask parent equivalence; slower than defaults |
+| v225 | 1697.86 | 1691.74 | 0.9964x | 123 | 0.00 / 0.00 | 33.21% | guarded checks/full seed1234/mask parent equivalence; slower than defaults |
+| v226 | 1750.30 | 1691.87 | 0.9666x | 128 | 0.00 / 0.00 | 46.05% | guarded checks/full seed1234/mask parent equivalence; slower than defaults |
+| v227 | 1797.79 | 1689.95 | 0.9400x | 128 | 0.00 / 0.00 | 56.78% | guarded memory/sync pass;9 full seed1234 failures,66 mask failures; slower |
+| v228 | 1798.11 | 1691.68 | 0.9408x | 128 | 0.00 / 0.00 | 56.82% | guarded checks/full seed1234/mask exact v227; no performance gain |
+| v229 | 1896.70 | 1691.58 | 0.8919x | 128 | 0.00 / 0.00 | 79.07% | guarded checks/full seed1234 and masks FP32 PASS; slower; no other full audits |
 
 Raw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. v090/v091/v094/v096/v097/v105/v108/v112/v125 have an observed sustained warm advantage in the extended eager-event, Graph and rotating-order runs, at baseline-level FP8 precision; v190 is the current fast path. Short five-event v125 tuning has a small observed advantage; v105 is near parity. Use the matching execution regime and retained distributions. v086 is near parity warm and its initial cold advantage does not reproduce in its rotating-order audit.
 

@@ -1,0 +1,23 @@
+{"version": "v229", "device_launch": false, "cutlass_dsl": "4.6.2", "cutlass_module": "/opt/sglang/lib/python3.12/site-packages/nvidia_cutlass_dsl/dsl_packages/cutlass/__init__.py", "cuda_context_initialized": true, "sha256": "7d670e816ec7822494de30771442f0f53571b9c84dc512dd33d954b78e63b88e"}
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "/tmp/glm53_sparse_mla_dev/compile_offline.py", line 46, in <module>
+    compiled = cute.compile(module.SparseMLA(args.block_k), *tensors, make_fake_stream(),
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/glm53_sparse_mla_dev/artifacts/normal_pipeline_compile/v229_initial_replay/kernel_v229.py", line 186, in __call__
+    qlayout, klayout, playout, vlayout, qtail_layout, ktail_layout).launch(
+                                                                    ^^^^^^^
+  File "/tmp/glm53_sparse_mla_dev/artifacts/normal_pipeline_compile/v229_initial_replay/kernel_v229.py", line 247, in kernel
+    if (warp >= 4) & (warp < 6):
+  File "/tmp/glm53_sparse_mla_dev/artifacts/normal_pipeline_compile/v229_initial_replay/kernel_v229.py", line 282, in elif_region_22
+    elif warp == 6:
+  File "/tmp/glm53_sparse_mla_dev/artifacts/normal_pipeline_compile/v229_initial_replay/kernel_v229.py", line 331, in elif_region_27
+    elif warp < 4:
+  File "/tmp/glm53_sparse_mla_dev/artifacts/normal_pipeline_compile/v229_initial_replay/kernel_v229.py", line 363, in then_block_51
+    for block in cutlass.range(cute.ceil_div(nvalid, self.block_k)):
+  File "/tmp/glm53_sparse_mla_dev/artifacts/normal_pipeline_compile/v229_initial_replay/kernel_v229.py", line 413, in loop_body_28
+    packed_p.store((probs - packed_p.load().to(cutlass.Float32)).to(cutlass.Float8E4M3FN))
+                    ~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  File "/opt/sglang/lib/python3.12/site-packages/nvidia_cutlass_dsl/dsl_packages/cutlass/cute/tuple.py", line 361, in transform_leaf
+    raise TypeError(f"profile of input tuples doesn't match: {args}")
+TypeError: profile of input tuples doesn't match: ((32, 1), 32)

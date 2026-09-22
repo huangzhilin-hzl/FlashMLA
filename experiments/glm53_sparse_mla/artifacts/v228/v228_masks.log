@@ -1,0 +1,4 @@
+trtllm {'checked_elements': 65536, 'mismatches': 78, 'max_abs': 0.02504098415374756, 'rmse': 0.0033672091085463762, 'relative_rmse': 0.01854783482849598, 'pass': False}
+v227 {'checked_elements': 65536, 'mismatches': 66, 'max_abs': 0.022370457649230957, 'rmse': 0.0030372105538845062, 'relative_rmse': 0.01673007942736149, 'pass': False, 'kernel_sha256': '2742796eef075f72fb53e409991ff9b47bb0652178901e6ac1aada506cf73b54', 'unequal_vs_trtllm': 59700, 'same_failures_as_trtllm': False}
+v228 {'checked_elements': 65536, 'mismatches': 66, 'max_abs': 0.022370457649230957, 'rmse': 0.0030372105538845062, 'relative_rmse': 0.01673007942736149, 'pass': False, 'kernel_sha256': '30f83bbc652f21511ad64c2e025e3b2aa74da05098343063a0a6e20d8e5ceea0', 'unequal_vs_trtllm': 59700, 'same_failures_as_trtllm': False}
+pairwise_bitwise_mismatches {'trtllm/v227': 59700, 'trtllm/v228': 59700, 'v227/v228': 0}

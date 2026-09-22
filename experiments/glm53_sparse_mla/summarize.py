@@ -171,6 +171,14 @@ for directory in sorted(root.glob("v[0-9][0-9][0-9]")):
         status = "guarded/full seed1234/mask checks pass; looped TMA coordinate reuse slower"
     if version in ("v215", "v216"):
         status = "full seed1234/masked FP32 and guarded checks pass; half residual conversion slower"
+    if version in ("v219", "v220", "v221", "v222", "v223", "v224", "v225", "v226"):
+        status = "guarded checks/full seed1234/mask parent equivalence; slower than defaults"
+    if version == "v227":
+        status = "guarded memory/sync pass;9 full seed1234 failures,66 mask failures; slower"
+    if version == "v228":
+        status = "guarded checks/full seed1234/mask exact v227; no performance gain"
+    if version == "v229":
+        status = "guarded checks/full seed1234 and masks FP32 PASS; slower; no other full audits"
     if version == "v217":
         status = "guarded/full seed1234/mask equivalence pass; intermediate register budget no short gain"
     if version == "v142":

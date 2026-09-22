@@ -1,0 +1,6 @@
+========= COMPUTE-SANITIZER
+{"length": 64, "mismatches": 60983, "maxabs": 1.87483811378479, "actual_absmax": 1.78125, "ref_absmax": 2.27132248878479}
+{"length": 128, "mismatches": 60470, "maxabs": 1.7187734842300415, "actual_absmax": 1.5234375, "ref_absmax": 1.6362539529800415}
+{"length": 256, "mismatches": 59546, "maxabs": 1.3039586544036865, "actual_absmax": 1.2265625, "ref_absmax": 1.3625524044036865}
+{"length": 2048, "mismatches": 55544, "maxabs": 0.47800207138061523, "actual_absmax": 0.546875, "ref_absmax": 0.4555288255214691}
+========= ERROR SUMMARY: 0 errors

@@ -15,6 +15,7 @@ import benchmark_source as source
 parser = argparse.ArgumentParser()
 parser.add_argument('--baseline', default='v054')
 parser.add_argument('--candidate', required=True)
+parser.add_argument('--block-k', type=int, choices=(64, 128, 256), default=128)
 parser.add_argument('--local-tokens', type=int, default=8192)
 parser.add_argument('--chunk', type=int, default=3)
 parser.add_argument('--seed', type=int, default=1234)
@@ -30,7 +31,7 @@ with torch.inference_mode():
     runners = {}
     for version in (args.baseline, args.candidate):
         module = importlib.import_module(f'kernel_{version}')
-        runners[version] = module.make_runner(inputs, 128)
+        runners[version] = module.make_runner(inputs, args.block_k)
         result['kernel_sha256'][version] = hashlib.sha256(Path(module.__file__).read_bytes()).hexdigest()
     expected = runners[args.baseline]().clone()
     for repeat in range(args.repeats):

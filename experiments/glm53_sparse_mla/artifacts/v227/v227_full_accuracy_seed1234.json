@@ -1,0 +1,210 @@
+{
+  "purpose": "accuracy only; no latency claim",
+  "args": {
+    "kernel_versions": [
+      "v227"
+    ],
+    "include_trtllm": true,
+    "block_k": 64,
+    "local_tokens": 8192,
+    "chunk": 3,
+    "seed": 1234,
+    "batch_rows": 256,
+    "output_json": "artifacts/v227_full_accuracy_seed1234.json"
+  },
+  "benchmark_sha256": "d843320fb5147a807135282a1b87bb4c247cdd7a6a16b9107d546c48c8a8fb66",
+  "atol": 0.01,
+  "rtol": 0.05,
+  "cases": {
+    "v227": {
+      "kernel_sha256": "2742796eef075f72fb53e409991ff9b47bb0652178901e6ac1aada506cf73b54",
+      "finite": true,
+      "mismatches": 9,
+      "max_abs": 0.019369810819625854,
+      "squared_error_sum": 491.2954934841189,
+      "examples": [
+        {
+          "row": 152,
+          "head": 48,
+          "channel": 141,
+          "actual": -0.0301513671875,
+          "reference": -0.018754715099930763,
+          "abs_error": 0.011396652087569237,
+          "allowed_error": 0.010937735754996538
+        },
+        {
+          "row": 4237,
+          "head": 53,
+          "channel": 93,
+          "actual": -0.00823974609375,
+          "reference": 0.0024305107071995735,
+          "abs_error": 0.010670256800949574,
+          "allowed_error": 0.01012152553535998
+        },
+        {
+          "row": 4237,
+          "head": 53,
+          "channel": 317,
+          "actual": 0.0400390625,
+          "reference": 0.02504468895494938,
+          "abs_error": 0.014994373545050621,
+          "allowed_error": 0.01125223444774747
+        },
+        {
+          "row": 4237,
+          "head": 53,
+          "channel": 382,
+          "actual": -0.006439208984375,
+          "reference": -0.019218668341636658,
+          "abs_error": 0.012779459357261658,
+          "allowed_error": 0.010960933417081833
+        },
+        {
+          "row": 5637,
+          "head": 27,
+          "channel": 107,
+          "actual": 0.05712890625,
+          "reference": 0.044811613857746124,
+          "abs_error": 0.012317292392253876,
+          "allowed_error": 0.012240580692887307
+        },
+        {
+          "row": 5637,
+          "head": 27,
+          "channel": 505,
+          "actual": -0.021240234375,
+          "reference": -0.010162655264139175,
+          "abs_error": 0.011077579110860825,
+          "allowed_error": 0.01050813276320696
+        },
+        {
+          "row": 6051,
+          "head": 60,
+          "channel": 23,
+          "actual": 0.01129150390625,
+          "reference": 0.022972095757722855,
+          "abs_error": 0.011680591851472855,
+          "allowed_error": 0.011148604787886143
+        },
+        {
+          "row": 7358,
+          "head": 36,
+          "channel": 27,
+          "actual": 0.0186767578125,
+          "reference": 0.008099159225821495,
+          "abs_error": 0.010577598586678505,
+          "allowed_error": 0.010404957961291076
+        },
+        {
+          "row": 7595,
+          "head": 2,
+          "channel": 490,
+          "actual": -0.0194091796875,
+          "reference": -0.007609369698911905,
+          "abs_error": 0.011799809988588095,
+          "allowed_error": 0.010380468484945596
+        }
+      ],
+      "checked_rows": 8192,
+      "checked_elements": 268435456,
+      "rmse": 0.0013528556225830036,
+      "relative_rmse": 0.014889594109634027,
+      "pass": false,
+      "unequal_vs_trtllm": 142042445
+    },
+    "trtllm": {
+      "finite": true,
+      "mismatches": 9,
+      "max_abs": 0.019369810819625854,
+      "squared_error_sum": 497.2356795438251,
+      "examples": [
+        {
+          "row": 152,
+          "head": 48,
+          "channel": 141,
+          "actual": -0.0299072265625,
+          "reference": -0.018754715099930763,
+          "abs_error": 0.011152511462569237,
+          "allowed_error": 0.010937735754996538
+        },
+        {
+          "row": 4237,
+          "head": 53,
+          "channel": 93,
+          "actual": -0.0078125,
+          "reference": 0.0024305107071995735,
+          "abs_error": 0.010243010707199574,
+          "allowed_error": 0.01012152553535998
+        },
+        {
+          "row": 4237,
+          "head": 53,
+          "channel": 317,
+          "actual": 0.039794921875,
+          "reference": 0.02504468895494938,
+          "abs_error": 0.014750232920050621,
+          "allowed_error": 0.01125223444774747
+        },
+        {
+          "row": 4237,
+          "head": 53,
+          "channel": 382,
+          "actual": -0.00628662109375,
+          "reference": -0.019218668341636658,
+          "abs_error": 0.012932047247886658,
+          "allowed_error": 0.010960933417081833
+        },
+        {
+          "row": 4237,
+          "head": 53,
+          "channel": 510,
+          "actual": -0.03125,
+          "reference": -0.019941171631217003,
+          "abs_error": 0.011308828368782997,
+          "allowed_error": 0.01099705858156085
+        },
+        {
+          "row": 5637,
+          "head": 27,
+          "channel": 107,
+          "actual": 0.05712890625,
+          "reference": 0.044811613857746124,
+          "abs_error": 0.012317292392253876,
+          "allowed_error": 0.012240580692887307
+        },
+        {
+          "row": 5637,
+          "head": 27,
+          "channel": 505,
+          "actual": -0.021240234375,
+          "reference": -0.010162655264139175,
+          "abs_error": 0.011077579110860825,
+          "allowed_error": 0.01050813276320696
+        },
+        {
+          "row": 6051,
+          "head": 60,
+          "channel": 23,
+          "actual": 0.01153564453125,
+          "reference": 0.022972095757722855,
+          "abs_error": 0.011436451226472855,
+          "allowed_error": 0.011148604787886143
+        },
+        {
+          "row": 7595,
+          "head": 2,
+          "channel": 490,
+          "actual": -0.0194091796875,
+          "reference": -0.007609369698911905,
+          "abs_error": 0.011799809988588095,
+          "allowed_error": 0.010380468484945596
+        }
+      ],
+      "checked_rows": 8192,
+      "checked_elements": 268435456,
+      "rmse": 0.0013610096447320748,
+      "relative_rmse": 0.014979337669947452,
+      "pass": false
+    }
+  }
+}

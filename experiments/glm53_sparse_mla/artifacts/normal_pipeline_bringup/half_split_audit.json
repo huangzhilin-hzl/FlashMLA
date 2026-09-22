@@ -1,0 +1,48 @@
+{
+  "purpose": "Compare emitted TMEM half-split immediates; static coordinates alone did not detect the default-zero LD.RED parameter.",
+  "v227": {
+    "plain_load": {
+      "sites": 16,
+      "immediates": [
+        32
+      ]
+    },
+    "reduce_load": {
+      "sites": 1,
+      "immediates": [
+        0
+      ]
+    },
+    "source_sha256": "b04068daaffc450bee499341b8652a09e71e8db24ac4d392f0664a39d17fc968"
+  },
+  "v227_corrected": {
+    "plain_load": {
+      "sites": 16,
+      "immediates": [
+        32
+      ]
+    },
+    "reduce_load": {
+      "sites": 1,
+      "immediates": [
+        0
+      ]
+    },
+    "source_sha256": "b04068daaffc450bee499341b8652a09e71e8db24ac4d392f0664a39d17fc968"
+  },
+  "v227_corrected_sync": {
+    "plain_load": {
+      "sites": 16,
+      "immediates": [
+        32
+      ]
+    },
+    "reduce_load": {
+      "sites": 1,
+      "immediates": [
+        32
+      ]
+    },
+    "source_sha256": "2742796eef075f72fb53e409991ff9b47bb0652178901e6ac1aada506cf73b54"
+  }
+}
