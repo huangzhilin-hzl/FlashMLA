@@ -1,0 +1,22 @@
+{
+  "v278": {
+    "same_register_stack_and_local_site_counts_as_parent": true,
+    "timestamp_ptx_sites": 2,
+    "native_timer_sites": 2
+  },
+  "v284": {
+    "same_register_stack_and_local_site_counts_as_parent": true,
+    "timestamp_ptx_sites": 2,
+    "native_timer_sites": 2
+  },
+  "v281": {
+    "same_register_stack_and_local_site_counts_as_parent": true,
+    "timestamp_ptx_sites": 2,
+    "native_timer_sites": 2
+  },
+  "v285": {
+    "same_register_stack_and_local_site_counts_as_parent": true,
+    "timestamp_ptx_sites": 2,
+    "native_timer_sites": 2
+  }
+}

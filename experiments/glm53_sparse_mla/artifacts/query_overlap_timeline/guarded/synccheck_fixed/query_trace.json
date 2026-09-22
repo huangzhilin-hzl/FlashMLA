@@ -1,0 +1,287 @@
+{
+  "events": {
+    "first_qk_issue": 0,
+    "compute_epilogue_done": 1
+  },
+  "local_tokens": 2,
+  "chunk": 3,
+  "notice": "Instrumented global timestamps; no production latency or saved-time claims.",
+  "versions": {
+    "v278": {
+      "original_sha256": "6ea88fb21e8fc556e8a80dd7f14fe1c6a6e890d9d0c00b93083f223d73e72d2d",
+      "instrumented_sha256": "9004ecc1617798ccbe0518dd19bf90cc042431e1adcb12b8a54ee715330019ee",
+      "runs": [
+        {
+          "repeat": 0,
+          "finite": true,
+          "bitwise_mismatches": 0,
+          "summary": {
+            "query_pairs": 0,
+            "next_qk_before_prior_epilogue_done": 0,
+            "equal_timestamps": 0,
+            "prior_epilogue_done_minus_next_qk_ns": null
+          },
+          "timestamps_ns": [
+            [
+              1790099846757853248,
+              1790099846759925504
+            ],
+            [
+              1790099846757856224,
+              1790099846759926176
+            ]
+          ]
+        },
+        {
+          "repeat": 1,
+          "finite": true,
+          "bitwise_mismatches": 0,
+          "summary": {
+            "query_pairs": 0,
+            "next_qk_before_prior_epilogue_done": 0,
+            "equal_timestamps": 0,
+            "prior_epilogue_done_minus_next_qk_ns": null
+          },
+          "timestamps_ns": [
+            [
+              1790099846930342016,
+              1790099846932474912
+            ],
+            [
+              1790099846930343168,
+              1790099846932610208
+            ]
+          ]
+        },
+        {
+          "repeat": 2,
+          "finite": true,
+          "bitwise_mismatches": 0,
+          "summary": {
+            "query_pairs": 0,
+            "next_qk_before_prior_epilogue_done": 0,
+            "equal_timestamps": 0,
+            "prior_epilogue_done_minus_next_qk_ns": null
+          },
+          "timestamps_ns": [
+            [
+              1790099846934322784,
+              1790099846936384640
+            ],
+            [
+              1790099846934328544,
+              1790099846936387232
+            ]
+          ]
+        }
+      ]
+    },
+    "v284": {
+      "original_sha256": "51778ed69fe960ed98b88f0e890b7db619973102e8e0eb4aeb8082ebf86dbf16",
+      "instrumented_sha256": "54e1d3a09383fc79f290b3f1f8bb52057542ec8e99de3c90cbac1080be154fe4",
+      "runs": [
+        {
+          "repeat": 0,
+          "finite": true,
+          "bitwise_mismatches": 0,
+          "summary": {
+            "query_pairs": 0,
+            "next_qk_before_prior_epilogue_done": 0,
+            "equal_timestamps": 0,
+            "prior_epilogue_done_minus_next_qk_ns": null
+          },
+          "timestamps_ns": [
+            [
+              1790099849446564000,
+              1790099849448654880
+            ],
+            [
+              1790099849446568480,
+              1790099849448864384
+            ]
+          ]
+        },
+        {
+          "repeat": 1,
+          "finite": true,
+          "bitwise_mismatches": 0,
+          "summary": {
+            "query_pairs": 0,
+            "next_qk_before_prior_epilogue_done": 0,
+            "equal_timestamps": 0,
+            "prior_epilogue_done_minus_next_qk_ns": null
+          },
+          "timestamps_ns": [
+            [
+              1790099849450940608,
+              1790099849453670976
+            ],
+            [
+              1790099849450942464,
+              1790099849453102496
+            ]
+          ]
+        },
+        {
+          "repeat": 2,
+          "finite": true,
+          "bitwise_mismatches": 0,
+          "summary": {
+            "query_pairs": 0,
+            "next_qk_before_prior_epilogue_done": 0,
+            "equal_timestamps": 0,
+            "prior_epilogue_done_minus_next_qk_ns": null
+          },
+          "timestamps_ns": [
+            [
+              1790099849455245504,
+              1790099849457249856
+            ],
+            [
+              1790099849455251648,
+              1790099849457256512
+            ]
+          ]
+        }
+      ]
+    },
+    "v281": {
+      "original_sha256": "ae0c609d8b29bacce63f4a93284d2132cbe1c2e6e33ee78cc105ce830bc746cc",
+      "instrumented_sha256": "ef39626b8748d6be0e59382ac37345671cfa0d6928b4b699088d2c5fa939e74c",
+      "runs": [
+        {
+          "repeat": 0,
+          "finite": true,
+          "bitwise_mismatches": 0,
+          "summary": {
+            "query_pairs": 0,
+            "next_qk_before_prior_epilogue_done": 0,
+            "equal_timestamps": 0,
+            "prior_epilogue_done_minus_next_qk_ns": null
+          },
+          "timestamps_ns": [
+            [
+              1790099852419160352,
+              1790099852422511744
+            ],
+            [
+              1790099852419169824,
+              1790099852422612800
+            ]
+          ]
+        },
+        {
+          "repeat": 1,
+          "finite": true,
+          "bitwise_mismatches": 0,
+          "summary": {
+            "query_pairs": 0,
+            "next_qk_before_prior_epilogue_done": 0,
+            "equal_timestamps": 0,
+            "prior_epilogue_done_minus_next_qk_ns": null
+          },
+          "timestamps_ns": [
+            [
+              1790099852424780832,
+              1790099852428098016
+            ],
+            [
+              1790099852424790400,
+              1790099852427777824
+            ]
+          ]
+        },
+        {
+          "repeat": 2,
+          "finite": true,
+          "bitwise_mismatches": 0,
+          "summary": {
+            "query_pairs": 0,
+            "next_qk_before_prior_epilogue_done": 0,
+            "equal_timestamps": 0,
+            "prior_epilogue_done_minus_next_qk_ns": null
+          },
+          "timestamps_ns": [
+            [
+              1790099852451656000,
+              1790099852454967200
+            ],
+            [
+              1790099852451665952,
+              1790099852455285600
+            ]
+          ]
+        }
+      ]
+    },
+    "v285": {
+      "original_sha256": "c7b3de9f9bf8c4ab0b988e3d00640efe78bdf4f24296524bd838fa3dc1cf5e01",
+      "instrumented_sha256": "44b999b3515e89e2debf9cd125e28a5a2ca3397d758f8edfa4c3ab1fcb6ff082",
+      "runs": [
+        {
+          "repeat": 0,
+          "finite": true,
+          "bitwise_mismatches": 0,
+          "summary": {
+            "query_pairs": 0,
+            "next_qk_before_prior_epilogue_done": 0,
+            "equal_timestamps": 0,
+            "prior_epilogue_done_minus_next_qk_ns": null
+          },
+          "timestamps_ns": [
+            [
+              1790099855614836864,
+              1790099855618910336
+            ],
+            [
+              1790099855614841760,
+              1790099855617807680
+            ]
+          ]
+        },
+        {
+          "repeat": 1,
+          "finite": true,
+          "bitwise_mismatches": 0,
+          "summary": {
+            "query_pairs": 0,
+            "next_qk_before_prior_epilogue_done": 0,
+            "equal_timestamps": 0,
+            "prior_epilogue_done_minus_next_qk_ns": null
+          },
+          "timestamps_ns": [
+            [
+              1790099855621088928,
+              1790099855623779456
+            ],
+            [
+              1790099855621095904,
+              1790099855624671104
+            ]
+          ]
+        },
+        {
+          "repeat": 2,
+          "finite": true,
+          "bitwise_mismatches": 0,
+          "summary": {
+            "query_pairs": 0,
+            "next_qk_before_prior_epilogue_done": 0,
+            "equal_timestamps": 0,
+            "prior_epilogue_done_minus_next_qk_ns": null
+          },
+          "timestamps_ns": [
+            [
+              1790099855632721120,
+              1790099855636761152
+            ],
+            [
+              1790099855632728224,
+              1790099855636847616
+            ]
+          ]
+        }
+      ]
+    }
+  }
+}

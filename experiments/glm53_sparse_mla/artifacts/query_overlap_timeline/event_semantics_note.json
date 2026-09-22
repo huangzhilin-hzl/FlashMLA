@@ -1,0 +1,31 @@
+{
+  "historical_event_key": "first_qk_issue",
+  "meaning": "Entry to the first QK submission sequence, before descriptor preparation and actual MMA issue; not tensor-engine execution time.",
+  "documentation_only_probe_change": true,
+  "native_linear_instruction_distance_to_first_mma": {
+    "v278": {
+      "timer": "/*25c0*/              @!P0 CS2R R30, SR_GLOBALTIMERLO ;                                                     /* 0x00000000001e8805 */",
+      "mma": "/*27b0*/                   UTCQMMA.WS gdesc[UR60], gdesc[UR6], tmem[UR24], tmem[UR44], idesc[UR45], !UPT ;  /* 0x00ff2c063c0075ea */",
+      "distance": 31,
+      "not_a_cycle_estimate": true
+    },
+    "v284": {
+      "timer": "/*25c0*/              @!P0 CS2R R30, SR_GLOBALTIMERLO ;                                                     /* 0x00000000001e8805 */",
+      "mma": "/*27b0*/                   UTCQMMA.WS gdesc[UR60], gdesc[UR6], tmem[UR24], tmem[UR44], idesc[UR45], !UPT ;  /* 0x00ff2c063c0075ea */",
+      "distance": 31,
+      "not_a_cycle_estimate": true
+    },
+    "v281": {
+      "timer": "/*2600*/              @!P0 CS2R R22, SR_GLOBALTIMERLO ;                                                                     /* 0x0000000000168805 */",
+      "mma": "/*2750*/                   UTCQMMA.WS gdesc[UR48], gdesc[UR16], tmem[UR20], tmem[UR26], idesc[UR27], !UPT ;                 /* 0x00ff1a10300075ea */",
+      "distance": 21,
+      "not_a_cycle_estimate": true
+    },
+    "v285": {
+      "timer": "/*2600*/              @!P0 CS2R R22, SR_GLOBALTIMERLO ;                                                                     /* 0x0000000000168805 */",
+      "mma": "/*2750*/                   UTCQMMA.WS gdesc[UR48], gdesc[UR16], tmem[UR20], tmem[UR26], idesc[UR27], !UPT ;                 /* 0x00ff1a10300075ea */",
+      "distance": 21,
+      "not_a_cycle_estimate": true
+    }
+  }
+}

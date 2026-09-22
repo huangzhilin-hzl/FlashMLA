@@ -1,0 +1,42 @@
+{
+  "v278": {
+    "pairs": 24132,
+    "next_qk_before_prior_epilogue": 0,
+    "equal": 0,
+    "median_delta_ns": -1504.0,
+    "min_delta_ns": -2560,
+    "max_delta_ns": -1120,
+    "observed_timestamp_difference_gcd_ns": 32,
+    "notice": "Instrumented ordering observations; not production saved-time estimates."
+  },
+  "v284": {
+    "pairs": 24132,
+    "next_qk_before_prior_epilogue": 22,
+    "equal": 0,
+    "median_delta_ns": -448.0,
+    "min_delta_ns": -1184,
+    "max_delta_ns": 1088,
+    "observed_timestamp_difference_gcd_ns": 32,
+    "notice": "Instrumented ordering observations; not production saved-time estimates."
+  },
+  "v281": {
+    "pairs": 24132,
+    "next_qk_before_prior_epilogue": 0,
+    "equal": 0,
+    "median_delta_ns": -1536.0,
+    "min_delta_ns": -2816,
+    "max_delta_ns": -1216,
+    "observed_timestamp_difference_gcd_ns": 32,
+    "notice": "Instrumented ordering observations; not production saved-time estimates."
+  },
+  "v285": {
+    "pairs": 24132,
+    "next_qk_before_prior_epilogue": 0,
+    "equal": 0,
+    "median_delta_ns": -448.0,
+    "min_delta_ns": -1056,
+    "max_delta_ns": -96,
+    "observed_timestamp_difference_gcd_ns": 32,
+    "notice": "Instrumented ordering observations; not production saved-time estimates."
+  }
+}

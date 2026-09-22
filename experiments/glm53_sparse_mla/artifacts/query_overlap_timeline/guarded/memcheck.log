@@ -1,0 +1,7 @@
+========= COMPUTE-SANITIZER
+{"version": "v278", "repeat": 0, "finite": true, "bitwise_mismatches": 0, "summary": {"query_pairs": 364, "next_qk_before_prior_epilogue_done": 0, "equal_timestamps": 0, "prior_epilogue_done_minus_next_qk_ns": {"min": -17664, "median": -15776.0, "max": -14272}}}
+{"version": "v284", "repeat": 0, "finite": true, "bitwise_mismatches": 0, "summary": {"query_pairs": 364, "next_qk_before_prior_epilogue_done": 364, "equal_timestamps": 0, "prior_epilogue_done_minus_next_qk_ns": {"min": 31424, "median": 33920.0, "max": 36672}}}
+{"version": "v281", "repeat": 0, "finite": true, "bitwise_mismatches": 0, "summary": {"query_pairs": 364, "next_qk_before_prior_epilogue_done": 0, "equal_timestamps": 0, "prior_epilogue_done_minus_next_qk_ns": {"min": -21536, "median": -19840.0, "max": -17824}}}
+{"version": "v285", "repeat": 0, "finite": true, "bitwise_mismatches": 0, "summary": {"query_pairs": 364, "next_qk_before_prior_epilogue_done": 364, "equal_timestamps": 0, "prior_epilogue_done_minus_next_qk_ns": {"min": 38432, "median": 40496.0, "max": 44320}}}
+[RESULT] /tmp/glm53_sparse_mla_dev/artifacts/query_overlap_timeline/guarded/memcheck/query_trace.json
+========= ERROR SUMMARY: 0 errors

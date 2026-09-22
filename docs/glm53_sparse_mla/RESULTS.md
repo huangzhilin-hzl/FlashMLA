@@ -233,12 +233,14 @@ B300 physical GPU1; b8192, H64, D576/512, TopK2048, chunk3. Each row is a paired
 | v273 | 1608.03 | 1691.74 | 1.0521x | 128 | 1.71 / 0.46 | 47.33% | bitwise v197 full2seeds/short/masks; earlier strict default |
 | v274 | 1493.25 | 1691.81 | 1.1330x | 128 | 1.75 / 0.49 | 34.51% | bitwise v272 full2seeds/short/masks; larger grids mixed; not promoted |
 | v275 | 1496.06 | 1690.05 | 1.1297x | 128 | 1.83 / 0.54 | 34.55% | bitwise v272 full2seeds/short/masks; larger grids mixed; not promoted |
-| v278 | 1490.21 | 1691.78 | 1.1353x | 128 | 0.89 / 0.44 | 34.54% | bitwise v272 full2seeds/short/masks; current fast default; FP8 limits retained |
+| v278 | 1490.21 | 1691.78 | 1.1353x | 128 | 0.89 / 0.44 | 34.54% | bitwise v272 full2seeds/short/masks; earlier fast default; FP8 limits retained |
 | v279 | 1603.74 | 1691.68 | 1.0548x | 128 | 0.89 / 0.44 | 47.45% | bitwise v273 full2seeds/short/masks; mixed warm; not promoted |
 | v280 | 1491.14 | 1691.81 | 1.1346x | 128 | 0.00 / 0.00 | 34.28% | bitwise fast parent full2seeds/short/masks; zero local traffic; mixed cold; not promoted |
-| v281 | 1600.74 | 1691.84 | 1.0569x | 128 | 0.00 / 0.00 | 47.47% | bitwise strict parent full2seeds/short/masks; zero local traffic; current strict default |
+| v281 | 1600.74 | 1691.84 | 1.0569x | 128 | 0.00 / 0.00 | 47.47% | bitwise strict parent full2seeds/short/masks; zero local traffic; earlier strict default |
+| v284 | 1429.73 | 1691.74 | 1.1833x | 128 | 1.38 / 0.44 | 35.56% | bitwise v278 full2seeds/short/masks; current fast default; FP8 limits retained |
+| v285 | 1537.15 | 1691.97 | 1.1007x | 128 | 0.00 / 0.00 | 48.97% | bitwise v281 full2seeds/short/masks; current strict default; zero local traffic |
 
-Raw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. v090/v091/v094/v096/v097/v105/v108/v112/v125 have an observed sustained warm advantage in the extended eager-event, Graph and rotating-order runs, at baseline-level FP8 precision; v278 is the current fast path. Short five-event v125 tuning has a small observed advantage; v105 is near parity. Use the matching execution regime and retained distributions. v086 is near parity warm and its initial cold advantage does not reproduce in its rotating-order audit.
+Raw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. v090/v091/v094/v096/v097/v105/v108/v112/v125 have an observed sustained warm advantage in the extended eager-event, Graph and rotating-order runs, at baseline-level FP8 precision; v284 is the current fast path. Short five-event v125 tuning has a small observed advantage; v105 is near parity. Use the matching execution regime and retained distributions. v086 is near parity warm and its initial cold advantage does not reproduce in its rotating-order audit.
 
 ## CUDA Graph validation runs
 
@@ -254,6 +256,14 @@ These are separate warm/cold runs with 20 warmups and 100 repeats; sampled row c
 | v278 | 512 | cold | 1592.96 | 1919.14 | 1.2048x |
 | v281 | 512 | warm | 1846.82 | 1865.79 | 1.0103x |
 | v281 | 512 | cold | 1801.62 | 1915.81 | 1.0634x |
+| v278 | 512 | warm | 1610.30 | 1868.42 | 1.1603x |
+| v278 | 512 | cold | 1595.47 | 1911.71 | 1.1982x |
+| v281 | 512 | warm | 1846.85 | 1869.76 | 1.0124x |
+| v281 | 512 | cold | 1798.35 | 1916.98 | 1.0660x |
+| v284 | 512 | warm | 1569.23 | 1865.81 | 1.1890x |
+| v284 | 512 | cold | 1554.38 | 1916.86 | 1.2332x |
+| v285 | 512 | warm | 1817.18 | 1858.59 | 1.0228x |
+| v285 | 512 | cold | 1771.28 | 1911.94 | 1.0794x |
 | v190 | 512 | warm | 1650.59 | 1867.89 | 1.1316x |
 | v190 | 512 | cold | 1638.50 | 1915.82 | 1.1693x |
 | v272 | 512 | warm | 1615.52 | 1871.07 | 1.1582x |
@@ -367,6 +377,14 @@ These are separate warm/cold runs with 20 warmups and 100 repeats; sampled row c
 | v278 | 512 | cold | 1599.78 | 1915.17 | 1.1971x |
 | v281 | 512 | warm | 1765.76 | 1879.97 | 1.0647x |
 | v281 | 512 | cold | 1790.03 | 1916.42 | 1.0706x |
+| v278 | 512 | warm | 1584.14 | 1878.06 | 1.1855x |
+| v278 | 512 | cold | 1595.42 | 1916.77 | 1.2014x |
+| v281 | 512 | warm | 1781.44 | 1879.18 | 1.0549x |
+| v281 | 512 | cold | 1789.98 | 1914.91 | 1.0698x |
+| v284 | 512 | warm | 1537.81 | 1882.03 | 1.2238x |
+| v284 | 512 | cold | 1552.43 | 1921.31 | 1.2376x |
+| v285 | 512 | warm | 1756.32 | 1869.89 | 1.0647x |
+| v285 | 512 | cold | 1755.28 | 1916.96 | 1.0921x |
 | v190 | 512 | warm | 1632.45 | 1878.14 | 1.1505x |
 | v190 | 512 | cold | 1640.00 | 1911.01 | 1.1652x |
 | v272 | 512 | warm | 1605.81 | 1878.03 | 1.1695x |
@@ -440,6 +458,10 @@ Ranges below are the minimum and maximum per-round medians or paired ratios, not
 | fast_compute_release_round_robin | cute-v278/native | cold | 5 | 1596.91–1599.49 | 1.1971–1.2043x |
 | fast_compute_release_round_robin | cute-v280/native | warm | 5 | 1593.98–1604.77 | 1.1669–1.2297x |
 | fast_compute_release_round_robin | cute-v280/native | cold | 5 | 1579.10–1600.61 | 1.1985–1.2178x |
+| fast_query_epilogue_overlap_round_robin | cute-v278/native | warm | 5 | 1596.96–1622.38 | 1.1526–1.2238x |
+| fast_query_epilogue_overlap_round_robin | cute-v278/native | cold | 5 | 1593.22–1601.33 | 1.1946–1.2044x |
+| fast_query_epilogue_overlap_round_robin | cute-v284/native | warm | 5 | 1562.69–1564.82 | 1.1966–1.2513x |
+| fast_query_epilogue_overlap_round_robin | cute-v284/native | cold | 5 | 1546.19–1556.51 | 1.2319–1.2372x |
 | persistent_grid_round_robin | cute-v272/native | warm | 5 | 1599.60–1613.65 | 1.1657–1.2240x |
 | persistent_grid_round_robin | cute-v272/native | cold | 5 | 1599.58–1604.56 | 1.1940–1.2070x |
 | persistent_grid_round_robin | cute-v274/native | warm | 5 | 1597.55–1607.70 | 1.1774–1.2224x |
@@ -458,6 +480,10 @@ Ranges below are the minimum and maximum per-round medians or paired ratios, not
 | strict_compute_release_round_robin | cute-v279/native | cold | 5 | 1791.71–1795.98 | 1.0675–1.0708x |
 | strict_compute_release_round_robin | cute-v281/native | warm | 5 | 1818.58–1830.91 | 1.0269–1.0765x |
 | strict_compute_release_round_robin | cute-v281/native | cold | 5 | 1788.03–1791.98 | 1.0697–1.0732x |
+| strict_query_epilogue_overlap_round_robin | cute-v281/native | warm | 5 | 1818.70–1843.86 | 1.0142–1.0755x |
+| strict_query_epilogue_overlap_round_robin | cute-v281/native | cold | 5 | 1787.87–1790.00 | 1.0682–1.0725x |
+| strict_query_epilogue_overlap_round_robin | cute-v285/native | warm | 5 | 1809.95–1813.68 | 1.0311–1.0810x |
+| strict_query_epilogue_overlap_round_robin | cute-v285/native | cold | 5 | 1761.26–1773.58 | 1.0787–1.0862x |
 | strict_query_round_robin | cute-v197/native | warm | 5 | 1845.54–1867.89 | 1.0005–1.0487x |
 | strict_query_round_robin | cute-v197/native | cold | 5 | 1828.86–1832.98 | 1.0401–1.0461x |
 | strict_query_round_robin | cute-v273/native | warm | 5 | 1825.04–1832.48 | 1.0230–1.0624x |

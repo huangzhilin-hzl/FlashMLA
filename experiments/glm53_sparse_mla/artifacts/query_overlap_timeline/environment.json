@@ -1,0 +1,7 @@
+{
+  "python": "3.12.3 (main, Jul 15 2026, 23:46:41) [GCC 13.3.0]",
+  "cutlass_dsl": "4.6.2",
+  "torch": "2.13.0",
+  "probe_sha256": "4713e53ddc3fb9f50f761ad1e64ed196b8091750f195b3eb346362cd1a9d6faa",
+  "timestamp_notice": "Instrumented event ordering only; not production latency or saved-time estimates."
+}

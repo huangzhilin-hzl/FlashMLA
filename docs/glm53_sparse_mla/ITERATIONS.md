@@ -7153,3 +7153,68 @@ v278 unlocked source issues524266785 instructions versus v272523390320 (about0.1
 
 
 Source opcode deltas clarify the aggregate increases: v278 vs v272 reduces combined LDL/LDL.LU by597964 issues but adds1126638 combined three-op polling/sleep issues and401218 BRA issues. v281 vs v273 removes821072 LDL/LDL.LU and112416 STL issues, while polling/sleep grows3797169 and BRA1303670. The verifiedzero local traffic and small measured speedup can therefore coexist with a larger aggregate dynamic instruction count; these are separate sampled regimes and not a direct time decomposition.
+
+
+## Iterations284–285 — overlap next-query Q load with the output epilogue
+
+Based on promoted fast v278 and strict v281, load the first assigned Q at compute-role loop entry, then prefetch each next assigned Q immediately after the current key-tile loop and before denominator reduction/output writeback. The last current PV has already completed; all current QK operations have finished reading Q. This moves existing TMA requests rather than adding a second Q buffer or extra input traffic. Keep the query stride, arithmetic, register budgets, memory layouts, TMEM allocation, epilogue barrier and all tile barriers unchanged. Qbar still advances exactly once per query; the current phase has successful compute/issuer waiters before the next arrival.
+
+The hypothesis is two opportunities for overlap: Q TMA with normalization/output stores, and the next query's first QK with prior-query output reads. QK writes the score region at TMEM256; the epilogue reads O at0/128. Next PV must still wait for next-query P-ready, which is published only after the old output epilogue and the next compute iteration's softmax/correction. These are source-level dependency arguments, not proof of valid hardware accesses; guarded persistent fixed/variable/odd-batch tests and full uninstrumented numerical checks remain mandatory. Prefetch is outside the tile loop so query Q publication does not depend on finding a last tile.
+
+A host schedule check confirms exactly one Q load per row on small, odd and full batches. There is no early-QK arbitration inside a query and no dual-score buffer, distinguishing this from rejected250–257. Compile resources first; no performance or runtime correctness claims at creation.
+
+
+AST restoration of284/285 removes the added epilogue prefetch and restores the original entry condition, then exactly matches each parent after label normalization. The first generation attempt caught a nonunique indentation substring before writing either source; anchoring the epilogue marker at the line start resolved it. No failed-generation source was uploaded or compiled.
+
+
+v284/v285 compile with128 initial registers and unchanged512-thread/donor64/compute192 or176 limits. Fast keeps8 stack bytes and adds one static LDL (11 LDL/4 STL); strict remainszero stack/local. Static instructions grow40 each to1592/1688; MMA/commit sites stay26/2 and34/2. The additional code implements separate initial/next-query Q loads and guards, while host schedule coverage confirms unchanged dynamic Q count. Existing fast scalar-frame allowance and strict zero-local gates permit bounded guarded evaluation of the new overlap.
+
+
+v284 passes guarded b2 smoke,b512/chunk0 memcheck,fixed/variable synccheck and b513/chunk0 guarded exact equivalence across three repeats. Both the variable and odd fixtures cross query boundaries and exercise the new early Q publication. Three full8192/seed1234 and short1024/chunk0/seed5678 repeats match v278; masks match with inherited86 tolerance failures. Short timing/NCU follows before second full seed and expanded timing.
+
+
+v284 short timing is1429.73 us versus TRT1691.74 us, approximately4.1% below v2781490.21 us. NCU base/stable duration2.498048 ms,128 registers,194920 B dynamic shared,20.297030% occupancy,35.558349% tensor activity,0.374718 eligible warps/cycle,long-scoreboard ratio6.514156. Local read/write sectors1383952/443416 increase in reads versus v278892432/442908; aggregate shared conflicts7317423/4538723. The overlap candidate is faster despite greater scalar-local reads. This is a promising short result, not yet a sustained-speedup claim. Qualify strict v285, then complete second seed, rotating OFF and original standalone audits before promotion.
+
+
+v285 also passes guarded b2 smoke,b512/chunk0 memcheck,fixed/variable synccheck and b513/chunk0 three-repeat guarded exact equivalence. Three full8192/seed1234 and short1024/chunk0/seed5678 repeats match v281; masks match and both cases pass original FP32 tolerance. Short timing/NCU follows; second full seed and expanded audits are prepared for both overlap controls.
+
+
+v285 short timing is1537.15 us versus TRT1691.97 us,approximately4.0% below v2811600.74 us. NCU base/stable duration2.657920 ms,128 registers,203112 B dynamic shared,20.298681% occupancy,48.967776% tensor activity,0.400996 eligible warps/cycle,long-scoreboard ratio6.862057 andzero local read/write sectors. Aggregate shared conflicts8220983/3082915. Both precision paths now show a promising short-run improvement; second full seed and expanded OFF/standalone timing follow.
+
+
+v284/v285 also match their respective parents on full8192/seed5678 across three repeats, completing full2seed/short/mask exact equivalence. Five-round endpoint-OFF fast/strict Graph comparisons follow, then original standalone20/100 if gains persist.
+
+
+Fast endpoint-OFF five-round Graph audit favors v284 in all ten warm/cold pairs. Warm1562.688–1564.816 us versus parent v2781596.960–1622.384 us gives parent/candidate1.020615–1.038201; cold1546.192–1556.512 us versus1593.216–1601.328 gives1.023697–1.035659. TRT medians warm1869.920–1958.128,cold1912.992–1922.992 us. All512-row checks pass. The sustained gain is smaller than the initial4.1% short result but consistently favorable in this audit. Original standalone eager/Graph remains before promotion.
+
+
+Strict endpoint-OFF five-round Graph audit also favors v285 in all ten warm/cold pairs. Warm1809.952–1813.680 us versus parent v2811818.704–1843.856 gives parent/candidate1.004463–1.016638; cold1761.264–1773.584 us versus1787.872–1790.000 gives1.008814–1.015189. TRT medians warm1870.032–1956.480,cold1911.040–1918.928 us. All512-row checks pass. The strict sustained gain is notably smaller than the initial short-test4.0%, but consistently favorable in this audit. Original standalone20/100 eager/Graph comparison is now running for both candidates and parents.
+
+
+Original standalone20/100 also favors both candidates in all four eager/Graph warm/cold conditions. v284 eager1537.808001/1552.432001 us versus TRT1882.031977/1921.312034; Graph1569.231987/1554.383993 versus1865.808010/1916.864038. Matching v278 eager1584.143996/1595.424056,Graph1610.303998/1595.471978. v285 eager1756.320059/1755.280018 versus TRT1869.888008/1916.960001; Graph1817.184031/1771.279991 versus1858.591974/1911.935985. Matching v281 eager1781.440020/1789.983988,Graph1846.848011/1798.352003. All512-row checks pass.
+
+Promote fast v284 and strict v285 after guarded memory/fixed/variable/odd-batch checks, full2seed/short/mask exact equivalence, ten favorable rotated pairs per path and favorable original standalone eager/Graph conditions. Compiler remains4.6.2; fast FP8 limits and strict audited tolerance are unchanged. Production source profiling and a separate two-event query-boundary diagnostic will examine the overlap mechanism, without using instrumented timings to rank production kernels.
+
+The new probe_query_overlap.py generates separate copies of278/284/281/285, adding first-QK issue and compute-epilogue-completion global timestamps. No shared allocation or additional CTA barrier is introduced. Pair consecutive queries of the same CTA; a positive prior-epilogue-end minus next-QK-start denotes early issue relative to the observed rendezvous. Timestamp stores, extra control and changed register allocation can perturb scheduling. Generation/AST parsing passed locally; offline resource checks and fresh numerical/guarded validation remain before interpreting any timestamps.
+
+
+v284 unlocked source issues521587785 instructions versus v278524266785 (about0.51% fewer); shared actual/ideal wavefronts20210996 remain equal,zero excessive. Long-scoreboard total58046 versus62144,producer empty15412 versus16709 and QK13188 versus13628. The top17214-sample branch retains the short-context attribution limitation noted for v278. These samples support less waiting but do not establish precise saved time or prove how often next QK overlaps output; the separate query-boundary probe addresses the event ordering.
+
+
+v285 unlocked source issues577212153 instructions versus v281580492664 (about0.57% fewer); actual/ideal shared wavefronts28599604 remain equal withzero excessive. Long-scoreboard samples66822 versus71121,PV24548 versus24864,producer empty17131 versus18511,QK13447 versus13911. The larger relative drop in total waiting samples than in aggregate instruction count is consistent with the intended scheduling change; it is not a direct time decomposition. An instrumented event-ordering probe remains separate from production latency.
+
+
+Opcode comparisons show v284/v285 reduce combined three-op barrier-poll/sleep issues by2305455/2480589 and BRA by889430/950145 versus their parents. Added per-query guards and fast scalar LDL issues partly offset those reductions. This supports less polling rather than reduced attention arithmetic; clocks and profiling remain distinct from production timing.
+
+The query-boundary copies compile with128 registers and unchanged stack/local counts:278/284 retain8-byte metadata frames with10/11 LDL and4 STL,281/285 stayzero stack/local. All preserve512 threads,donor64,compute192/176,26/34 MMA sites andtwo commits. Each has two PTX/native global-timer sites. Static counts change to1544/1584/1664/1696, demonstrating that instrumentation still affects scheduling/code generation. Guarded smoke,memory,fixed/variable/odd-batch synchronization and exact output checks follow before interpreting timestamps.
+
+
+All four query-boundary copies pass guarded b2 smoke,b512/chunk0 memcheck,b2 fixed and b512 variable synccheck,plus b513/chunk0 odd-batch synccheck; all output comparisons match their respective production parents and sanitizer summaries reportzero errors. A local AST inversion also confirms only the two device timestamp markers were added to each kernel body. Proceed with three uninstrumented-by-sanitizer full8192 repeats, retaining the diagnostic timestamps and checking every output bit again before interpreting ordering.
+
+
+All four query-boundary copies match their production parents bitwise on three full8192 repeats. Compiled/generated source hashes match, all per-query events are present and ordered within each query, and each version contributes24132 consecutive-query pairs. Parent278/281 havezero next-QK-before-prior-epilogue pairs; candidate284 has22 (about0.091%),candidate285 haszero. Median prior-epilogue-end minus next-QK-start is−1504/−1536 ns for278/281 and−448 ns for284/285. Timestamp differences have observed32 ns granularity.
+
+Thus the diagnostic mostly observes a shorter positive gap after the old epilogue, not widespread next-QK execution before it ends. Early Q publication can explain reduced query-transition waiting, but the probe does not directly timestamp Q transfer completion and cannot attribute the entire production speedup or multiply these gaps into saved kernel time. Keep this narrower observation alongside the uninstrumented improvements. Guarded and full diagnostic outputs, native timer sites and resources are retained.
+
+
+Native timestamp-site inspection narrows the event meaning: the historical first_qk_issue field records entry to the QK submission sequence, with31 linear native instructions before the first MMA in fast copies and21 in strict copies. These include descriptor preparation; the distances are not cycle estimates. It does not timestamp actual MMA issue or tensor-engine execution. Interpret all early-pair counts and gap medians as submission-entry observations. Raw evidence retains its original keys; event_semantics_note.json and the probe docstring clarify the meaning. The docstring-only edit is AST-identical to the validated probe after removing module docstrings.

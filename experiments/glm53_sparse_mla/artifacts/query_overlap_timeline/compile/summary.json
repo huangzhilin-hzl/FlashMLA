@@ -1,0 +1,26 @@
+{
+  "v278": {
+    "resources": "\nResource usage:\n Common:\n  GLOBAL:0\n Function kernel_cutlass_kernel_kernel_v278_query_traceSparseMLA_object_at__tensorptrf8E4M3FNgmemalign16o819264576368645761_tensorptrf8E4M3FNgmemalign16o1310725765761_tensorptri32gmemalign16o819220_0:\n  REG:128 STACK:8 SHARED:1024 LOCAL:0 CONSTANT[2]:8 CONSTANT[0]:1024 TEXTURE:0 SURFACE:0 SAMPLER:0\n",
+    "LDL": 10,
+    "STL": 4,
+    "static_instructions": 1544
+  },
+  "v284": {
+    "resources": "\nResource usage:\n Common:\n  GLOBAL:0\n Function kernel_cutlass_kernel_kernel_v284_query_traceSparseMLA_object_at__tensorptrf8E4M3FNgmemalign16o819264576368645761_tensorptrf8E4M3FNgmemalign16o1310725765761_tensorptri32gmemalign16o819220_0:\n  REG:128 STACK:8 SHARED:1024 LOCAL:0 CONSTANT[2]:8 CONSTANT[0]:1024 TEXTURE:0 SURFACE:0 SAMPLER:0\n",
+    "LDL": 11,
+    "STL": 4,
+    "static_instructions": 1584
+  },
+  "v281": {
+    "resources": "\nResource usage:\n Common:\n  GLOBAL:0\n Function kernel_cutlass_kernel_kernel_v281_query_traceSparseMLA_object_at__tensorptrf8E4M3FNgmemalign16o819264576368645761_tensorptrf8E4M3FNgmemalign16o1310725765761_tensorptri32gmemalign16o819220_0:\n  REG:128 STACK:0 SHARED:1024 LOCAL:0 CONSTANT[2]:8 CONSTANT[0]:1024 TEXTURE:0 SURFACE:0 SAMPLER:0\n",
+    "LDL": 0,
+    "STL": 0,
+    "static_instructions": 1664
+  },
+  "v285": {
+    "resources": "\nResource usage:\n Common:\n  GLOBAL:0\n Function kernel_cutlass_kernel_kernel_v285_query_traceSparseMLA_object_at__tensorptrf8E4M3FNgmemalign16o819264576368645761_tensorptrf8E4M3FNgmemalign16o1310725765761_tensorptri32gmemalign16o819220_0:\n  REG:128 STACK:0 SHARED:1024 LOCAL:0 CONSTANT[2]:8 CONSTANT[0]:1024 TEXTURE:0 SURFACE:0 SAMPLER:0\n",
+    "LDL": 0,
+    "STL": 0,
+    "static_instructions": 1696
+  }
+}
