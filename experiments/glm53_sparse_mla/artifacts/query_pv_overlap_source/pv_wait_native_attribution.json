@@ -1,0 +1,462 @@
+{
+  "v278": {
+    "source_path": "experiments/glm53_sparse_mla/artifacts/compute_release_source/v278_source.csv",
+    "sha256": "f8b1dafbdef91ad4be78aba3132fa727e5e13d9880ce7ca0a675a36290ae6bd0",
+    "branch": {
+      "Address": "0x7ff8935b22c0",
+      "Source": "@!P1  BRA 0x7ff8935b35a0",
+      "stall_long_sb": "17355"
+    },
+    "predicate_writer": {
+      "Address": "0x7ff8935b2260",
+      "Source": "      SYNCS.PHASECHK.TRANS64.TRYWAIT P1, [UR4+0x2f928], R175"
+    },
+    "intervening_instruction_rows": 5,
+    "no_intervening_predicate_reference_or_branch": true,
+    "barrier_inference": "PV completion: shared address is QK barrier offset +8, matching consecutive qk_done/pv_done allocation and issuer commits",
+    "native_context": [
+      {
+        "Address": "0x7ff8935b2260",
+        "Source": "      SYNCS.PHASECHK.TRANS64.TRYWAIT P1, [UR4+0x2f928], R175"
+      },
+      {
+        "Address": "0x7ff8935b2270",
+        "Source": "      FADD R0, R3, R144"
+      },
+      {
+        "Address": "0x7ff8935b2280",
+        "Source": "      FADD R147, R147, R160"
+      },
+      {
+        "Address": "0x7ff8935b2290",
+        "Source": "      FADD R0, R0, R147"
+      },
+      {
+        "Address": "0x7ff8935b22a0",
+        "Source": "      ISETP.NE.U32.AND P0, PT, R4, RZ, PT"
+      },
+      {
+        "Address": "0x7ff8935b22b0",
+        "Source": "      FFMA R163, R163, R162, R0"
+      },
+      {
+        "Address": "0x7ff8935b22c0",
+        "Source": "@!P1  BRA 0x7ff8935b35a0"
+      }
+    ]
+  },
+  "v281": {
+    "source_path": "experiments/glm53_sparse_mla/artifacts/compute_release_source/v281_source.csv",
+    "sha256": "cc5239e8872193f541491dfdfbfd24921c2e1e24e2f2183509e2d3353538a25c",
+    "branch": {
+      "Address": "0x7ff48b5b2910",
+      "Source": "@!P1  BRA 0x7ff48b5b3be0",
+      "stall_long_sb": "24864"
+    },
+    "predicate_writer": {
+      "Address": "0x7ff48b5b2900",
+      "Source": "      SYNCS.PHASECHK.TRANS64.TRYWAIT P1, [UR4+0x31928], R113"
+    },
+    "intervening_instruction_rows": 0,
+    "no_intervening_predicate_reference_or_branch": true,
+    "barrier_inference": "PV completion: shared address is QK barrier offset +8, matching consecutive qk_done/pv_done allocation and issuer commits",
+    "native_context": [
+      {
+        "Address": "0x7ff48b5b2900",
+        "Source": "      SYNCS.PHASECHK.TRANS64.TRYWAIT P1, [UR4+0x31928], R113"
+      },
+      {
+        "Address": "0x7ff48b5b2910",
+        "Source": "@!P1  BRA 0x7ff48b5b3be0"
+      }
+    ]
+  },
+  "v284": {
+    "source_path": "experiments/glm53_sparse_mla/artifacts/query_epilogue_overlap_source/v284_source.csv",
+    "sha256": "79ef2d5114e0a7a5719f87ec330efc9920d76b7eb30d4eca2bcb6fd9da58ad8e",
+    "branch": {
+      "Address": "0x7f346f5b22e0",
+      "Source": "@!P1  BRA 0x7f346f5b3800",
+      "stall_long_sb": "17214"
+    },
+    "predicate_writer": {
+      "Address": "0x7f346f5b2280",
+      "Source": "      SYNCS.PHASECHK.TRANS64.TRYWAIT P1, [UR4+0x2f928], R175"
+    },
+    "intervening_instruction_rows": 5,
+    "no_intervening_predicate_reference_or_branch": true,
+    "barrier_inference": "PV completion: shared address is QK barrier offset +8, matching consecutive qk_done/pv_done allocation and issuer commits",
+    "native_context": [
+      {
+        "Address": "0x7f346f5b2280",
+        "Source": "      SYNCS.PHASECHK.TRANS64.TRYWAIT P1, [UR4+0x2f928], R175"
+      },
+      {
+        "Address": "0x7f346f5b2290",
+        "Source": "      FADD R0, R3, R144"
+      },
+      {
+        "Address": "0x7f346f5b22a0",
+        "Source": "      FADD R147, R147, R160"
+      },
+      {
+        "Address": "0x7f346f5b22b0",
+        "Source": "      FADD R0, R0, R147"
+      },
+      {
+        "Address": "0x7f346f5b22c0",
+        "Source": "      ISETP.NE.U32.AND P0, PT, R4, RZ, PT"
+      },
+      {
+        "Address": "0x7f346f5b22d0",
+        "Source": "      FFMA R163, R163, R162, R0"
+      },
+      {
+        "Address": "0x7f346f5b22e0",
+        "Source": "@!P1  BRA 0x7f346f5b3800"
+      }
+    ]
+  },
+  "v285": {
+    "source_path": "experiments/glm53_sparse_mla/artifacts/query_epilogue_overlap_source/v285_source.csv",
+    "sha256": "c0c5b31bab10aebf69c20e79b76534fe628f40aa386f9d96cce2c40f36d295b7",
+    "branch": {
+      "Address": "0x7f696b5b2920",
+      "Source": "@!P1  BRA 0x7f696b5b3e10",
+      "stall_long_sb": "24548"
+    },
+    "predicate_writer": {
+      "Address": "0x7f696b5b2910",
+      "Source": "      SYNCS.PHASECHK.TRANS64.TRYWAIT P1, [UR4+0x31928], R113"
+    },
+    "intervening_instruction_rows": 0,
+    "no_intervening_predicate_reference_or_branch": true,
+    "barrier_inference": "PV completion: shared address is QK barrier offset +8, matching consecutive qk_done/pv_done allocation and issuer commits",
+    "native_context": [
+      {
+        "Address": "0x7f696b5b2910",
+        "Source": "      SYNCS.PHASECHK.TRANS64.TRYWAIT P1, [UR4+0x31928], R113"
+      },
+      {
+        "Address": "0x7f696b5b2920",
+        "Source": "@!P1  BRA 0x7f696b5b3e10"
+      }
+    ]
+  },
+  "v286": {
+    "source_path": "experiments/glm53_sparse_mla/artifacts/query_pv_overlap_source/v286_source.csv",
+    "sha256": "2c7b3d5ca3a59d5125347e339952ce866b37e44b7f838c90139a99e2081cc564",
+    "branch": {
+      "Address": "0x7efc9b5b2400",
+      "Source": "@!P1  BRA 0x7efc9b5b38e0",
+      "stall_long_sb": "16526"
+    },
+    "predicate_writer": {
+      "Address": "0x7efc9b5b21d0",
+      "Source": "      SYNCS.PHASECHK.TRANS64.TRYWAIT P1, [UR4+0x2f928], R179"
+    },
+    "intervening_instruction_rows": 34,
+    "no_intervening_predicate_reference_or_branch": true,
+    "barrier_inference": "PV completion: shared address is QK barrier offset +8, matching consecutive qk_done/pv_done allocation and issuer commits",
+    "native_context": [
+      {
+        "Address": "0x7efc9b5b21d0",
+        "Source": "      SYNCS.PHASECHK.TRANS64.TRYWAIT P1, [UR4+0x2f928], R179"
+      },
+      {
+        "Address": "0x7efc9b5b21e0",
+        "Source": "      S2R R4, SR_TID.X"
+      },
+      {
+        "Address": "0x7efc9b5b21f0",
+        "Source": "      FADD R132, R133, R132"
+      },
+      {
+        "Address": "0x7efc9b5b2200",
+        "Source": "      FADD R3, R0, R3"
+      },
+      {
+        "Address": "0x7efc9b5b2210",
+        "Source": "      FADD R136, R137, R136"
+      },
+      {
+        "Address": "0x7efc9b5b2220",
+        "Source": "      FADD R135, R135, R134"
+      },
+      {
+        "Address": "0x7efc9b5b2230",
+        "Source": "      FADD R140, R141, R140"
+      },
+      {
+        "Address": "0x7efc9b5b2240",
+        "Source": "      FADD R139, R139, R138"
+      },
+      {
+        "Address": "0x7efc9b5b2250",
+        "Source": "      FADD R144, R145, R144"
+      },
+      {
+        "Address": "0x7efc9b5b2260",
+        "Source": "      FADD R143, R143, R142"
+      },
+      {
+        "Address": "0x7efc9b5b2270",
+        "Source": "      FADD R148, R149, R148"
+      },
+      {
+        "Address": "0x7efc9b5b2280",
+        "Source": "      FADD R147, R147, R146"
+      },
+      {
+        "Address": "0x7efc9b5b2290",
+        "Source": "      FADD R152, R153, R152"
+      },
+      {
+        "Address": "0x7efc9b5b22a0",
+        "Source": "      FADD R151, R151, R150"
+      },
+      {
+        "Address": "0x7efc9b5b22b0",
+        "Source": "      FADD R156, R157, R156"
+      },
+      {
+        "Address": "0x7efc9b5b22c0",
+        "Source": "      FADD R155, R155, R154"
+      },
+      {
+        "Address": "0x7efc9b5b22d0",
+        "Source": "      FADD R160, R161, R160"
+      },
+      {
+        "Address": "0x7efc9b5b22e0",
+        "Source": "      FADD R159, R158, R159"
+      },
+      {
+        "Address": "0x7efc9b5b22f0",
+        "Source": "      FADD R3, R132, R3"
+      },
+      {
+        "Address": "0x7efc9b5b2300",
+        "Source": "      FADD R136, R136, R135"
+      },
+      {
+        "Address": "0x7efc9b5b2310",
+        "Source": "      FADD R139, R140, R139"
+      },
+      {
+        "Address": "0x7efc9b5b2320",
+        "Source": "      FADD R144, R144, R143"
+      },
+      {
+        "Address": "0x7efc9b5b2330",
+        "Source": "      FADD R147, R148, R147"
+      },
+      {
+        "Address": "0x7efc9b5b2340",
+        "Source": "      FADD R152, R152, R151"
+      },
+      {
+        "Address": "0x7efc9b5b2350",
+        "Source": "      FADD R155, R156, R155"
+      },
+      {
+        "Address": "0x7efc9b5b2360",
+        "Source": "      FADD R160, R160, R159"
+      },
+      {
+        "Address": "0x7efc9b5b2370",
+        "Source": "      FADD R3, R3, R136"
+      },
+      {
+        "Address": "0x7efc9b5b2380",
+        "Source": "      FADD R144, R139, R144"
+      },
+      {
+        "Address": "0x7efc9b5b2390",
+        "Source": "      FADD R147, R147, R152"
+      },
+      {
+        "Address": "0x7efc9b5b23a0",
+        "Source": "      FADD R160, R155, R160"
+      },
+      {
+        "Address": "0x7efc9b5b23b0",
+        "Source": "      FADD R0, R3, R144"
+      },
+      {
+        "Address": "0x7efc9b5b23c0",
+        "Source": "      FADD R147, R147, R160"
+      },
+      {
+        "Address": "0x7efc9b5b23d0",
+        "Source": "      FADD R0, R0, R147"
+      },
+      {
+        "Address": "0x7efc9b5b23e0",
+        "Source": "      ISETP.NE.U32.AND P0, PT, R4, RZ, PT"
+      },
+      {
+        "Address": "0x7efc9b5b23f0",
+        "Source": "      FFMA R163, R163, R162, R0"
+      },
+      {
+        "Address": "0x7efc9b5b2400",
+        "Source": "@!P1  BRA 0x7efc9b5b38e0"
+      }
+    ]
+  },
+  "v287": {
+    "source_path": "experiments/glm53_sparse_mla/artifacts/query_pv_overlap_source/v287_source.csv",
+    "sha256": "300876122b4391c638b98579111606fd793da82c1a28ad32653e7d20797b6774",
+    "branch": {
+      "Address": "0x7f2c6b5b2b70",
+      "Source": "@!P1  BRA 0x7f2c6b5b4070",
+      "stall_long_sb": "23112"
+    },
+    "predicate_writer": {
+      "Address": "0x7f2c6b5b2960",
+      "Source": "      SYNCS.PHASECHK.TRANS64.TRYWAIT P1, [UR4+0x31928], R112"
+    },
+    "intervening_instruction_rows": 32,
+    "no_intervening_predicate_reference_or_branch": true,
+    "barrier_inference": "PV completion: shared address is QK barrier offset +8, matching consecutive qk_done/pv_done allocation and issuer commits",
+    "native_context": [
+      {
+        "Address": "0x7f2c6b5b2960",
+        "Source": "      SYNCS.PHASECHK.TRANS64.TRYWAIT P1, [UR4+0x31928], R112"
+      },
+      {
+        "Address": "0x7f2c6b5b2970",
+        "Source": "      FADD R96, R96, R97"
+      },
+      {
+        "Address": "0x7f2c6b5b2980",
+        "Source": "      FADD R95, R94, R95"
+      },
+      {
+        "Address": "0x7f2c6b5b2990",
+        "Source": "      FADD R92, R92, R93"
+      },
+      {
+        "Address": "0x7f2c6b5b29a0",
+        "Source": "      FADD R91, R90, R91"
+      },
+      {
+        "Address": "0x7f2c6b5b29b0",
+        "Source": "      FADD R88, R88, R89"
+      },
+      {
+        "Address": "0x7f2c6b5b29c0",
+        "Source": "      FADD R87, R86, R87"
+      },
+      {
+        "Address": "0x7f2c6b5b29d0",
+        "Source": "      FADD R84, R84, R85"
+      },
+      {
+        "Address": "0x7f2c6b5b29e0",
+        "Source": "      FADD R83, R82, R83"
+      },
+      {
+        "Address": "0x7f2c6b5b29f0",
+        "Source": "      FADD R80, R80, R81"
+      },
+      {
+        "Address": "0x7f2c6b5b2a00",
+        "Source": "      FADD R79, R78, R79"
+      },
+      {
+        "Address": "0x7f2c6b5b2a10",
+        "Source": "      FADD R76, R76, R77"
+      },
+      {
+        "Address": "0x7f2c6b5b2a20",
+        "Source": "      FADD R75, R74, R75"
+      },
+      {
+        "Address": "0x7f2c6b5b2a30",
+        "Source": "      FADD R72, R72, R73"
+      },
+      {
+        "Address": "0x7f2c6b5b2a40",
+        "Source": "      FADD R71, R70, R71"
+      },
+      {
+        "Address": "0x7f2c6b5b2a50",
+        "Source": "      FADD R68, R68, R69"
+      },
+      {
+        "Address": "0x7f2c6b5b2a60",
+        "Source": "      FADD R3, R2, R3"
+      },
+      {
+        "Address": "0x7f2c6b5b2a70",
+        "Source": "      FADD R95, R96, R95"
+      },
+      {
+        "Address": "0x7f2c6b5b2a80",
+        "Source": "      FADD R92, R92, R91"
+      },
+      {
+        "Address": "0x7f2c6b5b2a90",
+        "Source": "      FADD R87, R88, R87"
+      },
+      {
+        "Address": "0x7f2c6b5b2aa0",
+        "Source": "      FADD R84, R84, R83"
+      },
+      {
+        "Address": "0x7f2c6b5b2ab0",
+        "Source": "      FADD R79, R80, R79"
+      },
+      {
+        "Address": "0x7f2c6b5b2ac0",
+        "Source": "      FADD R76, R76, R75"
+      },
+      {
+        "Address": "0x7f2c6b5b2ad0",
+        "Source": "      FADD R71, R72, R71"
+      },
+      {
+        "Address": "0x7f2c6b5b2ae0",
+        "Source": "      FADD R68, R68, R3"
+      },
+      {
+        "Address": "0x7f2c6b5b2af0",
+        "Source": "      FADD R92, R95, R92"
+      },
+      {
+        "Address": "0x7f2c6b5b2b00",
+        "Source": "      FADD R87, R87, R84"
+      },
+      {
+        "Address": "0x7f2c6b5b2b10",
+        "Source": "      FADD R76, R79, R76"
+      },
+      {
+        "Address": "0x7f2c6b5b2b20",
+        "Source": "      FADD R71, R71, R68"
+      },
+      {
+        "Address": "0x7f2c6b5b2b30",
+        "Source": "      FADD R0, R92, R87"
+      },
+      {
+        "Address": "0x7f2c6b5b2b40",
+        "Source": "      FADD R71, R76, R71"
+      },
+      {
+        "Address": "0x7f2c6b5b2b50",
+        "Source": "      FADD R0, R0, R71"
+      },
+      {
+        "Address": "0x7f2c6b5b2b60",
+        "Source": "      FFMA R99, R99, R100, R0"
+      },
+      {
+        "Address": "0x7f2c6b5b2b70",
+        "Source": "@!P1  BRA 0x7f2c6b5b4070"
+      }
+    ]
+  }
+}

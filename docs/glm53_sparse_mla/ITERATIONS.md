@@ -7218,3 +7218,75 @@ Thus the diagnostic mostly observes a shorter positive gap after the old epilogu
 
 
 Native timestamp-site inspection narrows the event meaning: the historical first_qk_issue field records entry to the QK submission sequence, with31 linear native instructions before the first MMA in fast copies and21 in strict copies. These include descriptor preparation; the distances are not cycle estimates. It does not timestamp actual MMA issue or tensor-engine execution. Interpret all early-pair counts and gap medians as submission-entry observations. Raw evidence retains its original keys; event_semantics_note.json and the probe docstring clarify the meaning. The docstring-only edit is AST-identical to the validated probe after removing module docstrings.
+
+
+## Iterations286–287 — publish next Q before the final PV wait
+
+Based on promoted v284/v285, move next-Q prefetch from after the key loop to immediately before the existing final-tile PV wait, after P-ready publication. Last QK has completed and consumed Q; PV reads P/KV and writes O, so it does not require the old shared Q. The issuer still submits current PV before it advances to the next query's Qbar and first QK. This adds an opportunity to hide Q transfer behind the final PV as well as the epilogue. Keep all PV waits, empty releases, math, output order, layouts, register limits and query/barrier phases unchanged.
+
+The prior diagnostic shows a remaining median448 ns gap to next-QK submission entry, not actual tensor-engine start. This motivates an earlier publication control but does not predict its gain: per-tile last-iteration guards and register pressure may outweigh overlap. Initial Q loading remains at the first assigned query entry. Retain post-loop prefetch only when num_blocks<=0, so a zero-iteration key loop does not lose next-Q publication; this is a control-flow preservation check, not a new zero-length numerical guarantee. A host count check confirms one publication iff a next query exists for0/1/2/15/16/17 tiles.
+
+Compile resources before any runtime. Changed candidates require the same persistent memory/fixed/variable/odd-batch guards and full numerical equivalence, then timing only if those pass. No input conversion or precision changes.
+
+
+AST inversion for286/287 removes only the added pre-PV Q publication and restores the former unconditional post-loop next-Q condition; after label normalization it exactly matches284/285. Thus all original arithmetic, PV waits and empty/P-ready ordering remain intact in source. Hardware safety and runtime overlap still require fresh checks.
+
+
+v286/v287 compile with128 initial registers,unchanged donor64/compute192 or176 and512 threads. Fast retains8-byte scalar frame and11 LDL/4 STL; strict remainszero stack/local. Static instructions increase1592→1600 and1688→1728; R2UR changes79→69 and61→62,UIADD3 127→129 and128→159. MMA/commit counts remain26/2 and34/2. The strict control incurs noticeably more address/control instructions, but the earlier-publication hypothesis is distinct enough to warrant one bounded qualified measurement if guards pass. No runtime or speedup claimed from these resources.
+
+
+v286 passes guarded b2 smoke,b512/chunk0 memcheck,fixed/variable synccheck and b513/chunk0 guarded exact equivalence across three repeats. Three full8192/seed1234 and short1024/chunk0/seed5678 repeats match v284; masks match with inherited86 tolerance failures. Short timing is1411.231995 us versus TRT1689.919949,about1.29% below prior v2841429.728031. This cross-run short result is provisional. NCU base/stable duration2.449824 ms,128 registers,194920 B dynamic shared,20.289153% occupancy,36.116666% tensor activity,0.384522 eligible warps/cycle,long-scoreboard ratio6.205143. Local read/write sectors1383952/443012; aggregate shared conflicts7074674/4740713. Qualify strict v287 before the second full seed and expanded rotating/standalone audits.
+
+
+v287 passes the same guarded smoke,memory,fixed/variable/odd-batch synchronization checks and three-repeat full8192/seed1234 plus short1024/chunk0/seed5678 exact comparisons to v285. Masks match and retain FP32 tolerance PASS. Short timing1530.079961 us versus TRT1691.776037 is only about0.46% below prior v2851537.152052; expanded timing is necessary. NCU base/stable2.640736 ms,128 registers,203112 B dynamic shared,20.293741% occupancy,49.111200% tensor activity,0.418270 eligible warps/cycle,long-scoreboard6.596679,zero local sectors. Aggregate shared conflicts7903162/2762080. Both candidates proceed to second full seed and endpoint-OFF rotating timing; defaults stay284/285 until that evidence is available.
+
+
+v286/v287 also match284/285 on full8192/seed5678 across three repeats, completing full2seed/short/mask exact equivalence. Endpoint-OFF five-round Graph comparisons now measure paired sustained behavior; short-run gains alone do not justify promotion.
+
+
+Fast endpoint-OFF five-round Graph timing favors v286 in all ten warm/cold pairs. Warm1545.600–1549.648 us versus v2841562.896–1575.296 yields parent/candidate1.009829–1.019213; cold1537.712–1550.576 versus1548.192–1572.800 yields1.002487–1.018537. Paired TRT warm1872.176–1956.112,cold1914.304–1924.800. All512-row checks pass. The original standalone eager/Graph audit remains before promotion.
+
+
+Strict endpoint-OFF five-round Graph timing favors v287 in all ten warm/cold pairs. Warm1796.160–1802.384 us versus v2851804.368–1811.568 yields parent/candidate1.001101–1.008039; cold1759.328–1763.216 versus1768.016–1771.536 yields1.003577–1.005651. Paired TRT warm1857.568–1956.240,cold1904.688–1916.848. All512-row checks pass. Improvements are small but consistent in this paired audit; the original standalone20/100 eager/Graph comparison now runs for parents and candidates.
+
+
+Original standalone20/100 favors v287 over v285 in all four conditions: eager warm/cold1741.967976/1749.119997 us versus parent1753.008008/1758.864045 and paired TRT1869.744003/1918.944001; Graph1808.544040/1765.263975 versus parent1831.183970/1773.328006 and paired TRT1815.551996/1904.672027. Its Graph warm advantage over TRT is only about0.39% in this run; retain the operating-condition limitation.
+
+Fast v286 standalone eager warm/cold1519.808054/1544.159949 us versus v2841537.152052/1553.535998 and paired TRT1876.527965/1917.152047. Graph warm/cold1561.583996/1536.415994 versus v2841553.711951/1547.327995 and paired TRT1865.743995/1914.911985. The standalone Graph warm candidate is about0.51% slower than its parent despite ten favorable rotated pairs; retain this counterexample. Keep fast default284 pending a bounded three-round alternating-process Graph warm recheck with unchanged20/100/512-row parameters. Strict287 has completed the promotion evidence, pending archival/source record update.
+
+v286 unlocked source issues513729872 instructions versus v284521587785 (about1.51% fewer). Shared actual/ideal wavefronts20210996 remain equal,zero excessive. Long-scoreboard samples55780 versus58046,producer-empty15096 versus15412,QK12711 versus13188. The top16526-sample branch again lacks an immediately adjacent wait in the short context; leave it unattributed until native inspection. These sampled changes support reduced waiting but are not a direct latency decomposition.
+
+
+v287 unlocked source issues569229552 instructions versus v285577212153 (about1.38% fewer). Shared actual/ideal wavefronts28599604 remain equal,zero excessive. Long-scoreboard samples64922 versus66822,producer-empty17247 versus17131,QK12594 versus13447. The top23112-sample branch lacks an immediately adjacent wait in its short context; retain that attribution limit. The producer-empty sample increase illustrates that reduced overall waiting does not mean every stage improves.
+
+Opcode deltas for286/287 reduce the combined three-op barrier-poll/sleep count by8282076/9791124 and BRA by1510779/4273858. Strict287 adds12279512 UIADD3 while removing5708640 VIADD and changing predicate/address opcodes; the earlier prefetch changes control/address allocation as well as waiting. Do not treat aggregate instruction counts as useful math or time. All math/PV/TMA source operations remain unchanged by the AST restoration check.
+
+
+The bounded alternating-process Graph warm recheck is mixed: v2861554.048/1559.616/1559.088 us versus v2841551.648/1574.944/1561.552, parent/candidate0.998456/1.009828/1.001580. All512-row checks pass, with paired TRT1863.552–1875.504 us. Together with the earlier standalone warm loss, this does not establish a consistently favorable independent-process warm result. Keep fast default284 and retain286 as a fully validated scheduling alternative; do not discard its ten favorable rotated pairs or three other favorable standalone regimes. No further repetition of the same audit is justified without a new concern/change.
+
+Promote strict287 on CuTeDSL4.6.2 after full2seed/short/mask equivalence, memory/fixed/variable/odd-batch guards, ten favorable rotated pairs and all four favorable original standalone conditions. Strict numerical limits remain inherited from the separately audited FP32 path; original benchmark/tolerances unchanged. Fast default remains284.
+
+
+Expanded native predicate tracing resolves the formerly unattributed top branches for278/284/286 and287. Their predicates come from the PV-completion TRYWAIT at shared offset0x2f928 (fast) or0x31928 (strict), with no intervening predicate reference or branch. The distances are5/5/34 native instructions for278/284/286 and32 for287; strict281/285 place the branch immediately after TRYWAIT. In286/287 the compiler schedules denominator FADD/FFMA work between poll and branch. Thus these sampled PCs belong to the PV completion polling path, not a standalone arithmetic bottleneck. The previous short-context limitations remain in historical notes; pv_wait_native_attribution.json records the expanded evidence and source hashes. Counts17355→17214→16526 fast and24864→24548→23112 strict are sampled PV-poll observations, not saved cycles.
+
+
+## Iterations288–289 — prefetch next Q during the final softmax
+
+Based on qualified286/287, move the existing last-tile Q prefetch to immediately after the partial-max compute256 rendezvous, before the final max reduction, exponentials, probability packing, O correction and PV. Last QK has completed and no longer reads shared Q; the current score data resides in TMEM/registers. Crucially, the retained partial-max rendezvous ensures every compute Qbar waiter has passed the old query phase, including one-tile queries. Do not move this publication directly after an individual warp QK wait, which would lack that all-compute rendezvous for one-tile inputs. The issuer has necessarily passed old Qbar before committing the observed QK completion.
+
+The source reasoning follows NVIDIA PTX tcgen05.commit completion semantics and mbarrier phase/parity rules: https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#tcgen05-instructions-tcgen05-commit and the Primary phase / mbarrier.test_wait sections. All original QK/PV waits, P-ready and empty releases, compute barriers, zero-iteration fallback, query stride, arithmetic and layouts remain intact. AST inversion restoring only the moved prefetch exactly matches each parent before label normalization. The earlier placement may hide more Q transfer, but may extend descriptor live ranges while score fragments are live; compile/native inspection gates runtime. This is a candidate hypothesis, not established hardware safety or performance.
+
+
+v288/v289 native control checks preserve512 threads,128 initial registers,donor64/compute192 or176 and26/34 MMA withtwo commits. Fast stays8-byte scalar frame,11 LDL/4 STL and grows1600→1608 static instructions; strict stayszero stack/local and1728 instructions. R2UR remains69/62; UIADD3 changes129→130 fast and159 unchanged strict. The earlier descriptor placement does not introduce a new fragment spill. Bounded guarded runtime qualification follows; no numerical or timing claims from compilation alone.
+
+
+v288 passes guarded smoke,memory,fixed/variable/odd-batch synchronization and three-repeat full8192/seed1234 plus short1024/chunk0/seed5678 exact comparisons to286. Masks match with inherited86 tolerance failures. Short1425.503969 us versus TRT1691.648006 is about1.01% slower than2861411.231995 and near default2841429.728031. NCU base/stable2.511456 ms,128 registers,194920 B dynamic shared,20.295709% occupancy,35.638476% tensor activity,0.384900 eligible warps/cycle,long-scoreboard6.214682,local read/write1383952/442752 sectors,aggregate shared conflicts7048226/3477802. Earlier Q publication alone does not establish a gain; no promotion or expanded timing at this point. Strict289 qualification follows.
+
+
+v289 qualification dispatch returned143 after the initial stages. Inspection retained complete smoke,memcheck,fixed synccheck and variable synccheck results,each sanitizer log endingzero errors. The odd-batch log did not yet exist; no candidate/sanitizer process remained and GPU1 was idle. Cause of dispatch termination is unresolved; do not classify it as a kernel hang or validation pass. A fresh idle preflight precedes continuation at odd guarded equivalence, retaining all earlier logs and recording interruption metadata.
+
+
+v289 continuation passes b513/chunk0 guarded exact equivalence plus synccheck,three full8192/seed1234 and short1024/chunk0/seed5678 repeats,and masks exactly matching287 with FP32 tolerance PASS. The preserved initial logs and successful continuation together complete the first qualification set; the dispatch143 remains documented separately. Timing/NCU now follows.
+
+
+v289 timing/profiling did not start: the fresh GPU1 preflight observed86667 MiB in use on both samples and exited3. A subsequent read-only query still reported that allocation; no visible compute PID was returned from this container. No process was altered. This is an occupied-GPU condition, not a kernel timing or NCU result. All completed qualification logs and interruption metadata are retained in v289; runtime performance remains pending while local analysis/archival continues.

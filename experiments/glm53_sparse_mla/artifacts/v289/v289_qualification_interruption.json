@@ -1,0 +1,12 @@
+{
+  "dispatch_exit_code": 143,
+  "completed": [
+    "guarded_smoke",
+    "guarded_memcheck",
+    "synccheck",
+    "synccheck_varlen"
+  ],
+  "observed": "All sanitizer logs end with zero errors; odd-stage log absent; no v289/sanitizer process remains; selected GPU idle.",
+  "cause": "Unresolved external termination of dispatch; no observed kernel/sanitizer failure.",
+  "action": "Retain completed logs and continue from odd guarded equivalence after fresh idle preflight."
+}

@@ -183,10 +183,18 @@ for directory in sorted(root.glob("v[0-9][0-9][0-9]")):
         status = "guarded checks/full seed1234/mask parent equivalence; KV-tail P reuse slower"
     if version == "v232":
         status = "guarded checks pass;9 full seed1234 failures,86 mask failures; single-buffer slower"
+    if version == "v288":
+        status = "guarded checks/full seed1234/short/masks exact v286; earlier Q slower in short tuning"
+    if version == "v289":
+        status = "guarded checks/full seed1234/short/masks exact v287; timing pending occupied GPU"
+    if version == "v286":
+        status = "bitwise v284 full2seeds/short/masks; rotated wins but standalone warm mixed; not promoted"
+    if version == "v287":
+        status = "bitwise v285 full2seeds/short/masks; current strict default; zero local traffic"
     if version == "v284":
         status = "bitwise v278 full2seeds/short/masks; current fast default; FP8 limits retained"
     if version == "v285":
-        status = "bitwise v281 full2seeds/short/masks; current strict default; zero local traffic"
+        status = "bitwise v281 full2seeds/short/masks; earlier strict default; zero local traffic"
     if version == "v281":
         status = "bitwise strict parent full2seeds/short/masks; zero local traffic; earlier strict default"
     if version == "v280":

@@ -1,0 +1,12 @@
+{
+  "v288": {
+    "source_sha256": "ad14d5002a6842b14a81e7187b2c2e55e95810997b721d4dfe72b184cd056d8c",
+    "local_sites": 15,
+    "guarded_runtime_next": true
+  },
+  "v289": {
+    "source_sha256": "9fd658445b211f3bedbe2aee2bbe46f8d5cfab4e84bb158a701a204f52c8bb22",
+    "local_sites": 0,
+    "guarded_runtime_next": true
+  }
+}

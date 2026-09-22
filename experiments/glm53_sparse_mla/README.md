@@ -39,10 +39,10 @@ export CUTE_DSL_ARCH=sm_103a
   --output-json artifacts/v284_accuracy512_graph.json
 
 # Higher precision, retaining the audited full-reference tolerance passes.
-/opt/sglang/bin/python bench.py --kernel-version v285 --block-k 128 \
+/opt/sglang/bin/python bench.py --kernel-version v287 --block-k 128 \
   --backends trtllm cute --scope native --check-rows 512 \
   --warmup-iters 20 --repeat-iters 100 --cache both --timing cuda-graph \
-  --output-json artifacts/v285_accuracy512_graph.json
+  --output-json artifacts/v287_accuracy512_graph.json
 
 # Short event-based tuning run, followed by one warmed NCU invocation.
 bash run_iteration.sh v284 128
@@ -102,7 +102,8 @@ The full 8192-row/seed1234 audit checks all 268,435,456 output elements:
 | v197, role-local 64/176 register redistribution | Full bitwise equality to v184 on both seeds, short case and masks | Earlier higher-precision path |
 | v273, strict independent-role persistent query loops | Full bitwise equality to v197 on both seeds, short case and masks | Earlier higher-precision path |
 | v281, compute-local release and role-local CTA reads | Full bitwise equality through v279 to v273 on both seeds, short case and masks | Earlier higher-precision path |
-| v285, strict next-Q/epilogue overlap | Full bitwise equality to v281 on both seeds, short case and masks | Current higher-precision path |
+| v285, strict next-Q/epilogue overlap | Full bitwise equality to v281 on both seeds, short case and masks | Earlier higher-precision path |
+| v287, next Q before final PV wait | Full bitwise equality to v285 on both seeds, short case and masks | Current higher-precision path |
 
 The earlier fast path v138 matches v125 bitwise on both full8192-row seeds,
 all1024 short-case rows and masked inputs, retaining the FP8 limits below.
@@ -133,7 +134,7 @@ versus v108 1712.34–1713.34 µs and TRT 1871.36–1876.06 µs; cold
 1857.46–1859.60 µs. It improves on v108 in each recorded ordering, although
 one warm pair differs by less than 1 µs. These are observed ranges of round
 medians with unlocked clocks, not confidence intervals. The baseline FP8
-precision limits remain; v285 is the current higher-precision option.
+precision limits remain; v287 is the current higher-precision option.
 
 Earlier fast path v108 matches v105 bitwise on both full 8192-row seeds,
 all 1024 short-case rows and the masked input; qualified b2 synccheck/b512
@@ -215,7 +216,7 @@ TRT 1886.18/1916.88 µs; Graph medians are 1806.54/1796.08 µs versus
 TRT 1869.81–1878.22 µs, improving on v094 in every ordering. It moves the
 read-only global index fetch before stage-reuse waiting while keeping shared
 publication after that wait. This preserves the documented FP8 precision limits;
-it does not establish an all-row FP32-reference pass. v285 is the current validated
+it does not establish an all-row FP32-reference pass. v287 is the current validated
 higher-precision option.
 
 v094 retains v091 output bits on both full8192-row seeds, the1024-row short
@@ -232,7 +233,7 @@ Eager-event warm/cold medians are1852.51/1851.06 µs versusTRT1886.94/1917.02 µ
 Graph medians1847.62/1832.43 µs versusTRT1863.94/1926.14 µs. Three rotated
 orders give warm v0911822.98–1824.83 µs versusTRT1869.98–1879.65 µs; it also
 improves on v090 in every ordering. These are the same baseline-precision
-outputs, including the failures documented below. v285 is the current higher-precision option on its audited inputs.
+outputs, including the failures documented below. v287 is the current higher-precision option on its audited inputs.
 
 v090 matches v086 bitwise on all8192 rows of both seeds and all1024 rows of
 the short case, in three repeats each. The mask case also matches v086 bitwise,
@@ -357,7 +358,7 @@ Neither version is promoted.
 For higher precision, `v133` is the analogous output evict-first experiment:
 full2seeds/short/mask bits matchv128, and qualified sanitizers pass. Its three
 rotated orders improve slightly, while separate eager warm timing regresses
-slightly. It remains slower than TRT; v285 is now the established higher-precision default.
+slightly. It remains slower than TRT; v287 is now the established higher-precision default.
 
 
 The earlier higher-precision default was **v145**. It replaces per-element validity
@@ -456,7 +457,7 @@ five local wheels in one invocation. Never infer a runtime gain from compilation
 separate compile controls. Moving compute register allocation into its actual
 role branch permits native x32/x64 kernels to compile with installed4.6.2 as
 well. v194/v195/v197 runtime records use4.6.2; the4.6.3 instruction streams are
-not interchangeable evidence. Current defaults are v284/v285 after the persistence and higher-precision register-allocation audits below.
+not interchangeable evidence. Current defaults are v284/v287 after the persistence and higher-precision register-allocation audits below.
 
 
 The preceding higher-precision default was **v197**, with role-local register
@@ -515,7 +516,7 @@ local requests; persistence still improves the measured complete workload.
 Guarded fixed/variable-length and odd-batch synchronization plus memory checks pass.
 Both full8192 seeds, the full1024 short case and masked outputs are bitwise equal to
 v190. Its9/6 full-target failures,7650 short-case failures and86 masked failures
-remain; use v285 when the audited strict tolerance is required.
+remain; use v287 when the audited strict tolerance is required.
 
 Five endpoint-OFF rotating Graph orders show warm1603.472–1613.888 us and
 cold1601.568–1603.584 us, beating paired v190 in all10 comparisons by approximately
@@ -566,7 +567,7 @@ Compiler remains CuTeDSL4.6.2. v279/v280 are retained as validated controls;
 eliminating local traffic alone does not guarantee a consistent latency gain.
 
 
-## Current defaults: v284 fast and v285 strict
+## Earlier promotion: v284 fast and v285 strict
 
 Load the next assigned Q after the current final PV completes, before normalization
 and output writeback. This creates room for Q loading and the next first QK to
@@ -601,3 +602,23 @@ not production latency measurements or a decomposition of time saved.
 
 The historical first_qk_issue key marks submission-code entry, before descriptor
 preparation and actual MMA issue. It does not timestamp Tensor Core execution.
+
+
+## Current defaults: v284 fast and v287 strict
+
+Strict v287 moves next Q prefetch before the last PV wait, overlapping the existing
+transfer with more of the prior query. Its memory/fixed/variable/odd-batch guards
+pass; both full seeds, short case and masks match v285 bitwise. Zero stack/local
+traffic and the strict path's audited FP32 tolerance remain unchanged.
+Five endpoint-OFF rotated warm/cold rounds favor v287 in all ten pairs, with
+parent/candidate1.001101–1.008039. Original20/100 eager warm/cold is
+1741.968/1749.120 us versus TRT1869.744/1918.944; Graph1808.544/1765.264
+versus1815.552/1904.672. All four conditions improve v285; Graph warm's paired
+TRT advantage is only0.39%, illustrating operating-condition dependence.
+
+Fast v286 also passes all equivalence/guard checks and wins all ten rotated pairs,
+but its independent Graph warm test is slower than v284 and a three-round
+alternating-process recheck yields two wins/one loss. Keep fast default v284 and
+retain v286 as a validated alternative. Its eager1519.808/1544.160 us and
+Graph1561.584/1536.416 are measured regimes, not a universal improvement claim.
+Both kernels retain their precision class; compiler remains CuTeDSL4.6.2.
