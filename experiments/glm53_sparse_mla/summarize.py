@@ -179,6 +179,10 @@ for directory in sorted(root.glob("v[0-9][0-9][0-9]")):
         status = "guarded checks/full seed1234/mask exact v227; no performance gain"
     if version == "v229":
         status = "guarded checks/full seed1234 and masks FP32 PASS; slower; no other full audits"
+    if version in ("v230", "v231"):
+        status = "guarded checks/full seed1234/mask parent equivalence; KV-tail P reuse slower"
+    if version == "v232":
+        status = "guarded checks pass;9 full seed1234 failures,86 mask failures; single-buffer slower"
     if version == "v217":
         status = "guarded/full seed1234/mask equivalence pass; intermediate register budget no short gain"
     if version == "v142":

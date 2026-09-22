@@ -1,0 +1,10 @@
+{
+  "purpose": "Guarded normal-MMA TMEM packing/restore diagnostic, not MLA timing.\n\nTwo M64xN256 results occupy complementary Layout-F datapath halves in a\n256-column allocation. Save the upper-column M64xN128 half in registers, overwrite it\nwith a score product, read scores and both64-key maxima, restore the half, then accumulate into\nboth original outputs. Exact integer-valued FP8 inputs make every reference\nproduct and the final factor-of-two result exactly representable in FP32.\n",
+  "source_sha256": "1119e9ec752f8b894ba8afe8e4dbb7e4ebffcc382bdc883dba3a590a839f3a38",
+  "gpu_uuid": "GPU-2dc4b50c-07a5-26d6-f5ce-54ef728d56b2",
+  "blocks": 1,
+  "guardrails": true,
+  "compile_only": true,
+  "tmem_columns": 256,
+  "records": []
+}
