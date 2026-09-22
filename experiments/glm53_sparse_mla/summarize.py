@@ -96,7 +96,9 @@ for directory in sorted(root.glob("v[0-9][0-9][0-9]")):
     if version == "v140":
         status = "bitwise v128 full seed1234/mask; paired correction slower"
     if version == "v141":
-        status = "bitwise v138 full seed1234/mask; expanded audit pending"
+        status = "bitwise v138 full2seeds/short/masks; small cache-policy alternative"
+    if version == "v142":
+        status = "bitwise v138 full seed1234/mask; paired epilogue slower"
     if version == "v138":
         status = "bitwise v125 full2seeds/short/masks; current fast path"
     if version == "v136":

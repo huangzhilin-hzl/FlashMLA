@@ -4400,3 +4400,60 @@ Short1636.54 us versusTRT1691.94 us is about2.91 us belowv138. NCU base/stable:
 long-scoreboard6.196022,zero local sectors,aggregate shared conflicts6212999/
 1914229,diagnostic2.800256 ms. This small tuning change needs expanded validation
 and rotation before deciding whether to replace the normal-L2-policy default.
+
+### Iteration 141 expanded result — retain as a cache-policy alternative
+
+Both full seeds and the short case match v138 bitwise in three repeats each;
+masked equality and qualified sanitizers also pass. Eager 20/100 warm/cold:
+1706.26/1721.17 us versus TRT 1884.32/1917.01 us; Graph 1725.07/1689.62 us versus
+TRT 1871.66/1925.84 us. Three rotated warm orders favor v141 (1679.49/1679.46/
+1679.46 us) over v138 (1681.54/1684.13/1681.81 us). Cold orders are mixed:
+v141 1679.54/1681.12/1672.27 us versus v138 1675.38/1683.70/1684.06 us.
+Keep v138 as default and v141 as a fully validated cache-policy alternative;
+the 2–5 us warm advantage is small and cold/eager effects vary.
+
+### Iteration 142 result — paired epilogue loads do not improve latency
+
+REG123/STACK0. Full seed1234 matches v138 bitwise in three repeats; masks match,
+qualified b2 synccheck and b512 memcheck report zero errors. Short 1644.74 us
+versus TRT 1690.78 us is about 5.28 us above v138. NCU base/stable: 123 registers,
+194920 shared bytes, occupancy 19.283%, tensor 31.492%, eligible 0.396840,
+long-scoreboard 6.166939, zero local sectors, aggregate shared conflicts
+6214389/1963056, diagnostic 2.810336 ms. Do not promote; no expanded audit.
+
+## Iterations 143–144 — consolidate producer barriers in the current pipeline
+
+An older v063 control removed producer barriers before pre-wait index fetch,
+four-producer specialization, the dedicated MMA issuer, and paired TMEM correction
+were introduced. Revisit that dependency change on v138 with two bounded controls.
+v143 removes only the barrier between writing indices/masks and recording expected
+TMA bytes. The following 128-thread barrier already publishes both and prevents
+any gather from preceding the transaction expectation. Retain the post-gather
+barrier. v144 additionally removes the post-gather barrier: the next tile uses
+separate stage storage, and each producer waits for its stage's empty notification
+before reuse; the retained publication barrier still joins all producers before
+each tile's gather. No shared layout or numerical operations change. Validate
+synchronization and bitwise outputs before interpreting performance.
+
+### External exp2 emulation inspection
+
+The installed CuTe exp_packed_f32x2 is deprecated and lowers to packed multiply
+plus two ordinary exp2 calls; it is not a packed SFU instruction. FlashAttention
+[issue 2358](https://github.com/Dao-AILab/flash-attention/issues/2358) documents an
+SM103 exclusion for polynomial emulation, without a maintainer explanation on the
+retrieved page. The inspected FlashInfer checkout also enables its FMHA emulation
+only for capability (10, 0). These are implementation choices, not proof of a
+hardware limitation or universal performance result. No polynomial approximation
+is introduced here, and no bitwise claim is inferred from another kernel's tests.
+
+## Iteration 145 — validity bitmaps on the current higher-precision path
+
+Source inspection shows v128 still loads 32 individual validity entries per
+compute thread; the earlier v092 bitmap experiment was not promoted. Port only
+the bitmap publication and lookup from the fast path to v128. Each producer warp
+publishes its 32 validity predicates once; each compute thread reads its matching
+32-bit segment. Keep scaled-score multiplication inside the validity predicate,
+the bounded anchor, residual FP8 arithmetic, balanced sums, strict barriers and
+single x32 correction unchanged. This revisits bitmap cost after the dedicated
+issuer and newer register allocation; the older v092 result does not establish
+its effect in this schedule. Require bitwise v128 equivalence and mask accuracy.

@@ -134,7 +134,8 @@ B300 physical GPU1; b8192, H64, D576/512, TopK2048, chunk3. Each row is a paired
 | v136 | 2960.13 | 1691.74 | 0.5715x | 114 | 0.00 / 0.00 | 17.27% | guarded smoke/b512 and eight rows pass; slower; no full audit |
 | v138 | 1639.46 | 1691.49 | 1.0317x | 123 | 0.00 / 0.00 | 31.57% | bitwise v125 full2seeds/short/masks; current fast path |
 | v140 | 1822.75 | 1690.88 | 0.9277x | 123 | 0.00 / 0.00 | 41.79% | bitwise v128 full seed1234/mask; paired correction slower |
-| v141 | 1636.54 | 1691.94 | 1.0338x | 123 | 0.00 / 0.00 | 31.57% | bitwise v138 full seed1234/mask; expanded audit pending |
+| v141 | 1636.54 | 1691.94 | 1.0338x | 123 | 0.00 / 0.00 | 31.57% | bitwise v138 full2seeds/short/masks; small cache-policy alternative |
+| v142 | 1644.74 | 1690.78 | 1.0280x | 123 | 0.00 / 0.00 | 31.49% | bitwise v138 full seed1234/mask; paired epilogue slower |
 
 Raw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. v090/v091/v094/v096/v097/v105/v108/v112/v125 have an observed sustained warm advantage in the extended eager-event, Graph and rotating-order runs, at baseline-level FP8 precision; v125 is the current fast path. Short five-event v125 tuning has a small observed advantage; v105 is near parity. Use the matching execution regime and retained distributions. v086 is near parity warm and its initial cold advantage does not reproduce in its rotating-order audit.
 
@@ -214,6 +215,8 @@ These are separate warm/cold runs with 20 warmups and 100 repeats; sampled row c
 | v133 | 512 | cold | 1936.42 | 1917.06 | 0.9900x |
 | v138 | 512 | warm | 1724.70 | 1869.02 | 1.0837x |
 | v138 | 512 | cold | 1713.23 | 1920.93 | 1.1212x |
+| v141 | 512 | warm | 1725.07 | 1871.66 | 1.0850x |
+| v141 | 512 | cold | 1689.62 | 1925.84 | 1.1398x |
 
 ## Extended eager CUDA-event runs
 
@@ -253,6 +256,8 @@ These are separate warm/cold runs with 20 warmups and 100 repeats; sampled row c
 | v133 | 512 | cold | 1939.18 | 1918.99 | 0.9896x |
 | v138 | 512 | warm | 1708.69 | 1880.22 | 1.1004x |
 | v138 | 512 | cold | 1715.17 | 1914.93 | 1.1165x |
+| v141 | 512 | warm | 1706.26 | 1884.32 | 1.1044x |
+| v141 | 512 | cold | 1721.17 | 1917.01 | 1.1138x |
 
 ## Same-process rotating-order audits
 
@@ -346,5 +351,9 @@ Ranges below are the minimum and maximum per-round medians or paired ratios, not
 | v128_v133_round_robin | cute-v128/native | cold | 3 | 1916.94–1917.18 | 0.9700–0.9701x |
 | v128_v133_round_robin | cute-v133/native | warm | 3 | 1913.10–1920.22 | 0.9738–0.9817x |
 | v128_v133_round_robin | cute-v133/native | cold | 3 | 1898.53–1914.75 | 0.9712–0.9795x |
+| v138_v141_round_robin | cute-v138/native | warm | 3 | 1681.54–1684.13 | 1.1109–1.1173x |
+| v138_v141_round_robin | cute-v138/native | cold | 3 | 1675.38–1684.06 | 1.1029–1.1088x |
+| v138_v141_round_robin | cute-v141/native | warm | 3 | 1679.46–1679.49 | 1.1122–1.1200x |
+| v138_v141_round_robin | cute-v141/native | cold | 3 | 1672.27–1681.12 | 1.1050–1.1107x |
 
 See [ITERATIONS.md](ITERATIONS.md) for changes, failed hypotheses, correctness limits and source references.
