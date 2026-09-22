@@ -1,0 +1,380 @@
+[
+  {
+    "gpu_uuid": "GPU-2dc4b50c-07a5-26d6-f5ce-54ef728d56b2",
+    "source_sha256": "4895b2c9d1e69cdaa6e21262ea8451593a9eda759d5149829904882c8fd3cffd",
+    "pairs": 1,
+    "packed": false,
+    "threads": 32,
+    "loops": 4096,
+    "unroll": 8,
+    "steps_per_chain": 32768,
+    "repeats": 9,
+    "checksum": 24.25,
+    "median_cycles": 164116.0,
+    "cycles_per_step": 5.0084228515625,
+    "cycles_per_scalar_add_per_thread": 2.50421142578125,
+    "selected_native_ops": {
+      "FADD": 17,
+      "FADD2": 0,
+      "MOV": 0,
+      "BRA": 1
+    }
+  },
+  {
+    "gpu_uuid": "GPU-2dc4b50c-07a5-26d6-f5ce-54ef728d56b2",
+    "source_sha256": "4895b2c9d1e69cdaa6e21262ea8451593a9eda759d5149829904882c8fd3cffd",
+    "pairs": 1,
+    "packed": true,
+    "threads": 32,
+    "loops": 4096,
+    "unroll": 8,
+    "steps_per_chain": 32768,
+    "repeats": 9,
+    "checksum": 24.25,
+    "median_cycles": 159749.0,
+    "cycles_per_step": 4.875152587890625,
+    "cycles_per_scalar_add_per_thread": 2.4375762939453125,
+    "selected_native_ops": {
+      "FADD": 1,
+      "FADD2": 8,
+      "MOV": 2,
+      "BRA": 1
+    }
+  },
+  {
+    "gpu_uuid": "GPU-2dc4b50c-07a5-26d6-f5ce-54ef728d56b2",
+    "source_sha256": "4895b2c9d1e69cdaa6e21262ea8451593a9eda759d5149829904882c8fd3cffd",
+    "pairs": 4,
+    "packed": false,
+    "threads": 32,
+    "loops": 4096,
+    "unroll": 8,
+    "steps_per_chain": 32768,
+    "repeats": 9,
+    "checksum": 103.0,
+    "median_cycles": 311597.0,
+    "cycles_per_step": 9.509185791015625,
+    "cycles_per_scalar_add_per_thread": 1.1886482238769531,
+    "selected_native_ops": {
+      "FADD": 71,
+      "FADD2": 0,
+      "MOV": 0,
+      "BRA": 1
+    }
+  },
+  {
+    "gpu_uuid": "GPU-2dc4b50c-07a5-26d6-f5ce-54ef728d56b2",
+    "source_sha256": "4895b2c9d1e69cdaa6e21262ea8451593a9eda759d5149829904882c8fd3cffd",
+    "pairs": 4,
+    "packed": true,
+    "threads": 32,
+    "loops": 4096,
+    "unroll": 8,
+    "steps_per_chain": 32768,
+    "repeats": 9,
+    "checksum": 103.0,
+    "median_cycles": 299308.0,
+    "cycles_per_step": 9.1341552734375,
+    "cycles_per_scalar_add_per_thread": 1.1417694091796875,
+    "selected_native_ops": {
+      "FADD": 7,
+      "FADD2": 32,
+      "MOV": 0,
+      "BRA": 1
+    }
+  },
+  {
+    "gpu_uuid": "GPU-2dc4b50c-07a5-26d6-f5ce-54ef728d56b2",
+    "source_sha256": "4895b2c9d1e69cdaa6e21262ea8451593a9eda759d5149829904882c8fd3cffd",
+    "pairs": 8,
+    "packed": false,
+    "threads": 32,
+    "loops": 4096,
+    "unroll": 8,
+    "steps_per_chain": 32768,
+    "repeats": 9,
+    "checksum": 222.0,
+    "median_cycles": 573781.0,
+    "cycles_per_step": 17.510406494140625,
+    "cycles_per_scalar_add_per_thread": 1.094400405883789,
+    "selected_native_ops": {
+      "FADD": 143,
+      "FADD2": 0,
+      "MOV": 0,
+      "BRA": 1
+    }
+  },
+  {
+    "gpu_uuid": "GPU-2dc4b50c-07a5-26d6-f5ce-54ef728d56b2",
+    "source_sha256": "4895b2c9d1e69cdaa6e21262ea8451593a9eda759d5149829904882c8fd3cffd",
+    "pairs": 8,
+    "packed": true,
+    "threads": 32,
+    "loops": 4096,
+    "unroll": 8,
+    "steps_per_chain": 32768,
+    "repeats": 9,
+    "checksum": 222.0,
+    "median_cycles": 561212.0,
+    "cycles_per_step": 17.1268310546875,
+    "cycles_per_scalar_add_per_thread": 1.0704269409179688,
+    "selected_native_ops": {
+      "FADD": 15,
+      "FADD2": 64,
+      "MOV": 12,
+      "BRA": 1
+    }
+  },
+  {
+    "gpu_uuid": "GPU-2dc4b50c-07a5-26d6-f5ce-54ef728d56b2",
+    "source_sha256": "4895b2c9d1e69cdaa6e21262ea8451593a9eda759d5149829904882c8fd3cffd",
+    "pairs": 1,
+    "packed": false,
+    "threads": 128,
+    "loops": 4096,
+    "unroll": 8,
+    "steps_per_chain": 32768,
+    "repeats": 9,
+    "checksum": 24.25,
+    "median_cycles": 164120.0,
+    "cycles_per_step": 5.008544921875,
+    "cycles_per_scalar_add_per_thread": 2.5042724609375,
+    "selected_native_ops": {
+      "FADD": 17,
+      "FADD2": 0,
+      "MOV": 0,
+      "BRA": 1
+    }
+  },
+  {
+    "gpu_uuid": "GPU-2dc4b50c-07a5-26d6-f5ce-54ef728d56b2",
+    "source_sha256": "4895b2c9d1e69cdaa6e21262ea8451593a9eda759d5149829904882c8fd3cffd",
+    "pairs": 1,
+    "packed": true,
+    "threads": 128,
+    "loops": 4096,
+    "unroll": 8,
+    "steps_per_chain": 32768,
+    "repeats": 9,
+    "checksum": 24.25,
+    "median_cycles": 160023.0,
+    "cycles_per_step": 4.883514404296875,
+    "cycles_per_scalar_add_per_thread": 2.4417572021484375,
+    "selected_native_ops": {
+      "FADD": 1,
+      "FADD2": 8,
+      "MOV": 0,
+      "BRA": 1
+    }
+  },
+  {
+    "gpu_uuid": "GPU-2dc4b50c-07a5-26d6-f5ce-54ef728d56b2",
+    "source_sha256": "4895b2c9d1e69cdaa6e21262ea8451593a9eda759d5149829904882c8fd3cffd",
+    "pairs": 4,
+    "packed": false,
+    "threads": 128,
+    "loops": 4096,
+    "unroll": 8,
+    "steps_per_chain": 32768,
+    "repeats": 9,
+    "checksum": 103.0,
+    "median_cycles": 311611.5,
+    "cycles_per_step": 9.509628295898438,
+    "cycles_per_scalar_add_per_thread": 1.1887035369873047,
+    "selected_native_ops": {
+      "FADD": 71,
+      "FADD2": 0,
+      "MOV": 0,
+      "BRA": 1
+    }
+  },
+  {
+    "gpu_uuid": "GPU-2dc4b50c-07a5-26d6-f5ce-54ef728d56b2",
+    "source_sha256": "4895b2c9d1e69cdaa6e21262ea8451593a9eda759d5149829904882c8fd3cffd",
+    "pairs": 4,
+    "packed": true,
+    "threads": 128,
+    "loops": 4096,
+    "unroll": 8,
+    "steps_per_chain": 32768,
+    "repeats": 9,
+    "checksum": 103.0,
+    "median_cycles": 299323.5,
+    "cycles_per_step": 9.134628295898438,
+    "cycles_per_scalar_add_per_thread": 1.1418285369873047,
+    "selected_native_ops": {
+      "FADD": 7,
+      "FADD2": 32,
+      "MOV": 0,
+      "BRA": 1
+    }
+  },
+  {
+    "gpu_uuid": "GPU-2dc4b50c-07a5-26d6-f5ce-54ef728d56b2",
+    "source_sha256": "4895b2c9d1e69cdaa6e21262ea8451593a9eda759d5149829904882c8fd3cffd",
+    "pairs": 8,
+    "packed": false,
+    "threads": 128,
+    "loops": 4096,
+    "unroll": 8,
+    "steps_per_chain": 32768,
+    "repeats": 9,
+    "checksum": 222.0,
+    "median_cycles": 573819.5,
+    "cycles_per_step": 17.511581420898438,
+    "cycles_per_scalar_add_per_thread": 1.0944738388061523,
+    "selected_native_ops": {
+      "FADD": 143,
+      "FADD2": 0,
+      "MOV": 0,
+      "BRA": 1
+    }
+  },
+  {
+    "gpu_uuid": "GPU-2dc4b50c-07a5-26d6-f5ce-54ef728d56b2",
+    "source_sha256": "4895b2c9d1e69cdaa6e21262ea8451593a9eda759d5149829904882c8fd3cffd",
+    "pairs": 8,
+    "packed": true,
+    "threads": 128,
+    "loops": 4096,
+    "unroll": 8,
+    "steps_per_chain": 32768,
+    "repeats": 9,
+    "checksum": 222.0,
+    "median_cycles": 561248.0,
+    "cycles_per_step": 17.1279296875,
+    "cycles_per_scalar_add_per_thread": 1.07049560546875,
+    "selected_native_ops": {
+      "FADD": 15,
+      "FADD2": 64,
+      "MOV": 4,
+      "BRA": 1
+    }
+  },
+  {
+    "gpu_uuid": "GPU-2dc4b50c-07a5-26d6-f5ce-54ef728d56b2",
+    "source_sha256": "4895b2c9d1e69cdaa6e21262ea8451593a9eda759d5149829904882c8fd3cffd",
+    "pairs": 1,
+    "packed": false,
+    "threads": 256,
+    "loops": 4096,
+    "unroll": 8,
+    "steps_per_chain": 32768,
+    "repeats": 9,
+    "checksum": 24.25,
+    "median_cycles": 196880.0,
+    "cycles_per_step": 6.00830078125,
+    "cycles_per_scalar_add_per_thread": 3.004150390625,
+    "selected_native_ops": {
+      "FADD": 17,
+      "FADD2": 0,
+      "MOV": 0,
+      "BRA": 1
+    }
+  },
+  {
+    "gpu_uuid": "GPU-2dc4b50c-07a5-26d6-f5ce-54ef728d56b2",
+    "source_sha256": "4895b2c9d1e69cdaa6e21262ea8451593a9eda759d5149829904882c8fd3cffd",
+    "pairs": 1,
+    "packed": true,
+    "threads": 256,
+    "loops": 4096,
+    "unroll": 8,
+    "steps_per_chain": 32768,
+    "repeats": 9,
+    "checksum": 24.25,
+    "median_cycles": 164120.0,
+    "cycles_per_step": 5.008544921875,
+    "cycles_per_scalar_add_per_thread": 2.5042724609375,
+    "selected_native_ops": {
+      "FADD": 1,
+      "FADD2": 8,
+      "MOV": 0,
+      "BRA": 1
+    }
+  },
+  {
+    "gpu_uuid": "GPU-2dc4b50c-07a5-26d6-f5ce-54ef728d56b2",
+    "source_sha256": "4895b2c9d1e69cdaa6e21262ea8451593a9eda759d5149829904882c8fd3cffd",
+    "pairs": 4,
+    "packed": false,
+    "threads": 256,
+    "loops": 4096,
+    "unroll": 8,
+    "steps_per_chain": 32768,
+    "repeats": 9,
+    "checksum": 103.0,
+    "median_cycles": 549186.5,
+    "cycles_per_step": 16.759841918945312,
+    "cycles_per_scalar_add_per_thread": 2.094980239868164,
+    "selected_native_ops": {
+      "FADD": 71,
+      "FADD2": 0,
+      "MOV": 0,
+      "BRA": 1
+    }
+  },
+  {
+    "gpu_uuid": "GPU-2dc4b50c-07a5-26d6-f5ce-54ef728d56b2",
+    "source_sha256": "4895b2c9d1e69cdaa6e21262ea8451593a9eda759d5149829904882c8fd3cffd",
+    "pairs": 4,
+    "packed": true,
+    "threads": 256,
+    "loops": 4096,
+    "unroll": 8,
+    "steps_per_chain": 32768,
+    "repeats": 9,
+    "checksum": 103.0,
+    "median_cycles": 517501.0,
+    "cycles_per_step": 15.792877197265625,
+    "cycles_per_scalar_add_per_thread": 1.9741096496582031,
+    "selected_native_ops": {
+      "FADD": 7,
+      "FADD2": 32,
+      "MOV": 0,
+      "BRA": 1
+    }
+  },
+  {
+    "gpu_uuid": "GPU-2dc4b50c-07a5-26d6-f5ce-54ef728d56b2",
+    "source_sha256": "4895b2c9d1e69cdaa6e21262ea8451593a9eda759d5149829904882c8fd3cffd",
+    "pairs": 8,
+    "packed": false,
+    "threads": 256,
+    "loops": 4096,
+    "unroll": 8,
+    "steps_per_chain": 32768,
+    "repeats": 9,
+    "checksum": 222.0,
+    "median_cycles": 1073535.0,
+    "cycles_per_step": 32.761688232421875,
+    "cycles_per_scalar_add_per_thread": 2.047605514526367,
+    "selected_native_ops": {
+      "FADD": 143,
+      "FADD2": 0,
+      "MOV": 0,
+      "BRA": 1
+    }
+  },
+  {
+    "gpu_uuid": "GPU-2dc4b50c-07a5-26d6-f5ce-54ef728d56b2",
+    "source_sha256": "4895b2c9d1e69cdaa6e21262ea8451593a9eda759d5149829904882c8fd3cffd",
+    "pairs": 8,
+    "packed": true,
+    "threads": 256,
+    "loops": 4096,
+    "unroll": 8,
+    "steps_per_chain": 32768,
+    "repeats": 9,
+    "checksum": 222.0,
+    "median_cycles": 1034697.5,
+    "cycles_per_step": 31.576461791992188,
+    "cycles_per_scalar_add_per_thread": 1.9735288619995117,
+    "selected_native_ops": {
+      "FADD": 15,
+      "FADD2": 64,
+      "MOV": 4,
+      "BRA": 1
+    }
+  }
+]

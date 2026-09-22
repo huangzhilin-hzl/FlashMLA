@@ -165,6 +165,8 @@ for directory in sorted(root.glob("v[0-9][0-9][0-9]")):
         status = "full2seeds/short/masks bitwise; reciprocal handoff alternative; timing regime matters"
     if version in ("v207", "v208"):
         status = "guarded/full seed1234/mask checks pass; packed adjacent nodes slower"
+    if version in ("v209", "v210"):
+        status = "guarded/full seed1234/mask checks pass; packed half-trees improve previous packing, still slower"
     if version == "v142":
         status = "bitwise v138 full seed1234/mask; paired epilogue slower"
     if version == "v138":

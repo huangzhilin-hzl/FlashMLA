@@ -1,0 +1,6 @@
+
+Resource usage:
+ Common:
+  GLOBAL:0
+ Function kernel_cutlass_kernel___main__RecurrenceProbe_object_at__tensorptrf32gmemalign16o101_tensorptri64gmemalign16o2561_tensorptrf32gmemalign16o2561_0:
+  REG:21 STACK:0 SHARED:0 LOCAL:0 CONSTANT[0]:920 TEXTURE:0 SURFACE:0 SAMPLER:0

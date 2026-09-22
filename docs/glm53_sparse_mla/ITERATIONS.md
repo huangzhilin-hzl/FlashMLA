@@ -6155,3 +6155,45 @@ Both pass guarded b2 smoke/b512 memcheck, b2 synccheck, full1234 three-repeat ex
 Unlocked source totals:v207549667719 issued instructions, shared actual=ideal20275200 and zero excessive; v208644309881 issued instructions, shared actual=ideal28663808 and zero excessive. v208 is7.41% above its v197 parent's599875543 instruction record. v207 long/short-scoreboard samples63337/7084 and wait12697; v20870791/3117 and wait11024. These are sampled stall counts, not fractions of total latency. The separate opcode_audit.json quantifies actual issued arithmetic and moves; no exact v190 source capture is claimed for this control.
 
 v209 compilesREG109/STACK0,1424 static instructions, MOV29 versusv20743; v210REG128/STACK0,1616 instructions, MOV52 versusv20872. Both preserve15 new FADD2 operations and four ELECT sites. Their native code changes justify guarded/runtime qualification rather than treating this regrouping as a no-op.
+
+
+## FP32 recurrence diagnostic
+
+Add microbench_fp32_add.py to compare scalar and packed recurrences on GPU1, with1/4/8 independent pairs and32/128/256 threads in one CTA. Inline PTX brackets32768 recurrence steps with the per-SM clock counter; each pair has distinct runtime seeds, round-to-nearest additions and the same exact powers-of-two checksum. Inspect native SASS to verify scalar/packed instructions. This measures recurrence scheduling including loop, warp, timestamp and checksum overhead, not an isolated ISA latency or MLA throughput. No clock or power settings change.
+
+This control follows the failure of packing to improve the full kernel despite fewer requested add instructions. The NVIDIA forum confirms native FADD2 emission onSM100/103 but does not establish a latency benefit: https://forums.developer.nvidia.com/t/does-blackwell-sm-120-have-native-f32x2-support/344788 . Treat forum performance speculation as unverified; use local measured recurrence results and the full-kernel NCU evidence separately.
+
+
+### Iterations 209–210 result — half-tree packing remains slower than defaults
+
+v209 short: trtllm/native 1691.78us, cute-v209/native 1579.36us.
+
+v209 NCU base/stable: gpu__time_duration.sum=2.698752 ms, launch__registers_per_thread=109 register/thread, launch__shared_mem_per_block_dynamic=194.920000 Kbyte/block, sm__warps_active.avg.pct_of_peak_sustained_active=19.295605 %, sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed=32.757114 %, smsp__warps_eligible.avg.per_cycle_active=0.356068 warp, smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio=6.585684 inst, l1tex__t_sectors_pipe_lsu_mem_local_op_ld.sum=0 sector, l1tex__t_sectors_pipe_lsu_mem_local_op_st.sum=0 sector, l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum=6,246,758 , l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum=2,507,823 .
+
+v210 short: trtllm/native 1690.66us, cute-v210/native 1689.86us.
+
+v210 NCU base/stable: gpu__time_duration.sum=2.873408 ms, launch__registers_per_thread=128 register/thread, launch__shared_mem_per_block_dynamic=203.112000 Kbyte/block, sm__warps_active.avg.pct_of_peak_sustained_active=19.409159 %, sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed=45.392815 %, smsp__warps_eligible.avg.per_cycle_active=0.397025 warp, smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio=6.690863 inst, l1tex__t_sectors_pipe_lsu_mem_local_op_ld.sum=0 sector, l1tex__t_sectors_pipe_lsu_mem_local_op_st.sum=0 sector, l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum=6,934,579 , l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum=2,675,925 .
+
+Guarded b2 smoke/b512 memcheck, b2 synccheck, full1234 three-repeat exact comparison and mask fixture all pass; v210 passes masked FP32. v2091579.36us improves v2071583.20us slightly but remains above v1901549.06us. v2101689.86us improves v2081710.30us but remains above v1971662.30us. Local sectors stayzero and fewer static moves do not restore default-path latency. No second-seed/short expansion or promotion for these slower candidates.
+
+
+The first recurrence probe completed its checksum checks but failed when collecting the CUBIN: CuTe had captured the launch working directory at import time, before the script changed into the per-case folder. No timing result is retained from that incomplete run. Fix CLI bootstrap to normalize and enter the output directory before importing CuTe; preserve the failure log. Add256 threads to represent two active compute warps per SM partition. Re-run into a fresh artifact directory and verify native instruction types before interpreting cycle counts.
+
+
+### FP32 recurrence diagnostic result — packed scheduling helps the toy loop, not the MLA tree
+
+| Threads | Independent pairs | Scalar cycles/step | Packed cycles/step | Packed/scalar |
+|---:|---:|---:|---:|---:|
+| 32 | 1 | 5.0084 | 4.8752 | 0.9734 |
+| 32 | 4 | 9.5092 | 9.1342 | 0.9606 |
+| 32 | 8 | 17.5104 | 17.1268 | 0.9781 |
+| 128 | 1 | 5.0085 | 4.8835 | 0.9750 |
+| 128 | 4 | 9.5096 | 9.1346 | 0.9606 |
+| 128 | 8 | 17.5116 | 17.1279 | 0.9781 |
+| 256 | 1 | 6.0083 | 5.0085 | 0.8336 |
+| 256 | 4 | 16.7598 | 15.7929 | 0.9423 |
+| 256 | 8 | 32.7617 | 31.5765 | 0.9638 |
+
+All18 configurations completed with exact checksums and native scalar FADD or packed FADD2 confirmed. The packed loop is faster in every measured configuration, by2.2–16.6%; most cases show2–6%. This does not support the tentative idea that packed dependent additions are intrinsically slower on this GPU. The measurement includes loop/control/timestamp/checksum overhead, uses one CTA and fixed scalar-then-packed order, and does not establish isolated instruction latency, peak throughput or the speedup of a full MLA reduction.
+
+The full kernels still lose: adjacent-node v208 adds about35.68M dynamic MOV instructions while saving15.73M issued additions; fixed-half-tree v210 reduces static moves but remains slower than v197. Thus fewer requested arithmetic operations is insufficient. Keep the four packed-tree variants as rejected performance experiments, preserve the diagnostic raw cycles/SASS, and prioritize a different measured instruction bottleneck. Artifacts: experiments/glm53_sparse_mla/artifacts/fp32_add_probe_v2. No default change.

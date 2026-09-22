@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/tmp/glm53_sparse_mla_dev/microbench_fp32_add.py", line 149, in <module>
+    main()
+  File "/tmp/glm53_sparse_mla_dev/microbench_fp32_add.py", line 134, in main
+    assert len(cubins) == 1, cubins
+           ^^^^^^^^^^^^^^^^
+AssertionError: []
