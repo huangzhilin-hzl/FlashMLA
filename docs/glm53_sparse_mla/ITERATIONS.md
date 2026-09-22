@@ -5084,3 +5084,111 @@ v164 uses REG107/STACK0, versus v162101. This lowers fast-path register pressure
 but raises it on higher precision. Both retain512 TMEM columns, so no increased
 CTA residency is inferred. Parent guarded qualification passed; the children now
 require their own guarded and bitwise checks.
+
+
+## Iterations 167–168 — expose the uniform bitmap branch to the compiler
+
+Based on v163/v164, add only make_warp_uniform to the acquired bitmap value before
+QK waiting/masking. The installed CuTeDSL documents this API as a compiler hint,
+not a runtime check. Its precondition holds: stage and cgroup are warp invariant,
+ctid//64 is constant within every32-thread warp, and all lanes load the same word
+while the stage remains owned by the consumers. No producer can rewrite it before
+empty release. Do not generalize the hint to arbitrary per-lane validity values.
+
+The combined mask branch unexpectedly regresses despite zero spills. This tests
+whether explicitly communicating uniform control can improve its lowering; it is
+not yet evidence that divergence caused the regression. Preserve guarded checks,
+full/masked bit equivalence and the same profiling/timing protocol. Baselines:
+v163/v164. Compare SASS before claiming a uniform-branch mechanism.
+
+
+### Iterations 163–164 result — combined mask fallback regresses strongly
+
+Guarded b2 smoke and qualified guarded b512 memcheck pass, ordinary b2 synccheck
+reports zero errors. Full seed1234 matches v161/v162 respectively in three repeats;
+masks match, v164 masked FP32 checks pass and v163 retains fast-path failures.
+Short v1631855.87 us versus TRT1691.78 us; v1641957.82 us versus TRT1691.87 us.
+Both are much slower than their parents despite zero spills. No promotion or
+expanded accuracy claim. The planned software-max and uniform-hint controls
+investigate this regression; do not assume that skipped source operations imply
+fewer cycles.
+
+NCU base/stable(v163/v164):registers109/107,shared194920/203112 bytes,
+occupancy19.343%/19.370%,tensor27.741%/38.716%,eligible0.469447/0.473395,
+long-scoreboard5.424880/5.715607,zero local sectors,aggregate shared conflicts
+5068054/592415 and4974000/516172,diagnostic3.185216/3.358528 ms.
+The lower long-scoreboard ratio and lower aggregate conflict counts accompany
+worse performance, not improvement.
+
+### Static code inspection after v163
+
+v161/v163 both retain16 FFMA2 and128 FMUL2 static instructions, so this inspection
+does not support lost packed arithmetic as the cause. v163 instead has more
+reconvergence/control instructions, including28 BRA.U.ANY entries versus zero in
+v161. These static counts do not say how often a branch executes; unlocked source
+counters are needed before attributing runtime cost. v165/v166 compile at
+REG123/STACK0 andREG105/STACK0; their runtime qualification remains pending.
+
+
+### Iterations 167–168 compile result — uniform hint is a no-op here
+
+v167 matches v163's3680 instruction encoding words exactly; v168 matches
+v164's4176 words exactly. Resource counts also remain109/107 registers and zero
+stack. Do not launch redundant runtime/performance tests or infer a speedup from
+the source hint. The hint alone does not change this compiler's lowering.
+
+### v161/v163 unlocked source comparison — extra control work is executed
+
+v161596817394 instructions versus v163928480677; both have20275200 actual/ideal
+shared wavefronts and zero excessive. FFMA2 count16777216 and FMUL2 count64597504
+are unchanged. BSSY grows647168→4382720, BSYNC1179648→4915200, and BRA.U.ANY
+0→3670016. The first issuer MMA in v163 is surrounded by ELECT/PLOP/branch work;
+v161 issues the corresponding MMA without that per-operation sequence.
+This supports an executed control/code-generation regression, not a loss of
+packed arithmetic or a shared-bank-conflict explanation. It does not yet identify
+the compiler transformation responsible.
+
+v161 long-scoreboard66217 includesPV17369,producer-empty17183,QK13711. v163
+70504 includesPV19377,QK18878,producer-empty15958. Sample counts are not latency
+shares. Scalar software MAX issue counts are unchanged; predicated instructions
+still occupy issue slots, so count totals alone do not imply actual unmasked
+reductions occurred on every input.
+
+## Iterations 169–170 — explicit single issuer lane
+
+Based on v163/v164, replace only the two issuer-warp elect_one regions with
+if tid ==384. This selects lane0 of warp12 for the same QK/PV sequences and their
+completion commits. Q loading and producer gathering retain their original
+election. No CTA has more than one issuer thread, and that thread remains the
+same throughout the loop. TMEM allocation, masking, arithmetic and synchronization
+are unchanged.
+
+The source profile motivates a bounded control for the extra per-MMA election
+loops, not a claim that fixed-lane selection is generally better. Compare compiler
+output before runtime work. If it changes, repeat guarded smoke/memcheck,
+synccheck and full/masked exact equivalence to v163/v164 before timing.
+
+
+### Iterations 165–166 result — the branch alone also regresses
+
+Full seed1234 matches v146/v160 respectively in three repeats; mask bits match,
+v166 masked FP32 checks pass, and qualified b2 synccheck/b512 memcheck report
+zero errors. Short v1651672.03 us versus TRT1689.82 us is43.93 us slower than
+v146; v1661988.77 us versus TRT1689.89 us is264.23 us slower than v160.
+No expanded audit or promotion. The mask-bypass branch alone is therefore not
+a useful optimization in this generated code, independently of load/max support.
+
+NCU base/stable(v165/v166):registers123/105,shared194920/203112 bytes,
+occupancy19.313%/19.345%,tensor30.953%/38.055%,eligible0.439866/0.462501,
+long-scoreboard5.556309/5.876755,zero local sectors,aggregate shared conflicts
+6411003/1892005 and5026567/327096,diagnostic2.858496/3.412960 ms.
+
+### Predication audit of the load/max fallback
+
+On the profiled target, v161's per-thread software MAX instructions issue but
+have zero predicated-on thread executions. v163's conditional mask SEL and
+software MAX instructions likewise have zero predicated-on thread executions.
+The full-word path is being selected as intended; source-level branch bypass
+has lowered to predication and retained issue work. This further separates
+correct branch selection from the additional issuer/control overhead visible
+in the dynamic counts.

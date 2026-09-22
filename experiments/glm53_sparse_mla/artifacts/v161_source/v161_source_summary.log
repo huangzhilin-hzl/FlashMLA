@@ -1,0 +1,113 @@
+{
+  "totals": {
+    "stall_long_sb": 66217.0,
+    "stall_short_sb": 5480.0,
+    "stall_barrier": 2630.0,
+    "stall_mio": 2979.0,
+    "stall_wait": 12813.0,
+    "stall_no_inst": 661.0,
+    "stall_not_selected": 3060.0,
+    "L1 Wavefronts Shared Excessive": 0.0,
+    "L1 Wavefronts Shared": 20275200.0,
+    "L1 Wavefronts Shared Ideal": 20275200.0,
+    "Instructions Executed": 596817394.0
+  },
+  "top_long_sb": [
+    {
+      "address": "0x7f96775b1c30",
+      "sass": "@!P1  BRA 0x7f96775b2e90",
+      "value": 17369.0,
+      "share_of_metric_sum": 0.26230424211305253,
+      "context": [
+        {
+          "address": "0x7f96775b1bf0",
+          "sass": "ISETP.NE.U32.AND P0, PT, R103, RZ, PT"
+        },
+        {
+          "address": "0x7f96775b1c00",
+          "sass": "FFMA R101, R101, R100, R0"
+        },
+        {
+          "address": "0x7f96775b1c10",
+          "sass": "SYNCS.ARRIVE.TRANS64.A1T0 RZ, [UR4+0x2f930], RZ"
+        },
+        {
+          "address": "0x7f96775b1c20",
+          "sass": "SYNCS.PHASECHK.TRANS64.TRYWAIT P1, [UR4+0x2f928], R111"
+        },
+        {
+          "address": "0x7f96775b1c30",
+          "sass": "@!P1  BRA 0x7f96775b2e90"
+        },
+        {
+          "address": "0x7f96775b1c40",
+          "sass": "IADD3 R0, PT, PT, R113, 0x1, RZ"
+        }
+      ]
+    },
+    {
+      "address": "0x7f96775ae3d0",
+      "sass": "@!P0  BRA 0x7f96775b2c10",
+      "value": 17183.0,
+      "share_of_metric_sum": 0.25949529576996844,
+      "context": [
+        {
+          "address": "0x7f96775ae390",
+          "sass": "LOP3.LUT R5, R5, 0xfffffffe, RZ, 0xc0, !PT"
+        },
+        {
+          "address": "0x7f96775ae3a0",
+          "sass": "IMAD.IADD R6, R6, 0x1, -R5"
+        },
+        {
+          "address": "0x7f96775ae3b0",
+          "sass": "SHF.L.U32 R6, R6, 0x1f, RZ"
+        },
+        {
+          "address": "0x7f96775ae3c0",
+          "sass": "SYNCS.PHASECHK.TRANS64.TRYWAIT P0, [UR7+0x2f958], R6"
+        },
+        {
+          "address": "0x7f96775ae3d0",
+          "sass": "@!P0  BRA 0x7f96775b2c10"
+        },
+        {
+          "address": "0x7f96775ae3e0",
+          "sass": "ULEA UR31, UR23, UR4, 0x9"
+        }
+      ]
+    },
+    {
+      "address": "0x7f96775b0b20",
+      "sass": "@!P0  BRA 0x7f96775b2e40",
+      "value": 13711.0,
+      "share_of_metric_sum": 0.2070616306990652,
+      "context": [
+        {
+          "address": "0x7f96775b0ae0",
+          "sass": "@!P0  BRA 0x7f96775b2df0"
+        },
+        {
+          "address": "0x7f96775b0af0",
+          "sass": "NOP"
+        },
+        {
+          "address": "0x7f96775b0b00",
+          "sass": "LDS R42, [R42+0x2f900]"
+        },
+        {
+          "address": "0x7f96775b0b10",
+          "sass": "SYNCS.PHASECHK.TRANS64.TRYWAIT P0, [UR4+0x2f920], R111"
+        },
+        {
+          "address": "0x7f96775b0b20",
+          "sass": "@!P0  BRA 0x7f96775b2e40"
+        },
+        {
+          "address": "0x7f96775b0b30",
+          "sass": "R2UR UR5, R115"
+        }
+      ]
+    }
+  ]
+}
