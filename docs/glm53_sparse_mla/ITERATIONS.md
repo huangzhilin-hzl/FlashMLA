@@ -4112,3 +4112,162 @@ round medians. This is a small empirical/cache-counter-supported improvement,
 not a universal guarantee; keepv125 as the established default and retainv129 as
 a fully bitwise-validated cache-policy alternative. No further repeated timing
 solely to obtain a favorable ordering is needed.
+
+### Iteration 132 source control — no early QK observed in this profile
+
+Unlocked SourceCounters records604473721 instructions and64895 long-scoreboard
+samples, with PV17425, producer-empty16944 and QK13576. Shared wavefronts20275200
+remain equal to ideal, excessive0. The early-QK UTCQMMA/UTCBAR branch executes0
+times; the fallback QK branch executes122880 times (8192queries *15future tiles),
+bootstrap8192 and PV131072. This is direct evidence that the conditional schedule
+reverts to PV-before-QK in this instrumented invocation. Profiling can perturb
+readiness; do not assert that every unprofiled execution also has zero early QK.
+
+## Iteration 135 — two-CTA resource experiment with overlapping TMEM storage
+
+Starting from v125, use64-key KV tiles, one128-thread compute group, two producer
+warps and one issuer warp (224threads). Two KV stages require73728 bytes; Q still
+requires36864 bytes, P4096 bytes. Exchange producer indices by warp shuffles and
+reuse the128-float partial reduction array for final sums and denominator. This
+removes enough shared storage to target two CTAs per SM; actual residency depends
+on compiler registers, shared rounding and TMEM allocation and must be measured.
+
+Allocate256 TMEM columns instead of512. All512 output channels occupy columns
+0..255. QK uses columns224..255, intentionally overlapping the last physical
+output chunk. Before every QK after tile0, compute threads read that chunk into a
+32-FP32 register shadow, drain the load and publish count128 output-saved. The
+issuer acquires it before overwriting with QK. After score loads/softmax, compute
+restores the shadow with the same per-head correction, even for identity
+correction; the other seven output chunks retain the usual conditional rescale.
+PV waits for every compute thread's P/correction publication. On tile0, PV's first
+K instruction overwrites its accumulators, so no old-output restoration is needed.
+
+Risks: the shadow extends live ranges and may spill; QK now waits for output
+preservation after PV, reducing existing overlap; N64 doubles QK issue count and
+online-softmax rounds. Numerical rounding differs, so v125 equivalence cannot be
+assumed. Static ownership audit checks all4096 scores,32768 outputs,4096 shadow
+cells and64 gathered rows per stage; it does not establish device semantics.
+Offline resources, bounded smoke, qualified sanitizers, original-reference checks
+and NCU occupancy precede any performance claim. No launch-bound or dynamic
+register redistribution is added in this first candidate.
+
+### Iteration 133 initial result — higher-precision cache hint nearly ties
+
+Offline REG122/STACK0. Full8192 seed1234 output bits and masks matchv128;
+qualified b2 synccheck/b512 memcheck report zero errors, and masked FP32 checks
+pass. Short warm1802.05 us versusTRT1689.86 us is indistinguishable from recorded
+v1281802.37 us. NCU base/stable:122 registers,203080 shared bytes, occupancy
+19.337%, tensor42.265%, eligible0.455848, long-scoreboard6.156068, zero local
+sectors, aggregate shared conflicts6466215/1416810, diagnostic3.077344 ms.
+A three-order comparison is pending; no second-seed/short expansion or promotion.
+
+### Iteration 134 result — fewer publications recover some overhead
+
+Offline REG85/STACK0. Full8192 seed1234 and masked bits matchv125, qualified b2
+synccheck/b512 memcheck report zero errors. Short warm1652.93 us versusTRT
+1691.84 us improves8.22 us fromv132 but still trailsv1251648.86 us. NCU base/stable:
+85 registers,194928 shared bytes, occupancy19.311%, tensor31.284%, eligible
+0.395118, long-scoreboard6.048755, zero local sectors, aggregate shared conflicts
+6293935/1866058, diagnostic2.832256 ms. No demonstrated net gain; retain as a
+synchronization control. No second-seed/short/sustained expansion is claimed.
+
+### v135 instrumentation policy
+
+The runner supports MLA_TMEM_GUARDRAILS=1 solely for qualified correctness runs,
+passing --ptxas-options=-g-tmem-access-check to CuTe compilation. Performance runs
+leave it unset. This explicitly instruments the new TMEM overlap/allocation with
+NVIDIA's Tensor Core access checks; instrumented latency is not benchmark data.
+Reference: https://docs.nvidia.com/compute-sanitizer/ComputeSanitizer/index.html#tensor-core-mma-guardrails
+
+### Iteration 133 rotation — small consistent gain in the recorded orderings
+
+Three-order warm medians (us):v1331920.22/1913.10/1919.65 versusv1281925.25/
+1923.10/1927.25 andTRT1869.84/1878.03/1876.10. Cold:v1331914.75/1898.53/1912.80
+versusv1281916.94/1916.98/1917.18 andTRT1859.54/1859.58/1859.60. v133 wins all
+three recorded orders in both cache modes but still trailsTRT. Extend bitwise
+validation and eager/Graph20/100 before deciding promotion; cache hints have
+shown small, regime-dependent gains in the fast path.
+
+### Iteration 135 guardrail failure — no performance result
+
+Offline REG114/STACK0 and the assumed logical-coordinate audit pass, but the
+first b2 Tensor Core guardrail run fails: both CTAs report tcgen05.mma accessing
+unallocated column256 with columns0..255 reserved. The process exits; the b512,
+synccheck, mask and performance commands never run. GPU1 subsequently reports
+0% utilization/0MiB memory twice; no reset or other-GPU action was performed.
+Retain source and complete failure log. Do not rank this version or infer safety
+from the static logical-coordinate audit.
+
+The C++ CUTLASS tmem_frg_ws M64 layout uses N/2 logical columns across128 datapaths
+(mma_traits_sm100.hpp around935), matching the initial element mapping, while
+this instrumented program rejects the256-column reservation. This discrepancy
+requires further isolation; the present evidence does not establish whether it
+is an actual MMA reservation requirement, an error in our descriptor/address
+calculation, or a guardrail limitation. Do not bypass the failure to claim a
+working two-CTA optimization.
+
+## Iteration 136 — conservative allocation control
+
+Keep v135's N64 algorithm, register shadow and all addresses, but allocate512
+TMEM columns. This covers the full N-wide range from both QK base224/N64 and
+PV base128/N256, even under the more conservative interpretation. It tests the
+functional overlap protocol independently of the failed256-column reservation;
+it cannot establish two simultaneously usable TMEM allocations per SM. Keep
+Tensor Core guardrails enabled for initial checks; uninstrumented timings, if
+correctness passes, are only a control for the resource experiment.
+
+### External compiler evidence related to v122/v124
+
+NVIDIA/CUTLASS issue3420 reports the same generic NVVM-backend failure for a
+consumed tcgen05.ld.x64 combined with warpgroup register deallocation, including
+SM103 observations. Its reproducer reports that replacing x64 with x32 or
+removing deallocation compiles. This resembles our v122/v124 failure, but is not
+proof that all cases share one root cause or that this installed4.6.2 wheel is
+fixed. The public page is closed without visible resolution details. Preserve
+our failed compiler logs and avoid attributing the error solely to partial
+warpgroups (v124 used complete warpgroups).
+Source: https://github.com/NVIDIA/cutlass/issues/3420
+
+## Iteration 137 — paired x32 correction loads with complete register donors
+
+Based on v125, group each pair of32-column correction chunks into64 live FP32
+values: issue two native x32 TMEM loads before one load wait, apply packed
+multiplication, then issue two x32 stores. Keep two such groups and the final
+store drain. Unlike v121/v124, no x64 load appears in compiler IR, addressing the
+specific x64/deallocation combination reported in CUTLASS issue3420. This is an
+experimentally motivated workaround, not a claim of a proven vendor fix.
+
+Use512threads and complete warpgroups:8 donor warps decrease to32 registers;
+8 compute warps increase to192. Only warps8..11 produce KV and warp12 issues
+MMA; warps13..15 exit after the common redistribution. Retain v125 direct256-bit
+output. The role budget is57344 registers; initial allocation must cover it
+before launch. Offline compilation with CUDA context queries precedes resource
+and USETMAXREG inspection. This tests fewer TMEM load waits without x64 IR or
+spill traffic; arithmetic and tile geometry remain unchanged.
+
+### Iteration 133 expanded result — validated alternative, keep current default
+
+Full8192 seeds1234/5678 and full1024 short/chunk0 seed5678 matchv128 bitwise in
+three repeats, in addition to masked equality and qualified sanitizers. Eager
+20/100 warm/cold1947.57/1939.18 us versusTRT1878.99/1918.99 us; Graph1966.26/
+1936.42 us versusTRT1867.84/1917.06 us. Compared with the separately recordedv128
+runs, eager warm is slightly worse, while cold and Graph improve slightly. The
+three rotated orders favorv133, but the overall change remains small and regime
+dependent; retainv128 as the established higher-precision default and exposev133
+as a fully validated cache-policy alternative. No claim of surpassingTRT.
+
+### Iteration 136 result — safe allocation control is much slower
+
+Offline REG114/STACK0. Qualified b2 and b512 memcheck with explicit Tensor Core
+guardrails report zero errors; b2 synccheck and the original eight-row full-target
+check pass. Masked FP32 comparison has66 mismatches/max_abs0.02237046 versus
+TRT78 mismatches, with59700 unequal outputs; this is not a full-tolerance pass or
+bitwise agreement. No full-row/second-seed audit is claimed.
+
+Uninstrumented short warm2960.13 us versusTRT1691.74 us rejects this schedule.
+NCU base/stable:114 registers,115296 dynamic shared bytes, occupancy21.356%,
+tensor17.274%, eligible0.242501, long-scoreboard4.365522, zero local sectors,
+aggregate shared conflicts12996/723591, diagnostic5.106496 ms. Increased resident
+warps can include a CTA waiting for its512-column TMEM reservation and do not
+establish simultaneous useful MMA work. Reducing shared storage alone did not
+repay the smaller tiles, extra output preservation and lost QK/PV overlap.

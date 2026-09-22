@@ -15,6 +15,7 @@ import benchmark_source as source
 parser = argparse.ArgumentParser()
 parser.add_argument('--kernel-versions', nargs='+', required=True)
 parser.add_argument('--output-json', required=True)
+parser.add_argument('--block-k', type=int, default=128)
 args = parser.parse_args()
 source.LOCAL_TOKENS = 2
 source.make_sparse_indices.__defaults__ = (2, source.TOPK)
@@ -37,11 +38,11 @@ for row in range(2):
 reference = torch.stack(references)
 runners = {'trtllm': source.make_trtllm_case(inputs).run}
 for version in args.kernel_versions:
-    runners[version] = importlib.import_module(f'kernel_{version}').make_runner(inputs, 128)
+    runners[version] = importlib.import_module(f'kernel_{version}').make_runner(inputs, args.block_k)
 outputs = {name: runner().reshape(2, 64, 512).float().clone() for name, runner in runners.items()}
 report = {'purpose': 'accuracy only; unchanged masked-input tolerance',
           'benchmark_sha256': hashlib.sha256(Path(source.__file__).read_bytes()).hexdigest(),
-          'valid_counts': counts, 'atol': 0.01, 'rtol': 0.05, 'cases': {}}
+          'block_k': args.block_k, 'valid_counts': counts, 'atol': 0.01, 'rtol': 0.05, 'cases': {}}
 for name, actual in outputs.items():
     error = (actual-reference).abs()
     bad = (~torch.isfinite(actual)) | (error > 0.01 + 0.05*reference.abs())

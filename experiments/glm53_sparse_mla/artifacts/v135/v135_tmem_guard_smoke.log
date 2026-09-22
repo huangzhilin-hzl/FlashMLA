@@ -1,0 +1,153 @@
+========= COMPUTE-SANITIZER
+{
+  "gpu": "NVIDIA B300 SXM6 AC",
+  "capability": [
+    10,
+    3
+  ],
+  "versions": {
+    "torch": "2.13.0+cu130",
+    "cuda": "13.0",
+    "flashinfer-python": "0.6.18",
+    "flash-mla": "not installed as a distribution",
+    "flashmla_source_revision": "unreported"
+  },
+  "args": {
+    "mode": "bench",
+    "backends": [
+      "cute"
+    ],
+    "scope": "native",
+    "chunk": 3,
+    "rank": 0,
+    "seed": 1234,
+    "warmup_iters": 1,
+    "repeat_iters": 1,
+    "profile_iters": 20,
+    "timing": "cuda-event",
+    "cache": "warm",
+    "check_rows": 2,
+    "check_atol": 0.01,
+    "check_rtol": 0.05,
+    "trace_path": null,
+    "output_json": "artifacts/v135_tmem_guard_smoke.json",
+    "with_stack": false
+  },
+  "workload": {
+    "local_tokens": 2,
+    "cp": 4,
+    "context_len": 131072,
+    "heads": 64,
+    "qk_dim": 576,
+    "v_dim": 512,
+    "topk": 2048,
+    "page_size": 64,
+    "softmax_scale": 0.0625,
+    "bmm2_scale": 1.0,
+    "synthetic": true,
+    "enable_dcp": false
+  },
+  "tensors": {
+    "query": {
+      "shape": [
+        2,
+        1,
+        64,
+        576
+      ],
+      "dtype": "torch.float8_e4m3fn",
+      "stride": [
+        36864,
+        36864,
+        576,
+        1
+      ]
+    },
+    "kv_cache": {
+      "shape": [
+        2048,
+        1,
+        64,
+        576
+      ],
+      "dtype": "torch.float8_e4m3fn",
+      "stride": [
+        36864,
+        36864,
+        576,
+        1
+      ]
+    },
+    "block_tables": {
+      "shape": [
+        2,
+        1,
+        2048
+      ],
+      "dtype": "torch.int32",
+      "stride": [
+        2048,
+        2048,
+        1
+      ]
+    },
+    "seq_lens": {
+      "shape": [
+        2
+      ],
+      "dtype": "torch.int32",
+      "stride": [
+        1
+      ]
+    }
+  },
+  "cases": {
+    "cute-v135/native": "FP8 Q/KV; preallocated BF16 output; block_k=64"
+  }
+}
+========= Tensor Memory column 256 being accessed by instruction tcgen05.mma is not allocated. Columns allocated are: 0-255.
+=========     at $__internal_7_$__cuda_sm10x_tcgen05_guardrail_trap_unallocated_columns_access+0x22a10
+=========     by thread (192,0,0) in block (0,0,0)
+=========         Device Frame: kernel_cutlass_kernel_kernel_v135SparseMLA_object_at__tensorptrf8E4M3FNgmemalign16o264576368645761_tensorptrf8E4M3FNgmemalign16o1310725765761_tensorptri32gmemalign16o2204820481_tensorptri_0+0x3230
+=========     Saved host backtrace up to driver entry point at kernel launch time
+=========         Host Frame:  [0x7e276d] in libcute_dsl_runtime.so
+=========         Host Frame:  [0x8508da] in libcute_dsl_runtime.so
+=========         Host Frame:  [0xfffffffff7b862fe]
+=========         Host Frame: run_compiled_program in jit_executor.py:1071
+=========         Host Frame: run_compiled_program in jit_executor.py:1415
+=========         Host Frame: __call__ in jit_executor.py:1398
+=========         Host Frame: run in kernel_v135.py:434
+=========         Host Frame: check_cases in benchmark_source.py:281
+=========         Host Frame: main in benchmark_source.py:552
+========= 
+========= Tensor Memory column 256 being accessed by instruction tcgen05.mma is not allocated. Columns allocated are: 0-255.
+=========     at $__internal_7_$__cuda_sm10x_tcgen05_guardrail_trap_unallocated_columns_access+0x22a10
+=========     by thread (192,0,0) in block (1,0,0)
+=========         Device Frame: kernel_cutlass_kernel_kernel_v135SparseMLA_object_at__tensorptrf8E4M3FNgmemalign16o264576368645761_tensorptrf8E4M3FNgmemalign16o1310725765761_tensorptri32gmemalign16o2204820481_tensorptri_0+0x3230
+=========     Saved host backtrace up to driver entry point at kernel launch time
+=========         Host Frame:  [0x7e276d] in libcute_dsl_runtime.so
+=========         Host Frame:  [0x8508da] in libcute_dsl_runtime.so
+=========         Host Frame:  [0xfffffffff7b862fe]
+=========         Host Frame: run_compiled_program in jit_executor.py:1071
+=========         Host Frame: run_compiled_program in jit_executor.py:1415
+=========         Host Frame: __call__ in jit_executor.py:1398
+=========         Host Frame: run in kernel_v135.py:434
+=========         Host Frame: check_cases in benchmark_source.py:281
+=========         Host Frame: main in benchmark_source.py:552
+========= 
+Traceback (most recent call last):
+  File "/tmp/glm53_sparse_mla_dev/bench.py", line 46, in <module>
+    source.main(rest)
+  File "/tmp/glm53_sparse_mla_dev/benchmark_source.py", line 552, in main
+    result["correctness"] = check_cases(cases, inputs, args)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/glm53_sparse_mla_dev/benchmark_source.py", line 290, in check_cases
+    if not torch.isfinite(output).all().item():
+           ^^^^^^^^^^^^^^^^^^^^^^
+torch.AcceleratorError: CUDA error: unspecified launch failure
+Search for `cudaErrorLaunchFailure' in https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__TYPES.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1
+
+========= Target application returned an error
+========= ERROR SUMMARY: 2 errors

@@ -89,6 +89,12 @@ for directory in sorted(root.glob("v[0-9][0-9][0-9]")):
         status = "bitwise v125 full seed1234/mask; mandatory lookahead slower"
     if version == "v132":
         status = "bitwise v125 full seed1234/mask; conditional lookahead, no net gain"
+    if version == "v133":
+        status = "bitwise v128 full2seeds/short/masks; small cache-policy alternative"
+    if version == "v134":
+        status = "bitwise v125 full seed1234/mask; no net scheduling gain"
+    if version == "v136":
+        status = "guarded smoke/b512 and eight rows pass; slower; no full audit"
     if version == "v109":
         status = "bitwise v105 full seed1234; slower overlap control"
     if version == "v098":

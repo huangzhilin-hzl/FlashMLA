@@ -321,3 +321,17 @@ KV evict-last (`v130`) has no consistent gain. Mandatory future-QK lookahead
 (`v131`) delays PV and regresses to2.038ms; readiness-conditional lookahead
 (`v132`) recovers to1.661ms but still does not improvev125. See the iteration log
 for the complete sampled accuracy, timing and profiling limits.
+
+
+`v135` is rejected before timing: Tensor Core guardrails report an unallocated
+TMEM column in its attempted256-column overlapping layout. Its static logical
+mapping check does not establish safety. The failure log is retained; `v136`
+uses512 columns as a separate allocation/overlap control: explicit Tensor Core
+guardrails and sampled checks pass, but its2.960ms tuning result is much slower.
+Neither version is promoted.
+
+
+For higher precision, `v133` is the analogous output evict-first experiment:
+full2seeds/short/mask bits matchv128, and qualified sanitizers pass. Its three
+rotated orders improve slightly, while separate eager warm timing regresses
+slightly. It remains slower than TRT; v128 stays the established default.

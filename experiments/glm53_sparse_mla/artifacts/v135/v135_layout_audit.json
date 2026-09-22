@@ -1,0 +1,12 @@
+{
+  "purpose": "static assumed-WS-layout ownership audit, not runtime validation",
+  "score_elements": 4096,
+  "output_elements": 32768,
+  "shadow_elements": 4096,
+  "tmem_columns": 256,
+  "q_bytes": 36864,
+  "kv_bytes": 73728,
+  "p_bytes": 4096,
+  "producer_indices": "all64 exactly once per stage",
+  "pass_": true
+}
