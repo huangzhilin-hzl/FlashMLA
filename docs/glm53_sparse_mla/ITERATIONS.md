@@ -4925,3 +4925,107 @@ NCU base/stable:100 registers,203112 shared bytes,occupancy19.330%,tensor44.079%
 eligible0.433828,long-scoreboard6.405203,zero local sectors,aggregate shared
 conflicts6344405/2093303,diagnostic2.950208 ms. The higher long-scoreboard ratio
 coexists with faster timing; do not treat the ratio as a direct latency fraction.
+
+
+## Iterations 161–162 — SM103 fused TMEM load/max reduction
+
+The [CUDA13.0 PTX specification](https://docs.nvidia.com/cuda/archive/13.0.0/parallel-thread-execution/index.html#tcgen05-instructions-tcgen05-ld)
+introduces tcgen05.ld.red in PTX8.8 and supports the sm103 family. The installed
+CuTeDSL exposes LdRed32x32bOp and tuple destinations for loaded values plus the
+reduction. The inspected FlashInfer implementation uses this API in
+flashinfer/cute_dsl/attention/roles/mla_compute.py:273 and
+attention/monolithic/mla_decode_fp8.py:3073. This avoids inventing a manual TMEM
+address mapping or an inline-assembly return convention.
+
+v161 replaces v146's score Ld32x32b.x32 with LdRed32x32b.x32 MAX, retaining the
+same partitioned score tensor, .NaN propagation and explicit load wait. A full
+validity word uses the loaded maximum combined with the running maximum. Any
+holes or partial tile use the original masked-register max reduction. All masking,
+probabilities, denominator and PV operations remain as before. The all-valid
+branch applies only to max reduction, not a new unmasked probability path.
+
+v162 applies the same experiment to v160. Its hardware maximum is over raw
+scores, so scale that scalar before combining with the scaled running maximum;
+positive FP32 multiplication is monotonic on these finite inputs. Validity masks
+still trigger the original scaled-score reduction when needed. Exact equivalence
+must be measured, not assumed from this algebraic argument.
+
+Keep512 TMEM columns and the existing launch footprint. Compile resources and
+inspect actual LDTM lowering, then run guarded smoke/memcheck with
+MLA_TMEM_GUARDRAILS=1, plus ordinary synccheck and full/masked output equivalence.
+Clear the guardrail flag for uninstrumented timing. Baselines:v146/v160.
+
+
+### Iteration 157 expanded result — packed scaling has a small sustained gain
+
+Full seeds1234/5678 and the full short/chunk0 case match v152 bitwise in three
+repeats each; masks and qualified sanitizers pass. Eager20/100 warm/cold1872.02/
+1873.92 us versus TRT1884.03/1914.85 us; Graph1923.17/1875.76 us versus
+TRT1869.97/1900.58 us. Four rotated Graph orders:
+
+| Cache | v152 us, rounds0–3 | v153 us, rounds0–3 | v157 us, rounds0–3 | TRT us, rounds0–3 |
+|---|---|---|---|---|
+| warm | 1869.82 / 1868.00 / 1869.95 / 1873.82 | 1865.81 / 1865.52 / 1865.89 / 1867.74 | 1863.65 / 1864.27 / 1863.90 / 1865.65 | 1866.40 / 1871.82 / 1873.42 / 1870.54 |
+| cold | 1859.65 / 1861.66 / 1860.91 / 1861.60 | 1853.98 / 1855.58 / 1863.70 / 1855.49 | 1852.94 / 1859.50 / 1863.10 / 1851.25 | 1857.57 / 1856.50 / 1860.54 / 1857.34 |
+
+v157 beats both candidates in all four warm orders, but cold comparisons are
+mixed. Retain as a fully validated arithmetic-scheduling alternative pending
+v160's combination, rather than claiming a cache-independent speedup.
+Unlocked source:656335596 instructions, shared28663808 actual/ideal, zero excessive;
+long-scoreboard72508, includingPV24738, producer-empty17692 andQK13833.
+The total instruction count is below both v148679841906 and v153675737258,
+consistent with the confirmed scalar-to-packed scaling reduction, though those
+predecessors also differ in bitmap placement/stage release.
+
+### Iterations 158–159 result — Q eviction priority improves aggregate hits, not timing
+
+v158 REG123/STACK0, v159 REG100/STACK0. Each matches its baseline on full seed1234
+in three repeats and on masked output bits; v159 masked FP32 tolerance passes,
+while v158 retains the fast-path failures. Qualified b2 synccheck/b512 memcheck
+report zero errors. Short v1581627.23 us versus TRT1691.65 us is effectively
+unchanged from v1461628.10 us; v1591740.86 us versus TRT1689.98 us regresses
+from v1531734.72 us. Neither is promoted or expanded.
+
+NCU base/stable(v158/v159):shared194920/203112 bytes,occupancy19.299%/19.331%,
+tensor31.804%/43.789%,eligible0.390557/0.469985,long-scoreboard6.146275/6.161828,
+zero local sectors,shared-conflict aggregates6311676/2010310 and6432791/1889520,
+diagnostic2.782656/2.968992 ms. Aggregate L2 hit rate increases from v14675.044%
+to v15877.781%, and from v15375.088% to v15977.841%. These whole-kernel hit rates
+do not isolate KV traffic, nor establish a latency benefit. Streaming-Q priority
+alone is not a useful performance change in the observed regime.
+
+### Iteration 160 initial result — packed scaling composes with stage release
+
+REG100/STACK0. Full seed1234 matches v153 in three repeats; masks match and
+masked FP32 checks plus qualified b2 synccheck/b512 memcheck pass. Short1724.54 us
+versus TRT1689.70 us improves10.18 us from v153 and8.07 us from v157. NCU
+base/stable:100 registers,203112 shared bytes,occupancy19.334%,tensor44.358%,
+eligible0.429091,long-scoreboard6.458982,zero local sectors,aggregate shared
+conflicts6420251/2086491,diagnostic2.939168 ms. Expanded validation is pending.
+
+
+### Iteration 160 expanded result — promote the packed higher-precision path
+
+Both full seeds and the full short/chunk0 case match v153 bitwise in three
+repeats each, retaining the documented v148 FP32-reference passes on these
+inputs. Eager20/100 warm/cold1872.77/1886.27 us versus TRT1884.06/1914.90 us;
+Graph1923.22/1890.34 us versus TRT1873.89/1914.67 us. Four rotated Graph orders:
+
+| Cache | v153 us, rounds0–3 | v157 us, rounds0–3 | v160 us, rounds0–3 | TRT us, rounds0–3 |
+|---|---|---|---|---|
+| warm | 1867.79 / 1869.68 / 1867.94 / 1871.90 | 1865.66 / 1867.87 / 1867.87 / 1867.92 | 1861.78 / 1861.50 / 1861.76 / 1861.74 | 1866.22 / 1875.90 / 1876.05 / 1878.11 |
+| cold | 1857.74 / 1867.78 / 1867.65 / 1868.05 | 1865.49 / 1863.63 / 1863.81 / 1865.47 | 1861.58 / 1857.86 / 1859.73 / 1859.57 | 1861.68 / 1859.87 / 1862.64 / 1865.63 |
+
+v160 beats v153 in all warm orders and three of four cold orders; cold round0
+is3.84 us slower. It beats v157 in all eight orders. Promote v160 based on the
+combined evidence, retaining that cold regression explicitly. Every recorded
+rotated TRT comparison favors v160, but the first cold margin is only0.10 us;
+this is parity rather than a convincing standalone win. Separate Graph warm
+still favors TRT by about2.6%, so no universal high-precision performance lead.
+
+### Iterations 161–162 compile inspection
+
+v161 REG123/STACK0; v162 REG101/STACK0. Both lower to
+LDTM.STAT.x32.MAX.F32.NAN, with the expected PTX tcgen05.ld.red and retained
+wait::ld. The installed compiler therefore supports the requested SM103 operation.
+Compile-only success is not a runtime, guardrail or output-equivalence result.

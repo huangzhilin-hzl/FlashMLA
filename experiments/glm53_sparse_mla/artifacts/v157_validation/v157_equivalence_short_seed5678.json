@@ -1,0 +1,42 @@
+{
+  "purpose": "kernel equivalence only; not FP32-reference accuracy or timing",
+  "args": {
+    "baseline": "v152",
+    "candidate": "v157",
+    "local_tokens": 1024,
+    "chunk": 0,
+    "seed": 5678,
+    "repeats": 3,
+    "output_json": "artifacts/v157_equivalence_short_seed5678.json"
+  },
+  "kernel_sha256": {
+    "v152": "747bc82cfd92ccc13ceba7463eb92289cf04becfea57292b7d5ff469df01f036",
+    "v157": "5e1901159d54d4c104c0ba6da99499653baab864a8ff7201d79ce3d972b75013"
+  },
+  "repeats": [
+    {
+      "repeat": 0,
+      "finite": true,
+      "elements": 33554432,
+      "bitwise_mismatches": 0,
+      "max_abs_difference": 0.0,
+      "pass": true
+    },
+    {
+      "repeat": 1,
+      "finite": true,
+      "elements": 33554432,
+      "bitwise_mismatches": 0,
+      "max_abs_difference": 0.0,
+      "pass": true
+    },
+    {
+      "repeat": 2,
+      "finite": true,
+      "elements": 33554432,
+      "bitwise_mismatches": 0,
+      "max_abs_difference": 0.0,
+      "pass": true
+    }
+  ]
+}
