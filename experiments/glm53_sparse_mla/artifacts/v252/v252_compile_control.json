@@ -1,0 +1,35 @@
+{
+  "v251": {
+    "static_native_instructions": 1768,
+    "LDL": 0,
+    "STL": 0,
+    "ELECT": 7,
+    "VOTE": 4,
+    "BRA_U_ANY": 0,
+    "MMA": 62,
+    "commit_sites": 5,
+    "elections": [
+      "elect.sync \t%r64|%p5, -1;",
+      "elect.sync \t%r1220|%p59, -1;",
+      "elect.sync \t%r991|%p28, -1;",
+      "elect.sync \t%r1100|%p35, -1;",
+      "elect.sync \t%r1123|%p39, -1;",
+      "elect.sync \t%r1157|%p44, -1;"
+    ]
+  },
+  "v252": {
+    "static_native_instructions": 1704,
+    "LDL": 0,
+    "STL": 0,
+    "ELECT": 5,
+    "VOTE": 2,
+    "BRA_U_ANY": 0,
+    "MMA": 62,
+    "commit_sites": 5,
+    "elections": [
+      "elect.sync \t%r60|%p5, -1;",
+      "elect.sync \t%r1192|%p52, -1;",
+      "elect.sync \t%r988|%p27, -1;"
+    ]
+  }
+}

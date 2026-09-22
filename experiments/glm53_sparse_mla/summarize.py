@@ -183,6 +183,10 @@ for directory in sorted(root.glob("v[0-9][0-9][0-9]")):
         status = "guarded checks/full seed1234/mask parent equivalence; KV-tail P reuse slower"
     if version == "v232":
         status = "guarded checks pass;9 full seed1234 failures,86 mask failures; single-buffer slower"
+    if version == "v252":
+        status = "guarded fixed/varlen and full/short/mask exact v251; single polling owner modestly faster, no default gain"
+    if version == "v251":
+        status = "guarded fixed/varlen and full/short/mask exact v250; delayed PV wait improves v250, slower than default"
     if version == "v250":
         status = "guarded fixed/varlen and full/short/mask exact v242; early QK executes but slower"
     if version in ("v248", "v249"):
