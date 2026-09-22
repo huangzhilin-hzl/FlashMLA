@@ -1,0 +1,258 @@
+[
+  {
+    "source": "v190_462_round0.json",
+    "case": "trtllm/native",
+    "cache": "warm",
+    "timing": "cuda-graph",
+    "median_us": 1880.1119923591614,
+    "speedup_vs_trtllm": 1.0
+  },
+  {
+    "source": "v190_462_round0.json",
+    "case": "cute-v190/native",
+    "cache": "warm",
+    "timing": "cuda-graph",
+    "median_us": 1655.9520363807678,
+    "speedup_vs_trtllm": 1.1353662129419613
+  },
+  {
+    "source": "v190_462_round0.json",
+    "case": "trtllm/native",
+    "cache": "cold",
+    "timing": "cuda-graph",
+    "median_us": 1904.6559929847717,
+    "speedup_vs_trtllm": 1.0
+  },
+  {
+    "source": "v190_462_round0.json",
+    "case": "cute-v190/native",
+    "cache": "cold",
+    "timing": "cuda-graph",
+    "median_us": 1634.1599822044373,
+    "speedup_vs_trtllm": 1.165526027883416
+  },
+  {
+    "source": "v190_462_round1.json",
+    "case": "trtllm/native",
+    "cache": "warm",
+    "timing": "cuda-graph",
+    "median_us": 1872.4479675292969,
+    "speedup_vs_trtllm": 1.0
+  },
+  {
+    "source": "v190_462_round1.json",
+    "case": "cute-v190/native",
+    "cache": "warm",
+    "timing": "cuda-graph",
+    "median_us": 1649.903953075409,
+    "speedup_vs_trtllm": 1.1348830118499125
+  },
+  {
+    "source": "v190_462_round1.json",
+    "case": "trtllm/native",
+    "cache": "cold",
+    "timing": "cuda-graph",
+    "median_us": 1917.9039597511292,
+    "speedup_vs_trtllm": 1.0
+  },
+  {
+    "source": "v190_462_round1.json",
+    "case": "cute-v190/native",
+    "cache": "cold",
+    "timing": "cuda-graph",
+    "median_us": 1642.0480012893677,
+    "speedup_vs_trtllm": 1.1679950636309986
+  },
+  {
+    "source": "v190_471_round0.json",
+    "case": "trtllm/native",
+    "cache": "warm",
+    "timing": "cuda-graph",
+    "median_us": 1877.072036266327,
+    "speedup_vs_trtllm": 1.0
+  },
+  {
+    "source": "v190_471_round0.json",
+    "case": "cute-v190/native",
+    "cache": "warm",
+    "timing": "cuda-graph",
+    "median_us": 1648.751974105835,
+    "speedup_vs_trtllm": 1.1384805390661117
+  },
+  {
+    "source": "v190_471_round0.json",
+    "case": "trtllm/native",
+    "cache": "cold",
+    "timing": "cuda-graph",
+    "median_us": 1916.815996170044,
+    "speedup_vs_trtllm": 1.0
+  },
+  {
+    "source": "v190_471_round0.json",
+    "case": "cute-v190/native",
+    "cache": "cold",
+    "timing": "cuda-graph",
+    "median_us": 1633.4400177001953,
+    "speedup_vs_trtllm": 1.1734841655641743
+  },
+  {
+    "source": "v190_471_round1.json",
+    "case": "trtllm/native",
+    "cache": "warm",
+    "timing": "cuda-graph",
+    "median_us": 1870.9760308265686,
+    "speedup_vs_trtllm": 1.0
+  },
+  {
+    "source": "v190_471_round1.json",
+    "case": "cute-v190/native",
+    "cache": "warm",
+    "timing": "cuda-graph",
+    "median_us": 1653.7440419197083,
+    "speedup_vs_trtllm": 1.1313576849865423
+  },
+  {
+    "source": "v190_471_round1.json",
+    "case": "trtllm/native",
+    "cache": "cold",
+    "timing": "cuda-graph",
+    "median_us": 1918.720006942749,
+    "speedup_vs_trtllm": 1.0
+  },
+  {
+    "source": "v190_471_round1.json",
+    "case": "cute-v190/native",
+    "cache": "cold",
+    "timing": "cuda-graph",
+    "median_us": 1634.4320178031921,
+    "speedup_vs_trtllm": 1.1739368698379165
+  },
+  {
+    "source": "v197_462_round0.json",
+    "case": "trtllm/native",
+    "cache": "warm",
+    "timing": "cuda-graph",
+    "median_us": 1871.887981891632,
+    "speedup_vs_trtllm": 1.0
+  },
+  {
+    "source": "v197_462_round0.json",
+    "case": "cute-v197/native",
+    "cache": "warm",
+    "timing": "cuda-graph",
+    "median_us": 1881.0240030288696,
+    "speedup_vs_trtllm": 0.9951430597788616
+  },
+  {
+    "source": "v197_462_round0.json",
+    "case": "trtllm/native",
+    "cache": "cold",
+    "timing": "cuda-graph",
+    "median_us": 1912.880003452301,
+    "speedup_vs_trtllm": 1.0
+  },
+  {
+    "source": "v197_462_round0.json",
+    "case": "cute-v197/native",
+    "cache": "cold",
+    "timing": "cuda-graph",
+    "median_us": 1833.2160115242004,
+    "speedup_vs_trtllm": 1.0434558674085903
+  },
+  {
+    "source": "v197_462_round1.json",
+    "case": "trtllm/native",
+    "cache": "warm",
+    "timing": "cuda-graph",
+    "median_us": 1873.8719820976257,
+    "speedup_vs_trtllm": 1.0
+  },
+  {
+    "source": "v197_462_round1.json",
+    "case": "cute-v197/native",
+    "cache": "warm",
+    "timing": "cuda-graph",
+    "median_us": 1888.2720470428467,
+    "speedup_vs_trtllm": 0.9923739458158202
+  },
+  {
+    "source": "v197_462_round1.json",
+    "case": "trtllm/native",
+    "cache": "cold",
+    "timing": "cuda-graph",
+    "median_us": 1902.671992778778,
+    "speedup_vs_trtllm": 1.0
+  },
+  {
+    "source": "v197_462_round1.json",
+    "case": "cute-v197/native",
+    "cache": "cold",
+    "timing": "cuda-graph",
+    "median_us": 1832.0000171661377,
+    "speedup_vs_trtllm": 1.038576405540629
+  },
+  {
+    "source": "v197_471_round0.json",
+    "case": "trtllm/native",
+    "cache": "warm",
+    "timing": "cuda-graph",
+    "median_us": 1872.0319867134094,
+    "speedup_vs_trtllm": 1.0
+  },
+  {
+    "source": "v197_471_round0.json",
+    "case": "cute-v197/native",
+    "cache": "warm",
+    "timing": "cuda-graph",
+    "median_us": 1873.856008052826,
+    "speedup_vs_trtllm": 0.999026594716148
+  },
+  {
+    "source": "v197_471_round0.json",
+    "case": "trtllm/native",
+    "cache": "cold",
+    "timing": "cuda-graph",
+    "median_us": 1909.824013710022,
+    "speedup_vs_trtllm": 1.0
+  },
+  {
+    "source": "v197_471_round0.json",
+    "case": "cute-v197/native",
+    "cache": "cold",
+    "timing": "cuda-graph",
+    "median_us": 1837.119996547699,
+    "speedup_vs_trtllm": 1.0395749963524146
+  },
+  {
+    "source": "v197_471_round1.json",
+    "case": "trtllm/native",
+    "cache": "warm",
+    "timing": "cuda-graph",
+    "median_us": 1873.968005180359,
+    "speedup_vs_trtllm": 1.0
+  },
+  {
+    "source": "v197_471_round1.json",
+    "case": "cute-v197/native",
+    "cache": "warm",
+    "timing": "cuda-graph",
+    "median_us": 1898.5919952392578,
+    "speedup_vs_trtllm": 0.9870303940390333
+  },
+  {
+    "source": "v197_471_round1.json",
+    "case": "trtllm/native",
+    "cache": "cold",
+    "timing": "cuda-graph",
+    "median_us": 1912.880003452301,
+    "speedup_vs_trtllm": 1.0
+  },
+  {
+    "source": "v197_471_round1.json",
+    "case": "cute-v197/native",
+    "cache": "cold",
+    "timing": "cuda-graph",
+    "median_us": 1837.776005268097,
+    "speedup_vs_trtllm": 1.0408667857066987
+  }
+]

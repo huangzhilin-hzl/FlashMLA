@@ -1,0 +1,8 @@
+{
+  "purpose": "host logical assignment coverage only",
+  "unique_16byte_vectors": 4608,
+  "expected": 4608,
+  "exact_cover": true,
+  "threads_per_main_row": 8,
+  "threads_per_tail_row": 4
+}

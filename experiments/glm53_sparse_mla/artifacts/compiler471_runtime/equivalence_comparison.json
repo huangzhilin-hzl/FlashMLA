@@ -1,0 +1,5 @@
+{
+  "records": 24,
+  "records_equal": true,
+  "purpose": "All input/output bytes across compiler processes; inherits baseline numerical limitations."
+}

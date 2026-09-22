@@ -1,0 +1,82 @@
+[
+  {
+    "package": "nvidia-cutlass-dsl",
+    "version": "4.7.1",
+    "filename": "nvidia_cutlass_dsl-4.7.1-py3-none-any.whl",
+    "bytes": 10460,
+    "sha256": "765850c74868a0b5a02fefbfc1b380842b64e5f7a1c8b1655e322a3b14c01726",
+    "url": "https://files.pythonhosted.org/packages/af/ef/903dab832a19e0f1d798c9acc96edbda5dfb29f2e030b46e163946555817/nvidia_cutlass_dsl-4.7.1-py3-none-any.whl",
+    "requires_dist": [
+      "nvidia-cutlass-dsl-libs-base==4.7.1",
+      "nvidia-cutlass-dsl-libs-cu12==4.7.1",
+      "nvidia-cutlass-dsl-libs-cu13==4.7.1; extra == \"cu13\""
+    ]
+  },
+  {
+    "package": "nvidia-cutlass-dsl-libs-base",
+    "version": "4.7.1",
+    "filename": "nvidia_cutlass_dsl_libs_base-4.7.1-cp312-cp312-manylinux_2_28_x86_64.whl",
+    "bytes": 2832971,
+    "sha256": "c2b67dacabfc905e4d132784fe4848647f40b0b97b1cdde3ce4a482642536b84",
+    "url": "https://files.pythonhosted.org/packages/55/b5/af332a4dbb0dba45828994d9789d1969dfecca006a6221cd8b92e4825d3f/nvidia_cutlass_dsl_libs_base-4.7.1-cp312-cp312-manylinux_2_28_x86_64.whl",
+    "requires_dist": [
+      "numpy",
+      "typing-extensions>=4.10.0",
+      "cuda-python>=12.8",
+      "backports.strenum; python_version < \"3.11\"",
+      "protobuf>=4.21.12",
+      "nvidia-cuda-nvdisasm<14,>=13.3",
+      "nvidia-cutlass-dsl-libs-core==4.7.1"
+    ]
+  },
+  {
+    "package": "nvidia-cutlass-dsl-libs-core",
+    "version": "4.7.1",
+    "filename": "nvidia_cutlass_dsl_libs_core-4.7.1-py3-none-any.whl",
+    "bytes": 1235214,
+    "sha256": "c65662abc9ab18fd997c57547895736928e559f4624bbe2aa1aa91418ea014ca",
+    "url": "https://files.pythonhosted.org/packages/6b/14/b669cc890f7fd74008d7bc52f493d0a7ff256de10f3941c6676249419c07/nvidia_cutlass_dsl_libs_core-4.7.1-py3-none-any.whl",
+    "requires_dist": [
+      "numpy",
+      "typing-extensions>=4.10.0",
+      "cuda-python>=12.8",
+      "backports.strenum; python_version < \"3.11\"",
+      "protobuf>=4.21.12",
+      "nvidia-cuda-nvdisasm<14,>=13.3"
+    ]
+  },
+  {
+    "package": "nvidia-cutlass-dsl-libs-cu12",
+    "version": "4.7.1",
+    "filename": "nvidia_cutlass_dsl_libs_cu12-4.7.1-cp312-cp312-manylinux_2_28_x86_64.whl",
+    "bytes": 88679788,
+    "sha256": "c8a0f93a1cde41404696b3194dd1f589c6f3a7b426bcabe97845f8fe96f949f5",
+    "url": "https://files.pythonhosted.org/packages/94/39/d847abeeb9a4ced8e11b30b401564c74c692ac9609f5bd921ed9d0a32f43/nvidia_cutlass_dsl_libs_cu12-4.7.1-cp312-cp312-manylinux_2_28_x86_64.whl",
+    "requires_dist": [
+      "numpy",
+      "typing-extensions>=4.10.0",
+      "cuda-python>=12.8",
+      "backports.strenum; python_version < \"3.11\"",
+      "protobuf>=4.21.12",
+      "nvidia-cuda-nvdisasm<14,>=13.3",
+      "nvidia-cutlass-dsl-libs-base==4.7.1"
+    ]
+  },
+  {
+    "package": "nvidia-cutlass-dsl-libs-cu13",
+    "version": "4.7.1",
+    "filename": "nvidia_cutlass_dsl_libs_cu13-4.7.1-cp312-cp312-manylinux_2_28_x86_64.whl",
+    "bytes": 88260436,
+    "sha256": "20c14e16125cb8e36bc9947a9f0a57a660f44651365337b911c84abde4967f5f",
+    "url": "https://files.pythonhosted.org/packages/10/71/e178bb0858fd7b96857e98e3acec70b23f13b88540a2fcc53569f8e8ea34/nvidia_cutlass_dsl_libs_cu13-4.7.1-cp312-cp312-manylinux_2_28_x86_64.whl",
+    "requires_dist": [
+      "numpy",
+      "typing-extensions>=4.10.0",
+      "cuda-python>=12.8",
+      "backports.strenum; python_version < \"3.11\"",
+      "protobuf>=4.21.12",
+      "nvidia-cuda-nvdisasm<14,>=13.3",
+      "nvidia-cutlass-dsl-libs-base==4.7.1"
+    ]
+  }
+]

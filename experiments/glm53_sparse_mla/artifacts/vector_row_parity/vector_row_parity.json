@@ -1,0 +1,14 @@
+{
+  "purpose": "CPU alignment-count correlation, not isolated hardware timing or a general bank-conflict proof",
+  "benchmark_sha256": "d843320fb5147a807135282a1b87bb4c247cdd7a6a16b9107d546c48c8a8fb66",
+  "shape": [
+    8192,
+    2048
+  ],
+  "odd_physical_slots": 8391526,
+  "odd_row_main_prediction": 33566104,
+  "tail_prediction": 8388608,
+  "total_predicted_excessive": 41954712,
+  "measured_v224_source_excessive": 41954712,
+  "matches": true
+}

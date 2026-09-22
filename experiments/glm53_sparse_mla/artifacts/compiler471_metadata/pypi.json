@@ -1,0 +1,192 @@
+[
+  {
+    "package": "nvidia-cutlass-dsl",
+    "version": "4.7.1",
+    "requires_dist": [
+      "nvidia-cutlass-dsl-libs-base==4.7.1",
+      "nvidia-cutlass-dsl-libs-cu12==4.7.1",
+      "nvidia-cutlass-dsl-libs-cu13==4.7.1; extra == \"cu13\""
+    ],
+    "files": [
+      {
+        "comment_text": null,
+        "core-metadata": {
+          "sha256": "ec4db1ffc00d1c01c7b2e72564050d9b7d68c0a03c3a864ef5d1d73f97ae8953"
+        },
+        "digests": {
+          "blake2b_256": "afef903dab832a19e0f1d798c9acc96edbda5dfb29f2e030b46e163946555817",
+          "md5": "0425de00003a66150f2082387bd39db3",
+          "sha256": "765850c74868a0b5a02fefbfc1b380842b64e5f7a1c8b1655e322a3b14c01726"
+        },
+        "downloads": -1,
+        "filename": "nvidia_cutlass_dsl-4.7.1-py3-none-any.whl",
+        "has_sig": false,
+        "md5_digest": "0425de00003a66150f2082387bd39db3",
+        "packagetype": "bdist_wheel",
+        "python_version": "py3",
+        "requires_python": ">=3.10",
+        "size": 10460,
+        "upload_time": "2026-08-26T03:11:56",
+        "upload_time_iso_8601": "2026-08-26T03:11:56.593193Z",
+        "url": "https://files.pythonhosted.org/packages/af/ef/903dab832a19e0f1d798c9acc96edbda5dfb29f2e030b46e163946555817/nvidia_cutlass_dsl-4.7.1-py3-none-any.whl",
+        "yanked": false,
+        "yanked_reason": null
+      }
+    ]
+  },
+  {
+    "package": "nvidia-cutlass-dsl-libs-base",
+    "version": "4.7.1",
+    "requires_dist": [
+      "numpy",
+      "typing-extensions>=4.10.0",
+      "cuda-python>=12.8",
+      "backports.strenum; python_version < \"3.11\"",
+      "protobuf>=4.21.12",
+      "nvidia-cuda-nvdisasm<14,>=13.3",
+      "nvidia-cutlass-dsl-libs-core==4.7.1"
+    ],
+    "files": [
+      {
+        "comment_text": null,
+        "core-metadata": {
+          "sha256": "5099df09a5506d254f0b8fc1d0d5c3a7aa7f6ee8390dd8ba7996a3c7bad2cda5"
+        },
+        "digests": {
+          "blake2b_256": "55b5af332a4dbb0dba45828994d9789d1969dfecca006a6221cd8b92e4825d3f",
+          "md5": "b6e1b3cf371b20a303185ecb6f7ca8ce",
+          "sha256": "c2b67dacabfc905e4d132784fe4848647f40b0b97b1cdde3ce4a482642536b84"
+        },
+        "downloads": -1,
+        "filename": "nvidia_cutlass_dsl_libs_base-4.7.1-cp312-cp312-manylinux_2_28_x86_64.whl",
+        "has_sig": false,
+        "md5_digest": "b6e1b3cf371b20a303185ecb6f7ca8ce",
+        "packagetype": "bdist_wheel",
+        "python_version": "cp312",
+        "requires_python": ">=3.10",
+        "size": 2832971,
+        "upload_time": "2026-08-26T02:53:52",
+        "upload_time_iso_8601": "2026-08-26T02:53:52.164357Z",
+        "url": "https://files.pythonhosted.org/packages/55/b5/af332a4dbb0dba45828994d9789d1969dfecca006a6221cd8b92e4825d3f/nvidia_cutlass_dsl_libs_base-4.7.1-cp312-cp312-manylinux_2_28_x86_64.whl",
+        "yanked": false,
+        "yanked_reason": null
+      }
+    ]
+  },
+  {
+    "package": "nvidia-cutlass-dsl-libs-core",
+    "version": "4.7.1",
+    "requires_dist": [
+      "numpy",
+      "typing-extensions>=4.10.0",
+      "cuda-python>=12.8",
+      "backports.strenum; python_version < \"3.11\"",
+      "protobuf>=4.21.12",
+      "nvidia-cuda-nvdisasm<14,>=13.3"
+    ],
+    "files": [
+      {
+        "comment_text": null,
+        "core-metadata": {
+          "sha256": "21170e4de30d3c3c671504deacee2c9692c1c70cb7feb4ee22ed3266fef5e300"
+        },
+        "digests": {
+          "blake2b_256": "6b14b669cc890f7fd74008d7bc52f493d0a7ff256de10f3941c6676249419c07",
+          "md5": "946079d2e10b4447b210608c988b3e98",
+          "sha256": "c65662abc9ab18fd997c57547895736928e559f4624bbe2aa1aa91418ea014ca"
+        },
+        "downloads": -1,
+        "filename": "nvidia_cutlass_dsl_libs_core-4.7.1-py3-none-any.whl",
+        "has_sig": false,
+        "md5_digest": "946079d2e10b4447b210608c988b3e98",
+        "packagetype": "bdist_wheel",
+        "python_version": "py3",
+        "requires_python": ">=3.10",
+        "size": 1235214,
+        "upload_time": "2026-08-26T02:50:56",
+        "upload_time_iso_8601": "2026-08-26T02:50:56.241093Z",
+        "url": "https://files.pythonhosted.org/packages/6b/14/b669cc890f7fd74008d7bc52f493d0a7ff256de10f3941c6676249419c07/nvidia_cutlass_dsl_libs_core-4.7.1-py3-none-any.whl",
+        "yanked": false,
+        "yanked_reason": null
+      }
+    ]
+  },
+  {
+    "package": "nvidia-cutlass-dsl-libs-cu12",
+    "version": "4.7.1",
+    "requires_dist": [
+      "numpy",
+      "typing-extensions>=4.10.0",
+      "cuda-python>=12.8",
+      "backports.strenum; python_version < \"3.11\"",
+      "protobuf>=4.21.12",
+      "nvidia-cuda-nvdisasm<14,>=13.3",
+      "nvidia-cutlass-dsl-libs-base==4.7.1"
+    ],
+    "files": [
+      {
+        "comment_text": null,
+        "core-metadata": {
+          "sha256": "64013ead0a5c89c3a6c3c2ffefc258910f5c5d7d1629e99f6f44d700ae37379a"
+        },
+        "digests": {
+          "blake2b_256": "9439d847abeeb9a4ced8e11b30b401564c74c692ac9609f5bd921ed9d0a32f43",
+          "md5": "e79c55685f7b68557b1e5da11992488e",
+          "sha256": "c8a0f93a1cde41404696b3194dd1f589c6f3a7b426bcabe97845f8fe96f949f5"
+        },
+        "downloads": -1,
+        "filename": "nvidia_cutlass_dsl_libs_cu12-4.7.1-cp312-cp312-manylinux_2_28_x86_64.whl",
+        "has_sig": false,
+        "md5_digest": "e79c55685f7b68557b1e5da11992488e",
+        "packagetype": "bdist_wheel",
+        "python_version": "cp312",
+        "requires_python": ">=3.10",
+        "size": 88679788,
+        "upload_time": "2026-08-26T03:00:32",
+        "upload_time_iso_8601": "2026-08-26T03:00:32.280489Z",
+        "url": "https://files.pythonhosted.org/packages/94/39/d847abeeb9a4ced8e11b30b401564c74c692ac9609f5bd921ed9d0a32f43/nvidia_cutlass_dsl_libs_cu12-4.7.1-cp312-cp312-manylinux_2_28_x86_64.whl",
+        "yanked": false,
+        "yanked_reason": null
+      }
+    ]
+  },
+  {
+    "package": "nvidia-cutlass-dsl-libs-cu13",
+    "version": "4.7.1",
+    "requires_dist": [
+      "numpy",
+      "typing-extensions>=4.10.0",
+      "cuda-python>=12.8",
+      "backports.strenum; python_version < \"3.11\"",
+      "protobuf>=4.21.12",
+      "nvidia-cuda-nvdisasm<14,>=13.3",
+      "nvidia-cutlass-dsl-libs-base==4.7.1"
+    ],
+    "files": [
+      {
+        "comment_text": null,
+        "core-metadata": {
+          "sha256": "f75dfc4d65fb5496aec67b260f1d31325470499a19aa142b19604e16c4ee8a8a"
+        },
+        "digests": {
+          "blake2b_256": "1071e178bb0858fd7b96857e98e3acec70b23f13b88540a2fcc53569f8e8ea34",
+          "md5": "b7c61172eba214cadc300a147b709fd3",
+          "sha256": "20c14e16125cb8e36bc9947a9f0a57a660f44651365337b911c84abde4967f5f"
+        },
+        "downloads": -1,
+        "filename": "nvidia_cutlass_dsl_libs_cu13-4.7.1-cp312-cp312-manylinux_2_28_x86_64.whl",
+        "has_sig": false,
+        "md5_digest": "b7c61172eba214cadc300a147b709fd3",
+        "packagetype": "bdist_wheel",
+        "python_version": "cp312",
+        "requires_python": ">=3.10",
+        "size": 88260436,
+        "upload_time": "2026-08-26T03:07:59",
+        "upload_time_iso_8601": "2026-08-26T03:07:59.639482Z",
+        "url": "https://files.pythonhosted.org/packages/10/71/e178bb0858fd7b96857e98e3acec70b23f13b88540a2fcc53569f8e8ea34/nvidia_cutlass_dsl_libs_cu13-4.7.1-cp312-cp312-manylinux_2_28_x86_64.whl",
+        "yanked": false,
+        "yanked_reason": null
+      }
+    ]
+  }
+]

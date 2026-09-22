@@ -1,0 +1,728 @@
+{
+  "LDC": {
+    "Instructions Executed": 1179648.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "S2R": {
+    "Instructions Executed": 2883584.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "S2UR": {
+    "Instructions Executed": 270336.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "UMOV": {
+    "Instructions Executed": 4562944.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "BSSY.RECONVERGENT": {
+    "Instructions Executed": 147456.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "ULEA": {
+    "Instructions Executed": 1204224.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "UIADD3": {
+    "Instructions Executed": 5619712.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "ISETP.NE.U32.AND": {
+    "Instructions Executed": 12984320.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "SHF.R.U32.HI": {
+    "Instructions Executed": 7274496.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "IMAD.U32": {
+    "Instructions Executed": 1826816.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "BRA": {
+    "Instructions Executed": 77002084.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "USHF.L.U32": {
+    "Instructions Executed": 434176.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "FENCE.VIEW.ASYNC.S": {
+    "Instructions Executed": 1318912.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "SYNCS.EXCH.64": {
+    "Instructions Executed": 65536.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "NOP": {
+    "Instructions Executed": 12078960.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "BSYNC.RECONVERGENT": {
+    "Instructions Executed": 155648.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "ELECT": {
+    "Instructions Executed": 24576.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "HFMA2": {
+    "Instructions Executed": 8192.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "MOV": {
+    "Instructions Executed": 3751903.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "DEPBAR.LE": {
+    "Instructions Executed": 8192.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "UTCATOMSWS.FIND_AND_SET.ALIGN": {
+    "Instructions Executed": 8192.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "BRA.U": {
+    "Instructions Executed": 598016.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "NANOSLEEP": {
+    "Instructions Executed": 0.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "SHF.L.U32": {
+    "Instructions Executed": 4038656.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "IMAD.SHL.U32": {
+    "Instructions Executed": 2465792.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "ATOMS.OR": {
+    "Instructions Executed": 16384.0,
+    "L1 Wavefronts Shared": 16384.0,
+    "L1 Wavefronts Shared Ideal": 16384.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "STS": {
+    "Instructions Executed": 2187264.0,
+    "L1 Wavefronts Shared": 2187264.0,
+    "L1 Wavefronts Shared Ideal": 2187264.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "WARPSYNC.ALL": {
+    "Instructions Executed": 16384.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "UVIRTCOUNT.DEALLOC.SMPOOL": {
+    "Instructions Executed": 8192.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "STS.U8": {
+    "Instructions Executed": 8192.0,
+    "L1 Wavefronts Shared": 8192.0,
+    "L1 Wavefronts Shared Ideal": 8192.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "BAR.SYNC.DEFER_BLOCKING": {
+    "Instructions Executed": 3997696.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "ISETP.GE.AND": {
+    "Instructions Executed": 237568.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "USETMAXREG.DEALLOC.CTAPOOL": {
+    "Instructions Executed": 65536.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "LOP3.LUT": {
+    "Instructions Executed": 13164544.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "LDCU.64": {
+    "Instructions Executed": 278528.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "UIADD3.64": {
+    "Instructions Executed": 663552.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "SYNCS.ARRIVE.TRANS64": {
+    "Instructions Executed": 8192.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "UIADD3.X": {
+    "Instructions Executed": 139264.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "UTMALDG.2D": {
+    "Instructions Executed": 40960.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "UIMAD.WIDE.U32": {
+    "Instructions Executed": 106496.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "LDG.E": {
+    "Instructions Executed": 630784.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "VIADD": {
+    "Instructions Executed": 7471104.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "SHF.R.S32.HI": {
+    "Instructions Executed": 1294336.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "LEA.HI": {
+    "Instructions Executed": 1744896.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "ISETP.GT.AND": {
+    "Instructions Executed": 720896.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "LEA.HI.SX32": {
+    "Instructions Executed": 106496.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "IMAD.MOV": {
+    "Instructions Executed": 1916928.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "EXIT": {
+    "Instructions Executed": 860160.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "ISETP.GT.U32.AND": {
+    "Instructions Executed": 638976.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "IMAD.MOV.U32": {
+    "Instructions Executed": 2441216.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "IMAD": {
+    "Instructions Executed": 8290304.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "LDC.64": {
+    "Instructions Executed": 589824.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "UISETP.GE.U32.AND": {
+    "Instructions Executed": 524288.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "ULOP3.LUT": {
+    "Instructions Executed": 1744896.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "ISETP.GE.OR": {
+    "Instructions Executed": 524288.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "LEA": {
+    "Instructions Executed": 3801088.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "LEA.HI.X.SX32": {
+    "Instructions Executed": 6815744.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "IMAD.IADD": {
+    "Instructions Executed": 2686976.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "SYNCS.PHASECHK.TRANS64.TRYWAIT": {
+    "Instructions Executed": 69358981.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "VOTE.ANY": {
+    "Instructions Executed": 524288.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "SYNCS.ARRIVE.TRANS64.A1T0": {
+    "Instructions Executed": 2621440.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "IADD3": {
+    "Instructions Executed": 9846784.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "LDS": {
+    "Instructions Executed": 35872768.0,
+    "L1 Wavefronts Shared": 11755520.0,
+    "L1 Wavefronts Shared Ideal": 11755520.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "VIMNMX": {
+    "Instructions Executed": 6291456.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "LDGSTS.E.BYPASS.LTC128B.128": {
+    "Instructions Executed": 18874368.0,
+    "L1 Wavefronts Shared": 117452184.0,
+    "L1 Wavefronts Shared Ideal": 75497472.0,
+    "L1 Wavefronts Shared Excessive": 41954712.0
+  },
+  "SEL": {
+    "Instructions Executed": 2752512.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "ARRIVES.LDGSTSBAR.64.ARVCNT": {
+    "Instructions Executed": 524288.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "R2UR": {
+    "Instructions Executed": 3860408.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "USHF.R.U32.HI": {
+    "Instructions Executed": 475136.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "CS2R": {
+    "Instructions Executed": 73728.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "MEMBAR.ALL.CTA": {
+    "Instructions Executed": 1310720.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "UTCQMMA.WS": {
+    "Instructions Executed": 4456448.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "UTCBAR": {
+    "Instructions Executed": 262144.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "UISETP.NE.U32.AND": {
+    "Instructions Executed": 131072.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "USETMAXREG.TRY_ALLOC.CTAPOOL": {
+    "Instructions Executed": 65536.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "LDTM.STAT.x32.MAX.F32.NAN": {
+    "Instructions Executed": 1048576.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "FMUL2": {
+    "Instructions Executed": 22345472.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "FMUL": {
+    "Instructions Executed": 1048576.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "FMNMX": {
+    "Instructions Executed": 2097152.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "BRX": {
+    "Instructions Executed": 1048576.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "R2P": {
+    "Instructions Executed": 0.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "FMNMX3.NAN": {
+    "Instructions Executed": 0.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "FADD": {
+    "Instructions Executed": 35700736.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "FMNMX3": {
+    "Instructions Executed": 1048576.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "FSETP.GTU.AND": {
+    "Instructions Executed": 1048576.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "FSEL": {
+    "Instructions Executed": 1048576.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "FADD2": {
+    "Instructions Executed": 33554432.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "MUFU.EX2": {
+    "Instructions Executed": 34603008.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "FSETP.NEU.AND": {
+    "Instructions Executed": 1048576.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "F2FP.SATFINITE.E4M3.F32.PACK_AB_MERGE_C": {
+    "Instructions Executed": 33554432.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "F2FP.F16.E4M3.UNPACK_B": {
+    "Instructions Executed": 16777216.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "VOTE.ALL": {
+    "Instructions Executed": 1048576.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "HADD2.F32": {
+    "Instructions Executed": 33554432.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "ISETP.EQ.U32.OR": {
+    "Instructions Executed": 1048576.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "PRMT": {
+    "Instructions Executed": 16777216.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "STS.128": {
+    "Instructions Executed": 4194304.0,
+    "L1 Wavefronts Shared": 16777216.0,
+    "L1 Wavefronts Shared Ideal": 16777216.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "LDTM.x32": {
+    "Instructions Executed": 348016.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "STTM.x32": {
+    "Instructions Executed": 85872.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "FENCE.VIEW.ASYNC.T": {
+    "Instructions Executed": 21468.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "FFMA": {
+    "Instructions Executed": 1081344.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "CALL.REL.NOINC": {
+    "Instructions Executed": 0.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "MUFU.RCP": {
+    "Instructions Executed": 16384.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "FADD.FTZ": {
+    "Instructions Executed": 16384.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "F2FP.BF16.F32.PACK_AB": {
+    "Instructions Executed": 4194304.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "IMAD.WIDE": {
+    "Instructions Executed": 65536.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "STG.E.NA.ENL2.256": {
+    "Instructions Executed": 524288.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "ISETP.NE.AND": {
+    "Instructions Executed": 16384.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "REDUX": {
+    "Instructions Executed": 16384.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "VOTEU.ANY": {
+    "Instructions Executed": 8192.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "UFLO.U32": {
+    "Instructions Executed": 8192.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "UTCATOMSWS.AND": {
+    "Instructions Executed": 8192.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "ISETP.EQ.U32.AND": {
+    "Instructions Executed": 8192.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "ATOMS.AND": {
+    "Instructions Executed": 16384.0,
+    "L1 Wavefronts Shared": 16384.0,
+    "L1 Wavefronts Shared Ideal": 16384.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "NANOSLEEP.SYNCS": {
+    "Instructions Executed": 65418629.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "SYNCS.PHASECHK.TRANS64": {
+    "Instructions Executed": 65418629.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "BPT.TRAP": {
+    "Instructions Executed": 0.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "RET.REL.NODEC": {
+    "Instructions Executed": 0.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "FFMA.RM": {
+    "Instructions Executed": 0.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "FFMA.RP": {
+    "Instructions Executed": 0.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "FSETP.NEU.FTZ.AND": {
+    "Instructions Executed": 0.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  },
+  "PLOP3.LUT": {
+    "Instructions Executed": 0.0,
+    "L1 Wavefronts Shared": 0.0,
+    "L1 Wavefronts Shared Ideal": 0.0,
+    "L1 Wavefronts Shared Excessive": 0.0
+  }
+}

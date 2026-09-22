@@ -6321,3 +6321,101 @@ The changes exceed the two limit immediates, so v217 warrants guarded/full/mask 
 ### Iteration 217 runtime result
 
 Guarded b2 smoke/b512 memcheck, b2 synccheck, full8192/seed1234 three-repeat BF16 equivalence and mask equivalence all pass; masked FP32 passes. Short v2171666.24us versus pairedTRT1693.98us does not improve the recorded v1971662.30us tuning result. No expanded second-seed/short validation or promotion for this candidate. Static movement reduction alone is insufficient. NCU base/stable: gpu__time_duration.sum=2.824928 ms, launch__registers_per_thread=128 register/thread, launch__shared_mem_per_block_dynamic=203.112000 Kbyte/block, sm__warps_active.avg.pct_of_peak_sustained_active=19.409021 %, sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed=46.034713 %, smsp__warps_eligible.avg.per_cycle_active=0.380385 warp, smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio=6.902128 inst, l1tex__t_sectors_pipe_lsu_mem_local_op_ld.sum=0 sector, l1tex__t_sectors_pipe_lsu_mem_local_op_st.sum=0 sector, l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum=7,255,284 , l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum=3,013,938 .
+
+
+## Isolated CuTeDSL4.7.1 compile control
+
+The4.7 series adds an experimental low-level Primitives API, task-schedule analysis and source-located register/spill diagnostics;4.7.1 carries the warp-specialized setmaxnreg fix also backported to4.6.3. References: https://github.com/NVIDIA/cutlass/releases/tag/v4.7.0 and https://github.com/NVIDIA/cutlass/releases/tag/v4.7.1 . These release features do not themselves establish a kernel speedup.
+
+Fetch the five matching official PyPI4.7.1 wheels for the Pod's CPython3.12/Linux x86_64, verify published SHA256/size, and retain metadata. Install only into a fresh compiler_envs/cutlass471 prefix using no-deps/offline wheels, with process-local PYTHONPATH selection and version/module-path assertions. Keep the shared4.6.2 environment and the earlier isolated4.6.3 prefix unchanged. Compare unchanged v190/v197 source, resources and native code before deciding on any runtime tests. This is a compiler control, not a new arithmetic kernel or an automatic upgrade.
+
+The initial4.7.1 target installation was rejected before creating the prefix because the Pod's inherited PIP_CONSTRAINT pins nvidia-cutlass-dsl4.6.2. Preserve that log and retry only this no-deps/offline target-install process with PIP_CONSTRAINT unset, as in the earlier4.6.3 control. The constraint file and shared site-packages are not edited. Existing dependencies satisfy the declared requirements: numpy1.26.4,typing-extensions4.16.0,cuda-python13.3.1,protobuf6.33.6,nvidia-cuda-nvdisasm13.3.73.
+
+
+### CuTeDSL4.7.1 control result
+
+Unchanged v190/v197 compile with123/128 registers,zero stack and1448/1600 native instructions. v190 versus4.6.2 replaces six uniform additions with logical operations and changes descriptor address masks. v197 versus4.6.3 similarly differs only in descriptor masks and five additions replaced by logical operations; its extra control-flow/allocation differences versus4.6.2 were already present in4.6.3. Retain full disassembly diffs; descriptor-alignment interpretation is inferred from those native regions, not a compiler-source proof. There is no static instruction-count gain.
+
+Both pass guarded b2/chunk3 smoke,b512/chunk0 memcheck and b2 synccheck. All24 input/output hash records (two full seeds,short input,and exact mask fixture;two versions,three repeats) match4.6.2. This inherits each baseline's numerical limits, including fast-path failures; it is not an independent FP32 pass.
+
+Two independent CUDA-graph20/100 pairs reverse compiler order. v190 warm4.6.2→4.7.1 is1655.952→1648.752us then1649.904→1653.744us; cold1634.160→1633.440 then1642.048→1634.432us. v197 warm1881.024→1873.856 then1888.272→1898.592us; cold1833.216→1837.120 then1832.000→1837.776us. Warm rankings reverse; v197 cold is consistently slower under4.7.1 in this bounded control. No robust common improvement, no automatic upgrade and no extra NCU capture solely to seek a favorable result. Defaults remain4.6.2/v190/v197; retain4.7.1 as an isolated qualified compatibility control.
+
+## Iterations219–220 — vector asynchronous sparse KV copy on the current pipeline
+
+Based on v190/v197. Replace only KV gather4 producers with128 active producer threads issuing16-byte cp.async.cg copies. Four threads share each row, nine64-byte groups cover576 channels, and four row groups cover128 selected tokens. Keep exact FP8 bytes, SW128/SW64 layouts,Q TMA,compute arithmetic,TMEM,MMA order and stage ownership. A hole uses ignore-src zero fill and a row-zero-clamped global pointer. The theoretical copy issue sites per stage become144 warp instructions versus160 elected gather4 instructions, while address arithmetic,active lanes and cache behavior change; this is not a prediction of total instruction count or latency.
+
+Use full-barrier count129: thread0 performs one ordinary release arrival after the existing producer barrier publishes bitmap stores, and each of128 producers registers one cp.async.mbarrier.arrive.noinc completion. Preserve the existing producer barriers and two-stage empty waits. Every asynchronous arrival accounts for all copies initiated by that thread; consumers retain their existing full wait and async/shared fences. Official semantics: https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#parallel-synchronization-and-communication-instructions-cp-async-mbarrier-arrive and https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#data-movement-and-conversion-instructions-cp-async . Compile/resource inspection precedes guarded memory/sync and exact-output qualification.
+
+Do not simply increase the existing TMA box width: swizzled inner bytes are limited to the selected swizzle size, gather4 forbids interleaving, and a plain512-byte row-major destination does not match the existing canonical TC shared layout. The vector-copy alternative explicitly computes the same swizzled addresses. Driver restrictions: https://docs.nvidia.com/cuda/cuda-driver-api/cuda_driver_api/group__CUDA__TENSOR__MEMORY.html . Earlier cp.async variants predate the present no-spill/bitmap/independent-issuer pipeline and do not establish the outcome of this isolated producer substitution.
+
+
+### Vector-copy bring-up correction
+
+Initial v219/v220 compile with123/128 registers andzero stack;1368/1528 static instructions,36 LDGSTS copy sites andone LDGSTSBAR arrival,with no KV gather4 sites. v219's first guarded b2/chunk3 numerical check fails57273/65536 elements,maxabs0.465337634. No timing accepted; v220 was not launched. GPU1 returned idle. Preserve initial source hashes,source snapshots,disassembly and failure log.
+
+Inspection of generated PTX shows the raw inline-asm destination uses affine shared addresses without the pointer's swizzle. CuTe pointer-to-integer conversion in this path does not materialize the load/store swizzle automatically. Correct the helper to explicitly XOR address bits: SW128 uses address^((address>>3)&0x70),SW64 uses mask0x30. Keep the logical layout,copy assignment,barrier protocol and arithmetic unchanged. Recompile into a fresh directory and rerun guarded smoke before other qualification. This is a bring-up defect,not numerical permission or a performance result.
+
+
+The corrected helpers compile with123/128 registers,zero stack,and1480/1632 static instructions. Both now pass guarded b2/chunk3 smoke,b512/chunk0 memcheck and b2 synccheck. Full8192/seed1234 compares every268435456 BF16 elements exactly to the corresponding parent across three repeats; mask/partial-length outputs also match exactly,and v220 passes masked FP32. No second-seed/short-input inheritance yet. Proceed to the established short tuning/NCU protocol; no performance conclusion from successful correctness checks.
+
+
+## Iterations221–222 — factor physical vector-copy addresses
+
+The corrected v219/v220 short timings1634.46/1736.93us and base/stable NCU2.785760/2.958272ms are slower than defaults. Their native producer code repeatedly shifts/masks each full shared pointer and contains signed layout-index division sequences. Investigate this concrete address-generation overhead before rejecting the copy mechanism outright.
+
+Based on v219/v220, keep identical copies,zero fill,barrier count129,stage protocol,and compute. Constrain producer lane arithmetic with bit masks valid for the existing complete128-thread role. Factor SW128/SW64 XOR terms from the row index, and compute physical offsets directly; enforce1024/512-byte alignment on the main/tail shared allocations. At this fixed geometry the existing offsets36864/167936 already satisfy those alignments, so padding/shared footprint should remain unchanged; verify compilation/runtime resources. Exhaustive host address algebra matches147456 byte addresses across both stages,all128 rows and576 channels. This proves the fixed-layout formulas,not GPU memory safety or performance. Compile/native counts and guarded/exact checks precede timing.
+
+
+### Vector-copy219–220 measured evidence
+
+v219 short: trtllm/native 1693.600us, cute-v219/native 1634.464us.
+
+NCU base/stable: gpu__time_duration.sum=2.785760 ms, launch__registers_per_thread=123 register/thread, launch__shared_mem_per_block_dynamic=194.920000 Kbyte/block, sm__warps_active.avg.pct_of_peak_sustained_active=19.358166 %, sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed=31.698247 %, smsp__warps_eligible.avg.per_cycle_active=0.336364 warp, smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio=6.956778 inst, l1tex__t_sectors_pipe_lsu_mem_local_op_ld.sum=0 sector, l1tex__t_sectors_pipe_lsu_mem_local_op_st.sum=0 sector, l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum=3,256,778 , l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum=5,291,391 .
+
+v220 short: trtllm/native 1691.840us, cute-v220/native 1736.928us.
+
+NCU base/stable: gpu__time_duration.sum=2.958272 ms, launch__registers_per_thread=128 register/thread, launch__shared_mem_per_block_dynamic=203.112000 Kbyte/block, sm__warps_active.avg.pct_of_peak_sustained_active=19.480619 %, sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed=44.129288 %, smsp__warps_eligible.avg.per_cycle_active=0.338610 warp, smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio=7.316874 inst, l1tex__t_sectors_pipe_lsu_mem_local_op_ld.sum=0 sector, l1tex__t_sectors_pipe_lsu_mem_local_op_st.sum=0 sector, l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum=3,902,472 , l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum=6,726,712 .
+
+v220 unlocked source issues796159074 instructions versus v197599875543 (+32.72%). LDGSTS alone accounts for18874368 issued copies,150994944 shared wavefronts versus75497472 ideal,and75497472 excessive. All measured excess is at these copy sites; other shared sites havezero excessive. This is a source-view access-pattern diagnostic,not the fraction of runtime or proof of a particular hardware banking mechanism. Retain opcode-level differences and investigate full128-byte row groups separately from address arithmetic. NVIDIA source-counter interpretation: https://forums.developer.nvidia.com/t/nsight-compute-h100-questions-on-l1-bank-conflict-statistic-discrepancies-between-details-and-source-pages/351780/3 . Earlier user reports also note that LDGSTS has stronger access-pattern/alignment requirements than separate LDG/STS,but do not establish our SM103 mechanism: https://forums.developer.nvidia.com/t/cp-async-introduces-bank-conflict-than-naive-ldg-and-sts-ptx/245066 .
+
+The largest positive opcode deltas in v220 are barrier-polling/control instructions: BRA+56,288,920,and PHASECHK,TRYWAIT,NANOSLEEP each+54,370,362. The total instruction increase therefore cannot be attributed entirely to address arithmetic; polling responds to the slower pipeline. Treat address and copy-access changes as hypotheses to measure,not an explanation already proven by the total.
+
+Address-factored v221/v222 compile with1288/1440 static instructions,123/128 registers andzero stack. Both pass guarded b2/b512 memory,b2 synchronization,full8192/seed1234 three-repeat exact comparison,and mask equivalence;v222 masked FP32 passes. No second-seed/short expansion yet.
+
+
+## Iterations223–224 — cover a full main-row panel with eight producer lanes
+
+Based on address-factored221/222. Change only the main512-channel copy assignment from four lanes per64-byte row slice to eight lanes per128-byte panel; split the64-byte tail into its own four-lane row loop. Keep36 per-thread16-byte copy sites per stage,all576 bytes,shared layout,zero fill,and the same asynchronous arrival protocol. This increases shared index reloads but tests a more contiguous128-byte access group at the sites exhibiting excessive wavefronts. Main rows have576-byte global stride,so odd physical rows remain64 bytes offset from a128-byte boundary; no claim that all LDGSTS excess will disappear. No repacking or preprocessing is added.
+
+Host coverage audit confirms all4608 distinct16-byte row/channel vectors are written once per stage. It does not establish GPU correctness or latency. Compile and guarded/exact checks are required before performance; inspect source metrics to separate access-pattern changes from timing.
+
+
+### Address-factored221–222 runtime
+
+v221 short: trtllm/native 1689.728us, cute-v221/native 1627.200us.
+
+NCU base/stable: gpu__time_duration.sum=2.779072 ms, launch__registers_per_thread=123 register/thread, launch__shared_mem_per_block_dynamic=194.920000 Kbyte/block, sm__warps_active.avg.pct_of_peak_sustained_active=19.357812 %, sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed=31.846940 %, smsp__warps_eligible.avg.per_cycle_active=0.281917 warp, smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio=7.647404 inst, l1tex__t_sectors_pipe_lsu_mem_local_op_ld.sum=0 sector, l1tex__t_sectors_pipe_lsu_mem_local_op_st.sum=0 sector, l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum=3,516,271 , l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum=5,394,720 .
+
+v222 short: trtllm/native 1691.776us, cute-v222/native 1720.672us.
+
+NCU base/stable: gpu__time_duration.sum=2.925152 ms, launch__registers_per_thread=128 register/thread, launch__shared_mem_per_block_dynamic=203.112000 Kbyte/block, sm__warps_active.avg.pct_of_peak_sustained_active=19.475290 %, sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed=44.642624 %, smsp__warps_eligible.avg.per_cycle_active=0.298745 warp, smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio=7.936412 inst, l1tex__t_sectors_pipe_lsu_mem_local_op_ld.sum=0 sector, l1tex__t_sectors_pipe_lsu_mem_local_op_st.sum=0 sector, l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum=3,770,476 , l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum=6,464,336 .
+
+The factored addresses lower short time by7.26/16.26us versus219/220,while remaining slower than defaults190/197. Shared memory stays194920/203112 bytes and local sectors stayzero. No promotion or second-seed/short expansion. The next row-group change targets the measured copy-site access pattern rather than another algebraic expression of the same addresses.
+
+
+### Full-row-group223–224 result
+
+Compiled1368/1528 static instructions,123/128 registers,zero stack. Guarded b2/b512 memory,b2 synchronization,full8192/seed1234 three-repeat exact comparison and masks pass;v224 masked FP32 passes. No second-seed/short-input numerical claim.
+
+v223 short: trtllm/native 1691.488us, cute-v223/native 1557.696us.
+
+NCU base/stable: gpu__time_duration.sum=2.655040 ms, launch__registers_per_thread=123 register/thread, launch__shared_mem_per_block_dynamic=194.920000 Kbyte/block, sm__warps_active.avg.pct_of_peak_sustained_active=19.315234 %, sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed=33.484704 %, smsp__warps_eligible.avg.per_cycle_active=0.333565 warp, smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio=6.628490 inst, l1tex__t_sectors_pipe_lsu_mem_local_op_ld.sum=0 sector, l1tex__t_sectors_pipe_lsu_mem_local_op_st.sum=0 sector, l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum=7,785,893 , l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum=5,511,872 .
+
+v224 short: trtllm/native 1693.408us, cute-v224/native 1674.176us.
+
+NCU base/stable: gpu__time_duration.sum=2.834688 ms, launch__registers_per_thread=128 register/thread, launch__shared_mem_per_block_dynamic=203.112000 Kbyte/block, sm__warps_active.avg.pct_of_peak_sustained_active=19.447791 %, sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed=45.878564 %, smsp__warps_eligible.avg.per_cycle_active=0.349507 warp, smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio=7.023454 inst, l1tex__t_sectors_pipe_lsu_mem_local_op_ld.sum=0 sector, l1tex__t_sectors_pipe_lsu_mem_local_op_st.sum=0 sector, l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum=9,439,219 , l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum=5,114,159 .
+
+The wider main-row assignment lowers short time by69.50/46.50us versus221/222,but1557.70/1674.18us still exceed defaults1549.06/1662.30us. No promotion. Unlocked v224 source issues740824758 instructions;shared actual148213144,ideal106258432,excessive41954712. LDGSTS issues18874368 copies with117452184 actual versus75497472 ideal wavefronts;all excess remains at those copy sites. This is44.43% less excess than v220,not a44.43% latency gain. Source counts confirm the access-group change helped,while TMA remains faster in the established short control.
+
+
+A CPU audit of the unchanged full1234 sparse indices finds8391526 odd physical token slots. With576-byte rows,these main128-byte copies start64 bytes into a128-byte sector group. The access-group prediction four main panels per odd token plusfour extra wavefronts for each tail warp-copy is8391526*4 + 8192*16*4*4*4 =41954712,exactly the measured v224 LDGSTS excessive count. This strongly supports a global/shared alignment and grouping explanation for this fixture;it is not an isolated latency measurement or a universal bank-conflict theorem. Existing TMA gathers avoid this vector-copy mapping constraint without repacking the canonical input.

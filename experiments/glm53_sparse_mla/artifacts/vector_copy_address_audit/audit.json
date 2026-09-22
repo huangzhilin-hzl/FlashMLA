@@ -1,0 +1,19 @@
+{
+  "purpose": "CPU address algebra only; does not establish runtime safety or latency",
+  "comparisons": 147456,
+  "equal": true,
+  "main": {
+    "base": 36864,
+    "stage_stride": 65536,
+    "alignment_required": 1024,
+    "raw": "base + panel*16384 + row*128 + column_within_panel",
+    "swizzle": "raw ^ ((raw >> 3) & 0x70)"
+  },
+  "tail": {
+    "base": 167936,
+    "stage_stride": 8192,
+    "alignment_required": 512,
+    "raw": "base + row*64 + column",
+    "swizzle": "raw ^ ((raw >> 3) & 0x30)"
+  }
+}
