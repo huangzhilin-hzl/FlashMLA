@@ -183,6 +183,12 @@ for directory in sorted(root.glob("v[0-9][0-9][0-9]")):
         status = "guarded checks/full seed1234/mask parent equivalence; KV-tail P reuse slower"
     if version == "v232":
         status = "guarded checks pass;9 full seed1234 failures,86 mask failures; single-buffer slower"
+    if version in ("v263", "v264"):
+        status = "guarded fixed/varlen and full/short/mask parent equivalence; index hint reduces total DRAM reads but no latency gain"
+    if version == "v262":
+        status = "guarded fixed/varlen and full/short/mask exact v197; strict grouped QK after loop control slower"
+    if version in ("v258", "v260"):
+        status = "guarded fixed/varlen and full/short/mask exact v190; grouped QK descriptors no latency gain"
     if version == "v257":
         status = "guarded fixed/varlen and full/short/mask exact v243; strict dual-score overlap slower than default"
     if version == "v256":

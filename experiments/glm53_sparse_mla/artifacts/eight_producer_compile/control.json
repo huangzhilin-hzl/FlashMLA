@@ -1,0 +1,22 @@
+{
+  "v265": {
+    "threads": 640,
+    "initial_registers": 96,
+    "donor": 48,
+    "compute": 168,
+    "register_pool": 61440,
+    "native_gather4_sites": 20,
+    "native_mma_sites": 34,
+    "local_spill": false
+  },
+  "v266": {
+    "threads": 640,
+    "initial_registers": 96,
+    "donor": 32,
+    "compute": 192,
+    "register_pool": 61440,
+    "native_gather4_sites": 20,
+    "native_mma_sites": 26,
+    "local_spill": false
+  }
+}

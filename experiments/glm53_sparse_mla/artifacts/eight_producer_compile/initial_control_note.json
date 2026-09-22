@@ -1,0 +1,6 @@
+{
+  "initial_assertion": "expected maxntid 640",
+  "observed": "reqntid 640, 1, 1",
+  "resolution": "check the emitted required thread count",
+  "candidate_launched_before_correction": false
+}

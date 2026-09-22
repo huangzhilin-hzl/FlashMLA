@@ -221,6 +221,11 @@ B300 physical GPU1; b8192, H64, D576/512, TopK2048, chunk3. Each row is a paired
 | v255 | 1546.34 | 1691.58 | 1.0939x | 123 | 0.00 / 0.00 | 33.54% | guarded fixed/varlen and full/short/mask exact v190; private index lookahead near default, no established gain |
 | v256 | 1550.62 | 1691.68 | 1.0910x | 123 | 0.00 / 0.00 | 33.44% | guarded fixed/varlen and full/short/mask exact v255; index issue after publication no default gain |
 | v257 | 1769.89 | 1689.76 | 0.9547x | 128 | 0.00 / 0.00 | 46.57% | guarded fixed/varlen and full/short/mask exact v243; strict dual-score overlap slower than default |
+| v258 | 1548.42 | 1691.23 | 1.0922x | 123 | 0.00 / 0.00 | 33.53% | guarded fixed/varlen and full/short/mask exact v190; grouped QK descriptors no latency gain |
+| v260 | 1549.15 | 1691.74 | 1.0920x | 123 | 0.00 / 0.00 | 33.49% | guarded fixed/varlen and full/short/mask exact v190; grouped QK descriptors no latency gain |
+| v262 | 1675.20 | 1691.81 | 1.0099x | 128 | 0.00 / 0.00 | 45.83% | guarded fixed/varlen and full/short/mask exact v197; strict grouped QK after loop control slower |
+| v263 | 1547.17 | 1689.92 | 1.0923x | 123 | 0.00 / 0.00 | 33.50% | guarded fixed/varlen and full/short/mask parent equivalence; index hint reduces total DRAM reads but no latency gain |
+| v264 | 1667.30 | 1691.84 | 1.0147x | 128 | 0.00 / 0.00 | 46.01% | guarded fixed/varlen and full/short/mask parent equivalence; index hint reduces total DRAM reads but no latency gain |
 
 Raw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. v090/v091/v094/v096/v097/v105/v108/v112/v125 have an observed sustained warm advantage in the extended eager-event, Graph and rotating-order runs, at baseline-level FP8 precision; v190 is the current fast path. Short five-event v125 tuning has a small observed advantage; v105 is near parity. Use the matching execution regime and retained distributions. v086 is near parity warm and its initial cold advantage does not reproduce in its rotating-order audit.
 

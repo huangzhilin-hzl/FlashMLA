@@ -1,0 +1,474 @@
+{
+  "v190": {
+    "dram__bytes_read.avg": {
+      "value": "22.300724",
+      "unit": "Mbyte"
+    },
+    "dram__bytes_read.max": {
+      "value": "24.659456",
+      "unit": "Mbyte"
+    },
+    "dram__bytes_read.min": {
+      "value": "9.203456",
+      "unit": "Mbyte"
+    },
+    "dram__bytes_read.sum": {
+      "value": "1.427246",
+      "unit": "Gbyte"
+    },
+    "dram__bytes_write.avg": {
+      "value": "8.220844",
+      "unit": "Mbyte"
+    },
+    "dram__bytes_write.max": {
+      "value": "8.801024",
+      "unit": "Mbyte"
+    },
+    "dram__bytes_write.min": {
+      "value": "4.274944",
+      "unit": "Mbyte"
+    },
+    "dram__bytes_write.sum": {
+      "value": "526.134016",
+      "unit": "Mbyte"
+    },
+    "gpu__time_duration.avg": {
+      "value": "1.544960",
+      "unit": "ms"
+    },
+    "gpu__time_duration.max": {
+      "value": "1.544960",
+      "unit": "ms"
+    },
+    "gpu__time_duration.min": {
+      "value": "1.544960",
+      "unit": "ms"
+    },
+    "gpu__time_duration.sum": {
+      "value": "1.544960",
+      "unit": "ms"
+    },
+    "lts__t_requests.avg": {
+      "value": "922622.706522",
+      "unit": "request"
+    },
+    "lts__t_requests.max": {
+      "value": "979940.000000",
+      "unit": "request"
+    },
+    "lts__t_requests.min": {
+      "value": "409475.000000",
+      "unit": "request"
+    },
+    "lts__t_requests.sum": {
+      "value": "169762578.000000",
+      "unit": "request"
+    },
+    "lts__t_sector_hit_rate.pct": {
+      "value": "76.670196",
+      "unit": "%"
+    },
+    "lts__t_sectors.avg": {
+      "value": "2166066.918478",
+      "unit": "sector"
+    },
+    "lts__t_sectors.max": {
+      "value": "2313627.000000",
+      "unit": "sector"
+    },
+    "lts__t_sectors.min": {
+      "value": "936484.000000",
+      "unit": "sector"
+    },
+    "lts__t_sectors.sum": {
+      "value": "398556313.000000",
+      "unit": "sector"
+    },
+    "lts__t_sectors_op_read.avg": {
+      "value": "2028577.864130",
+      "unit": "sector"
+    },
+    "lts__t_sectors_op_read.max": {
+      "value": "2171019.000000",
+      "unit": "sector"
+    },
+    "lts__t_sectors_op_read.min": {
+      "value": "867237.000000",
+      "unit": "sector"
+    },
+    "lts__t_sectors_op_read.sum": {
+      "value": "373258327.000000",
+      "unit": "sector"
+    },
+    "lts__t_sectors_op_write.avg": {
+      "value": "136786.016304",
+      "unit": "sector"
+    },
+    "lts__t_sectors_op_write.max": {
+      "value": "142338.000000",
+      "unit": "sector"
+    },
+    "lts__t_sectors_op_write.min": {
+      "value": "68832.000000",
+      "unit": "sector"
+    },
+    "lts__t_sectors_op_write.sum": {
+      "value": "25168627.000000",
+      "unit": "sector"
+    }
+  },
+  "v263": {
+    "dram__bytes_read.avg": {
+      "value": "21.581120",
+      "unit": "Mbyte"
+    },
+    "dram__bytes_read.max": {
+      "value": "23.857920",
+      "unit": "Mbyte"
+    },
+    "dram__bytes_read.min": {
+      "value": "8.951808",
+      "unit": "Mbyte"
+    },
+    "dram__bytes_read.sum": {
+      "value": "1.381192",
+      "unit": "Gbyte"
+    },
+    "dram__bytes_write.avg": {
+      "value": "8.220800",
+      "unit": "Mbyte"
+    },
+    "dram__bytes_write.max": {
+      "value": "8.801280",
+      "unit": "Mbyte"
+    },
+    "dram__bytes_write.min": {
+      "value": "4.270592",
+      "unit": "Mbyte"
+    },
+    "dram__bytes_write.sum": {
+      "value": "526.131200",
+      "unit": "Mbyte"
+    },
+    "gpu__time_duration.avg": {
+      "value": "1.545152",
+      "unit": "ms"
+    },
+    "gpu__time_duration.max": {
+      "value": "1.545152",
+      "unit": "ms"
+    },
+    "gpu__time_duration.min": {
+      "value": "1.545152",
+      "unit": "ms"
+    },
+    "gpu__time_duration.sum": {
+      "value": "1.545152",
+      "unit": "ms"
+    },
+    "lts__t_requests.avg": {
+      "value": "918610.891304",
+      "unit": "request"
+    },
+    "lts__t_requests.max": {
+      "value": "976110.000000",
+      "unit": "request"
+    },
+    "lts__t_requests.min": {
+      "value": "408700.000000",
+      "unit": "request"
+    },
+    "lts__t_requests.sum": {
+      "value": "169024404.000000",
+      "unit": "request"
+    },
+    "lts__t_sector_hit_rate.pct": {
+      "value": "77.280469",
+      "unit": "%"
+    },
+    "lts__t_sectors.avg": {
+      "value": "2154924.271739",
+      "unit": "sector"
+    },
+    "lts__t_sectors.max": {
+      "value": "2302467.000000",
+      "unit": "sector"
+    },
+    "lts__t_sectors.min": {
+      "value": "934927.000000",
+      "unit": "sector"
+    },
+    "lts__t_sectors.sum": {
+      "value": "396506066.000000",
+      "unit": "sector"
+    },
+    "lts__t_sectors_op_read.avg": {
+      "value": "2017466.690217",
+      "unit": "sector"
+    },
+    "lts__t_sectors_op_read.max": {
+      "value": "2159949.000000",
+      "unit": "sector"
+    },
+    "lts__t_sectors_op_read.min": {
+      "value": "865667.000000",
+      "unit": "sector"
+    },
+    "lts__t_sectors_op_read.sum": {
+      "value": "371213871.000000",
+      "unit": "sector"
+    },
+    "lts__t_sectors_op_write.avg": {
+      "value": "136787.885870",
+      "unit": "sector"
+    },
+    "lts__t_sectors_op_write.max": {
+      "value": "142818.000000",
+      "unit": "sector"
+    },
+    "lts__t_sectors_op_write.min": {
+      "value": "68864.000000",
+      "unit": "sector"
+    },
+    "lts__t_sectors_op_write.sum": {
+      "value": "25168971.000000",
+      "unit": "sector"
+    }
+  },
+  "v197": {
+    "dram__bytes_read.avg": {
+      "value": "24.420856",
+      "unit": "Mbyte"
+    },
+    "dram__bytes_read.max": {
+      "value": "27.106816",
+      "unit": "Mbyte"
+    },
+    "dram__bytes_read.min": {
+      "value": "9.995776",
+      "unit": "Mbyte"
+    },
+    "dram__bytes_read.sum": {
+      "value": "1.562935",
+      "unit": "Gbyte"
+    },
+    "dram__bytes_write.avg": {
+      "value": "8.251844",
+      "unit": "Mbyte"
+    },
+    "dram__bytes_write.max": {
+      "value": "8.827392",
+      "unit": "Mbyte"
+    },
+    "dram__bytes_write.min": {
+      "value": "4.315392",
+      "unit": "Mbyte"
+    },
+    "dram__bytes_write.sum": {
+      "value": "528.118016",
+      "unit": "Mbyte"
+    },
+    "gpu__time_duration.avg": {
+      "value": "1.655712",
+      "unit": "ms"
+    },
+    "gpu__time_duration.max": {
+      "value": "1.655712",
+      "unit": "ms"
+    },
+    "gpu__time_duration.min": {
+      "value": "1.655712",
+      "unit": "ms"
+    },
+    "gpu__time_duration.sum": {
+      "value": "1.655712",
+      "unit": "ms"
+    },
+    "lts__t_requests.avg": {
+      "value": "930637.961957",
+      "unit": "request"
+    },
+    "lts__t_requests.max": {
+      "value": "988120.000000",
+      "unit": "request"
+    },
+    "lts__t_requests.min": {
+      "value": "408874.000000",
+      "unit": "request"
+    },
+    "lts__t_requests.sum": {
+      "value": "171237385.000000",
+      "unit": "request"
+    },
+    "lts__t_sector_hit_rate.pct": {
+      "value": "75.095850",
+      "unit": "%"
+    },
+    "lts__t_sectors.avg": {
+      "value": "2198640.086957",
+      "unit": "sector"
+    },
+    "lts__t_sectors.max": {
+      "value": "2348213.000000",
+      "unit": "sector"
+    },
+    "lts__t_sectors.min": {
+      "value": "938320.000000",
+      "unit": "sector"
+    },
+    "lts__t_sectors.sum": {
+      "value": "404549776.000000",
+      "unit": "sector"
+    },
+    "lts__t_sectors_op_read.avg": {
+      "value": "2061006.266304",
+      "unit": "sector"
+    },
+    "lts__t_sectors_op_read.max": {
+      "value": "2205474.000000",
+      "unit": "sector"
+    },
+    "lts__t_sectors_op_read.min": {
+      "value": "869049.000000",
+      "unit": "sector"
+    },
+    "lts__t_sectors_op_read.sum": {
+      "value": "379225153.000000",
+      "unit": "sector"
+    },
+    "lts__t_sectors_op_write.avg": {
+      "value": "136772.179348",
+      "unit": "sector"
+    },
+    "lts__t_sectors_op_write.max": {
+      "value": "142304.000000",
+      "unit": "sector"
+    },
+    "lts__t_sectors_op_write.min": {
+      "value": "68768.000000",
+      "unit": "sector"
+    },
+    "lts__t_sectors_op_write.sum": {
+      "value": "25166081.000000",
+      "unit": "sector"
+    }
+  },
+  "v264": {
+    "dram__bytes_read.avg": {
+      "value": "23.726260",
+      "unit": "Mbyte"
+    },
+    "dram__bytes_read.max": {
+      "value": "26.333440",
+      "unit": "Mbyte"
+    },
+    "dram__bytes_read.min": {
+      "value": "9.724672",
+      "unit": "Mbyte"
+    },
+    "dram__bytes_read.sum": {
+      "value": "1.518481",
+      "unit": "Gbyte"
+    },
+    "dram__bytes_write.avg": {
+      "value": "8.228448",
+      "unit": "Mbyte"
+    },
+    "dram__bytes_write.max": {
+      "value": "8.806400",
+      "unit": "Mbyte"
+    },
+    "dram__bytes_write.min": {
+      "value": "4.300544",
+      "unit": "Mbyte"
+    },
+    "dram__bytes_write.sum": {
+      "value": "526.620672",
+      "unit": "Mbyte"
+    },
+    "gpu__time_duration.avg": {
+      "value": "1.662752",
+      "unit": "ms"
+    },
+    "gpu__time_duration.max": {
+      "value": "1.662752",
+      "unit": "ms"
+    },
+    "gpu__time_duration.min": {
+      "value": "1.662752",
+      "unit": "ms"
+    },
+    "gpu__time_duration.sum": {
+      "value": "1.662752",
+      "unit": "ms"
+    },
+    "lts__t_requests.avg": {
+      "value": "926984.885870",
+      "unit": "request"
+    },
+    "lts__t_requests.max": {
+      "value": "984489.000000",
+      "unit": "request"
+    },
+    "lts__t_requests.min": {
+      "value": "408553.000000",
+      "unit": "request"
+    },
+    "lts__t_requests.sum": {
+      "value": "170565219.000000",
+      "unit": "request"
+    },
+    "lts__t_sector_hit_rate.pct": {
+      "value": "75.626863",
+      "unit": "%"
+    },
+    "lts__t_sectors.avg": {
+      "value": "2188811.521739",
+      "unit": "sector"
+    },
+    "lts__t_sectors.max": {
+      "value": "2336945.000000",
+      "unit": "sector"
+    },
+    "lts__t_sectors.min": {
+      "value": "938594.000000",
+      "unit": "sector"
+    },
+    "lts__t_sectors.sum": {
+      "value": "402741320.000000",
+      "unit": "sector"
+    },
+    "lts__t_sectors_op_read.avg": {
+      "value": "2050732.288043",
+      "unit": "sector"
+    },
+    "lts__t_sectors_op_read.max": {
+      "value": "2193558.000000",
+      "unit": "sector"
+    },
+    "lts__t_sectors_op_read.min": {
+      "value": "869013.000000",
+      "unit": "sector"
+    },
+    "lts__t_sectors_op_read.sum": {
+      "value": "377334741.000000",
+      "unit": "sector"
+    },
+    "lts__t_sectors_op_write.avg": {
+      "value": "137043.603261",
+      "unit": "sector"
+    },
+    "lts__t_sectors_op_write.max": {
+      "value": "144867.000000",
+      "unit": "sector"
+    },
+    "lts__t_sectors_op_write.min": {
+      "value": "68704.000000",
+      "unit": "sector"
+    },
+    "lts__t_sectors_op_write.sum": {
+      "value": "25216023.000000",
+      "unit": "sector"
+    }
+  }
+}

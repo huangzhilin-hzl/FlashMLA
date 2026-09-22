@@ -1,0 +1,191 @@
+{
+  "configuration": {
+    "gpu": "NVIDIA B300 SXM6 AC",
+    "capability": [
+      10,
+      3
+    ],
+    "versions": {
+      "torch": "2.13.0+cu130",
+      "cuda": "13.0",
+      "flashinfer-python": "0.6.18",
+      "flash-mla": "not installed as a distribution",
+      "flashmla_source_revision": "unreported"
+    },
+    "args": {
+      "mode": "bench",
+      "backends": [
+        "trtllm",
+        "cute"
+      ],
+      "scope": "native",
+      "chunk": 3,
+      "rank": 0,
+      "seed": 1234,
+      "warmup_iters": 3,
+      "repeat_iters": 5,
+      "profile_iters": 20,
+      "timing": "cuda-event",
+      "cache": "warm",
+      "check_rows": 8,
+      "check_atol": 0.01,
+      "check_rtol": 0.05,
+      "trace_path": null,
+      "output_json": "artifacts/v262_full_event.json",
+      "with_stack": false
+    },
+    "workload": {
+      "local_tokens": 8192,
+      "cp": 4,
+      "context_len": 131072,
+      "heads": 64,
+      "qk_dim": 576,
+      "v_dim": 512,
+      "topk": 2048,
+      "page_size": 64,
+      "softmax_scale": 0.0625,
+      "bmm2_scale": 1.0,
+      "synthetic": true,
+      "enable_dcp": false
+    },
+    "tensors": {
+      "query": {
+        "shape": [
+          8192,
+          1,
+          64,
+          576
+        ],
+        "dtype": "torch.float8_e4m3fn",
+        "stride": [
+          36864,
+          36864,
+          576,
+          1
+        ]
+      },
+      "kv_cache": {
+        "shape": [
+          2048,
+          1,
+          64,
+          576
+        ],
+        "dtype": "torch.float8_e4m3fn",
+        "stride": [
+          36864,
+          36864,
+          576,
+          1
+        ]
+      },
+      "block_tables": {
+        "shape": [
+          8192,
+          1,
+          2048
+        ],
+        "dtype": "torch.int32",
+        "stride": [
+          2048,
+          2048,
+          1
+        ]
+      },
+      "seq_lens": {
+        "shape": [
+          8192
+        ],
+        "dtype": "torch.int32",
+        "stride": [
+          1
+        ]
+      }
+    },
+    "cases": {
+      "trtllm/native": "Q FP8 [4096,1,64,576]; KV FP8 [pages,1,64,576]; preallocated output",
+      "cute-v262/native": "FP8 Q/KV; preallocated BF16 output; block_k=128"
+    },
+    "candidate": {
+      "version": "v262",
+      "block_k": 128,
+      "file_sha256": "c0d1611b280cf2b7db02ad682819817f5c65c37f87de25360649e890cce12b0f",
+      "cutlass_dsl": "4.6.2",
+      "original_benchmark_sha256": "d843320fb5147a807135282a1b87bb4c247cdd7a6a16b9107d546c48c8a8fb66"
+    }
+  },
+  "correctness": {
+    "trtllm/native": {
+      "rows": [
+        0,
+        8191,
+        511,
+        512,
+        1170,
+        2340,
+        3510,
+        4680
+      ],
+      "max_abs": 0.00764106959104538,
+      "rmse": 0.0013537678169086576,
+      "relative_rmse": 0.015046226091400083,
+      "atol": 0.01,
+      "rtol": 0.05
+    },
+    "cute-v262/native": {
+      "rows": [
+        0,
+        8191,
+        511,
+        512,
+        1170,
+        2340,
+        3510,
+        4680
+      ],
+      "max_abs": 0.0018848180770874023,
+      "rmse": 0.00015578871534671634,
+      "relative_rmse": 0.0017314876334910113,
+      "atol": 0.01,
+      "rtol": 0.05
+    }
+  },
+  "benchmarks": [
+    {
+      "case": "trtllm/native",
+      "cache": "warm",
+      "timing": "cuda-event",
+      "mean_us": 1707.8207969665527,
+      "median_us": 1691.8079853057861,
+      "p05_us": 1691.1295890808105,
+      "p95_us": 1756.5952062606812,
+      "samples_us": [
+        1772.7680206298828,
+        1691.0079717636108,
+        1691.6160583496094,
+        1691.8079853057861,
+        1691.9039487838745
+      ],
+      "l2_flush_bytes": 0,
+      "speedup_vs_trtllm": 1.0
+    },
+    {
+      "case": "cute-v262/native",
+      "cache": "warm",
+      "timing": "cuda-event",
+      "mean_us": 1676.4991998672485,
+      "median_us": 1675.1999855041504,
+      "p05_us": 1672.326421737671,
+      "p95_us": 1683.7695837020874,
+      "samples_us": [
+        1685.6319904327393,
+        1672.0960140228271,
+        1675.1999855041504,
+        1673.248052597046,
+        1676.31995677948
+      ],
+      "l2_flush_bytes": 0,
+      "speedup_vs_trtllm": 1.009914040081989
+    }
+  ]
+}
