@@ -1,0 +1,9 @@
+{
+  "purpose": "Retention record for the reproducible synthetic intermediate-tensor capture; raw bytes remain on local disk and in the Pod.",
+  "file": "debug_tensors.pt",
+  "sha256": "3a4c388721c81ac40579285e5f75141d84b17e0d437b9ddaa5dd3515b483818f",
+  "remote_path": "/tmp/glm53_sparse_mla_dev/artifacts/v227_initial_failure/debug_tensors.pt",
+  "reproduction": "debug_intermediates.py in this directory captures benchmark_source.make_inputs(chunk=3, rank=0, seed=1234) with two query rows and a single64-key tile.",
+  "historical_commit_including_bytes": "4816ce1",
+  "current_tree_policy": "Keep generated binary diagnostic tensors outside tracked source. Published history is not rewritten. The original failing kernel source, diagnostic source and JSON statistics remain tracked."
+}

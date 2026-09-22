@@ -5,3 +5,4 @@ __pycache__/
 *.cubin
 compiler_envs/
 compiler_wheels/
+debug_tensors.pt
