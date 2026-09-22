@@ -1,0 +1,128 @@
+{
+  "v197": {
+    "FADD": {
+      "static_rows": 37,
+      "issued": 35700736.0,
+      "pred_on_threads": 1142423552.0
+    },
+    "FADD2": {
+      "static_rows": 32,
+      "issued": 33554432.0,
+      "pred_on_threads": 1073741824.0
+    },
+    "MOV": {
+      "static_rows": 38,
+      "issued": 8706722.0,
+      "pred_on_threads": 277853248.0
+    },
+    "R2UR": {
+      "static_rows": 66,
+      "issued": 21194680.0,
+      "pred_on_threads": 158136064.0
+    },
+    "UMOV": {
+      "static_rows": 217,
+      "issued": 76144640.0,
+      "pred_on_threads": 274227200.0
+    },
+    "UTCQMMA.WS": {
+      "static_rows": 34,
+      "issued": 4456448.0,
+      "pred_on_threads": 142606336.0
+    },
+    "BRX": {
+      "static_rows": 1,
+      "issued": 1048576.0,
+      "pred_on_threads": 33554432.0
+    },
+    "BAR.SYNC.DEFER_BLOCKING": {
+      "static_rows": 9,
+      "issued": 3997696.0,
+      "pred_on_threads": 127926272.0
+    }
+  },
+  "v207": {
+    "FADD": {
+      "static_rows": 5,
+      "issued": 2146304.0,
+      "pred_on_threads": 68681728.0
+    },
+    "FADD2": {
+      "static_rows": 15,
+      "issued": 15728640.0,
+      "pred_on_threads": 503316480.0
+    },
+    "MOV": {
+      "static_rows": 43,
+      "issued": 18402451.0,
+      "pred_on_threads": 588116576.0
+    },
+    "R2UR": {
+      "static_rows": 60,
+      "issued": 24245288.0,
+      "pred_on_threads": 255755520.0
+    },
+    "UMOV": {
+      "static_rows": 225,
+      "issued": 78692352.0,
+      "pred_on_threads": 257982464.0
+    },
+    "UTCQMMA.WS": {
+      "static_rows": 26,
+      "issued": 3407872.0,
+      "pred_on_threads": 109051904.0
+    },
+    "BRX": {
+      "static_rows": 1,
+      "issued": 1048576.0,
+      "pred_on_threads": 33554432.0
+    },
+    "BAR.SYNC.DEFER_BLOCKING": {
+      "static_rows": 8,
+      "issued": 2924544.0,
+      "pred_on_threads": 93585408.0
+    }
+  },
+  "v208": {
+    "FADD": {
+      "static_rows": 7,
+      "issued": 4243456.0,
+      "pred_on_threads": 135790592.0
+    },
+    "FADD2": {
+      "static_rows": 47,
+      "issued": 49283072.0,
+      "pred_on_threads": 1577058304.0
+    },
+    "MOV": {
+      "static_rows": 72,
+      "issued": 44389793.0,
+      "pred_on_threads": 1419711520.0
+    },
+    "R2UR": {
+      "static_rows": 66,
+      "issued": 21194680.0,
+      "pred_on_threads": 158136064.0
+    },
+    "UMOV": {
+      "static_rows": 217,
+      "issued": 76144640.0,
+      "pred_on_threads": 274227200.0
+    },
+    "UTCQMMA.WS": {
+      "static_rows": 34,
+      "issued": 4456448.0,
+      "pred_on_threads": 142606336.0
+    },
+    "BRX": {
+      "static_rows": 1,
+      "issued": 1048576.0,
+      "pred_on_threads": 33554432.0
+    },
+    "BAR.SYNC.DEFER_BLOCKING": {
+      "static_rows": 9,
+      "issued": 3997696.0,
+      "pred_on_threads": 127926272.0
+    }
+  }
+}

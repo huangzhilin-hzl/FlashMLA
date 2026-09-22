@@ -161,6 +161,10 @@ for directory in sorted(root.glob("v[0-9][0-9][0-9]")):
         status = "guarded/full seed1234/mask checks pass; maximal role budget no default gain"
     if version == "v202":
         status = "full2seeds/short/masks bitwise; cache hint mixed warm gain; validated alternative"
+    if version in ("v205", "v206"):
+        status = "full2seeds/short/masks bitwise; reciprocal handoff alternative; timing regime matters"
+    if version in ("v207", "v208"):
+        status = "guarded/full seed1234/mask checks pass; packed adjacent nodes slower"
     if version == "v142":
         status = "bitwise v138 full seed1234/mask; paired epilogue slower"
     if version == "v138":
@@ -223,7 +227,7 @@ if event_paths:
 round_paths = sorted(root.glob("*_round_robin/*_round_robin.json"))
 if round_paths:
     print("## Same-process rotating-order audits\n")
-    print("Ranges below are the minimum and maximum per-round medians or paired ratios, not confidence intervals.\n")
+    print("Ranges below are the minimum and maximum per-round medians or paired ratios, not confidence intervals. Historical audits here include nvidia-smi queries between cases; the endpoint control found roughly209ms idle gaps that change the operating regime. Future helper runs default to queries off. See ITERATIONS.md for the controls and original standalone timing.\n")
     print("| Audit | Candidate | Cache | Rounds | Candidate median range µs | Paired TRT/candidate range |")
     print("|---|---|---|---:|---:|---:|")
     for path in round_paths:

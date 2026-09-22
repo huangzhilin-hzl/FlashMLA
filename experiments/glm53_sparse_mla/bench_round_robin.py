@@ -22,8 +22,8 @@ parser.add_argument('--rounds', type=int, default=3)
 parser.add_argument('--check-rows', type=int, default=512)
 parser.add_argument('--warmup-iters', type=int, default=20)
 parser.add_argument('--repeat-iters', type=int, default=100)
-parser.add_argument('--endpoint-telemetry', choices=('on', 'off'), default='on',
-                    help='Disable nvidia-smi endpoint queries to test their inter-case idle gaps')
+parser.add_argument('--endpoint-telemetry', choices=('on', 'off'), default='off',
+                    help='Opt in to nvidia-smi queries; their idle gaps alter the operating regime')
 parser.add_argument('--output-json', required=True)
 args = parser.parse_args()
 source.LOCAL_TOKENS = 8192

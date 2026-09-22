@@ -486,4 +486,11 @@ separate. bench_with_telemetry.py records whole-case NVML samples without changi
 the source timing function or device settings; power/utilization are internally
 averaged and SM clocks are not Tensor Core boost-state measurements. The rotation
 helper now has --endpoint-telemetry off to isolate idle gaps from nvidia-smi calls;
-on remains the default for reproducibility of existing records.
+off is now the default after this control demonstrated that query-induced idle gaps change the operating regime; use on explicitly to reproduce historical records.
+
+
+Endpoint-query control: removing nvidia-smi calls between cases changes v197's
+warm rotation latency from roughly1.81ms to1.85ms. It still beats v191 in all12
+warm/cold comparisons with queries off. Earlier rotation numbers include these
+inter-case gaps. Future comparisons use --endpoint-telemetry off and no sampler
+unless explicitly labelled as diagnostics. The original benchmark is unchanged.

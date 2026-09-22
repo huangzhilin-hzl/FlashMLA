@@ -6044,3 +6044,114 @@ sampling=off cold trtllm/native: 1918.83 / 1918.80 / 1919.02us.
 sampling=off cold cute-v197/native: 1837.18 / 1839.10 / 1836.16us.
 
 The sampling-off warm runs now give v1971849.52–1851.58us versusTRT1925.22–1933.30us, all three wins, and retain cold wins. With sampling on, whole warm-case SM-clock medians areTRT1627–1635MHz andv1971702–1717MHz; both are predominantly power limited. The one-second power readings settle near1.09kW in later windows. This demonstrates warmup-dependent comparisons under unchanged kernel code; it does not replace the original20-warmup results or prove that all differences are clock-caused. Original script and local source copy both still hashd843320fb5147a807135282a1b87bb4c247cdd7a6a16b9107d546c48c8a8fb66.
+
+
+### Endpoint-query control — inter-case gaps materially change timings
+
+Endpoint queries on: same-cache inter-case host gaps median208.759ms, range202.790–407.253ms over32 gaps. These gaps lie outside source.measure_case and GPU events.
+
+endpoint=on warm trtllm/native: 1870.51 / 1874.05 / 1878.05 / 1874.06 / 1882.18 / 1884.46us.
+
+endpoint=on warm cute-v191/native: 1823.04 / 1824.46 / 1824.85 / 1824.69 / 1823.01 / 1832.05us.
+
+endpoint=on warm cute-v197/native: 1811.54 / 1810.58 / 1808.45 / 1808.29 / 1808.58 / 1824.88us.
+
+endpoint=on cold trtllm/native: 1859.57 / 1857.47 / 1859.60 / 1861.47 / 1858.11 / 1865.66us.
+
+endpoint=on cold cute-v191/native: 1822.98 / 1822.59 / 1822.70 / 1822.77 / 1822.40 / 1824.77us.
+
+endpoint=on cold cute-v197/native: 1802.90 / 1797.44 / 1798.27 / 1798.02 / 1814.53 / 1812.64us.
+
+Endpoint queries off: same-cache inter-case host gaps median0.213ms, range0.188–0.429ms over32 gaps. These gaps lie outside source.measure_case and GPU events.
+
+endpoint=off warm trtllm/native: 1871.87 / 1939.39 / 1937.58 / 1871.95 / 1956.00 / 1941.39us.
+
+endpoint=off warm cute-v191/native: 1878.06 / 1859.87 / 1859.62 / 1888.24 / 1861.09 / 1859.57us.
+
+endpoint=off warm cute-v197/native: 1851.49 / 1847.25 / 1847.71 / 1853.57 / 1848.06 / 1845.36us.
+
+endpoint=off cold trtllm/native: 1911.06 / 1916.94 / 1919.04 / 1914.75 / 1921.09 / 1908.72us.
+
+endpoint=off cold cute-v191/native: 1860.24 / 1858.61 / 1863.62 / 1861.66 / 1861.84 / 1858.96us.
+
+endpoint=off cold cute-v197/native: 1830.88 / 1832.18 / 1830.77 / 1829.01 / 1830.91 / 1832.50us.
+
+Two independent outer pairs reverse endpoint-mode order; each inner rotation uses three rounds,20 warmups and100 measured Graph calls, with the NVML sampler on in both modes. Removing nvidia-smi queries shifts v197 warm from approximately1.81ms to1.85ms and reduces its sampled SM clocks. v197 still beats v191 in all twelve warm/cold comparisons with endpoint queries off. The earlier promotion relative to v191 is supported, while the earlier absolute1.81ms rotation timings must be labelled as including query-induced inter-case gaps.
+
+Set bench_round_robin.py endpoint-telemetry default to off for future optimization comparisons; --endpoint-telemetry on reproduces the historical helper regime. This changes only the supplementary helper, not the user's benchmark or source.measure_case. Re-evaluate the small reciprocal candidates in a five-round, five-case rotation without endpoint queries and without the NVML sampler, as the former query gaps are larger than their measured candidate differences.
+
+
+## Iterations 207–208 — packed FP32 nodes of the unchanged denominator tree
+
+Based on current defaults v190/v197. Replace the first four levels of the32-value balanced denominator tree with add_packed_f32x2(rnd="rn",ftz=False), pairing two independent adjacent tree nodes per instruction. Keep the final scalar add and running-sum FMA unchanged. Each node still adds the same two operands in the same tree position; no reassociation, input specialization or tolerance change is intended.
+
+This requests15 packed adds plus one scalar instead of31 scalar adds. Register pairing/repacking may offset the saved ALU issue or raise pressure, so inspect actual SASS and spills before launch. The installed4.6.2 helper exposes explicit rounding/FTZ arguments. PTX8.6 introduced same-type add.f32x2 forSM100+, includingSM103: https://docs.nvidia.com/cuda/archive/13.0.0/parallel-thread-execution/index.html#floating-point-instructions-add . Guarded access/sync and exact full/masked equivalence precede timing; arithmetic source similarity is not treated as proof.
+
+
+### Reciprocal candidates without endpoint queries
+
+warm trtllm/native: 1868.00 / 1955.97 / 1957.97 / 1950.96 / 1954.11us.
+
+warm cute-v190/native: 1642.56 / 1642.98 / 1646.88 / 1644.83 / 1644.86us.
+
+warm cute-v205/native: 1640.69 / 1644.93 / 1644.90 / 1646.98 / 1642.86us.
+
+warm cute-v197/native: 1857.87 / 1861.68 / 1851.81 / 1841.55 / 1852.98us.
+
+warm cute-v206/native: 1853.73 / 1853.74 / 1849.63 / 1847.36 / 1851.66us.
+
+cold trtllm/native: 1908.70 / 1919.04 / 1918.85 / 1921.02 / 1919.98us.
+
+cold cute-v190/native: 1638.38 / 1636.93 / 1636.61 / 1640.24 / 1636.94us.
+
+cold cute-v205/native: 1636.14 / 1634.35 / 1638.45 / 1635.15 / 1634.58us.
+
+cold cute-v197/native: 1838.03 / 1840.96 / 1837.07 / 1838.24 / 1841.22us.
+
+cold cute-v206/native: 1830.70 / 1829.98 / 1828.98 / 1830.88 / 1841.23us.
+
+Five rounds rotate all five cases through every order position, with20 warmups/100 Graph repeats, no endpoint query and no NVML sampler. v205 wins3/5 warm and4/5 cold comparisons. v206 wins4/5 warm and4/5 cold, with the remaining cold result a0.016us near tie. Its warm loss is5.81us. The results justify expanded seed/short equivalence and original standalone timing before any default decision. They also confirm that the earlier query-gapped results do not predict all small candidate differences. No default change yet.
+
+
+### Reciprocal candidates expanded equivalence and standalone timing
+
+v205 cuda-event20/100: trtllm/native warm 1882.21us, cute-v205/native warm 1641.74us, trtllm/native cold 1914.94us, cute-v205/native cold 1641.49us.
+
+v205 cuda-graph20/100: trtllm/native warm 1867.68us, cute-v205/native warm 1646.02us, trtllm/native cold 1916.83us, cute-v205/native cold 1640.72us.
+
+v206 cuda-event20/100: trtllm/native warm 1880.10us, cute-v206/native warm 1812.67us, trtllm/native cold 1915.14us, cute-v206/native cold 1827.78us.
+
+v206 cuda-graph20/100: trtllm/native warm 1869.92us, cute-v206/native warm 1865.62us, trtllm/native cold 1915.92us, cute-v206/native cold 1835.22us.
+
+Both candidates match their parents on the second full seed5678 and1024-row chunk0/seed5678, three repeats each. Together with earlier full1234/masks they inherit the full audited precision scope. v206's standalone Graph warm1865.62us narrowly beats pairedTRT1869.92us, cold1835.22us beatsTRT1915.92us. This is encouraging relative to later v197 warm regressions, but warm timing is condition-sensitive and endpoint-off rotations retain one warm regression. Keep both as fully validated alternatives pending the new packed-sum comparison; defaults remain v190/v197.
+
+### Packed-sum compile details
+
+v207 reduces registers123→110 with STACK0, but total static instructions remain1448. Its scalarFADD35→5, FADD20→15 and MOV28→43 show that extra register moves can consume the arithmetic issue saving. v208 staysREG128/STACK0; scalarFADD37→7, FADD232→47, MOV38→72 and total1600→1640. Both keep four ELECT and the same MMA counts26/34. Actual timing and dynamic source counts, not the requested packed operation count, decide whether this is useful.
+
+
+## Iterations 209–210 — keep independent16-leaf trees in the packed lanes
+
+Based on current v190/v197. The previous adjacent-node pairing needs to regroup packed components at every reduction level. Instead, pair corresponding nodes from the first and last16 probabilities: packed lane0 reduces p[0:16], lane1 reduces p[16:32], each using the original balanced tree. The final scalar add joins these two roots in the original order. Each level consumes prior packed results without crossing their lanes, potentially reducing repacking moves while retaining exactly the same31 scalar additions and rounding structure.
+
+This remains15 packed adds and one scalar add; it changes which independent nodes share an instruction, not the arithmetic dependency graph. Initial probability layout/FP8 conversion may still force moves. Compile counts/resources and guarded/full/masked qualification precede timing. No numerical or performance conclusion is inherited from the source-level tree proof alone.
+
+
+### Iterations 207–208 runtime result — adjacent-node packing regresses
+
+v207 short: trtllm/native 1691.68us, cute-v207/native 1583.20us.
+
+v207 NCU base/stable: gpu__time_duration.sum=2.699872 ms, launch__registers_per_thread=110 register/thread, launch__shared_mem_per_block_dynamic=194.920000 Kbyte/block, sm__warps_active.avg.pct_of_peak_sustained_active=19.285379 %, sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed=32.774351 %, smsp__warps_eligible.avg.per_cycle_active=0.366384 warp, smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio=6.308334 inst, l1tex__t_sectors_pipe_lsu_mem_local_op_ld.sum=0 sector, l1tex__t_sectors_pipe_lsu_mem_local_op_st.sum=0 sector, l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum=6,228,333 , l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum=4,502,582 .
+
+v208 short: trtllm/native 1691.90us, cute-v208/native 1710.30us.
+
+v208 NCU base/stable: gpu__time_duration.sum=2.910688 ms, launch__registers_per_thread=128 register/thread, launch__shared_mem_per_block_dynamic=203.112000 Kbyte/block, sm__warps_active.avg.pct_of_peak_sustained_active=19.399432 %, sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed=44.707230 %, smsp__warps_eligible.avg.per_cycle_active=0.404229 warp, smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio=6.438198 inst, l1tex__t_sectors_pipe_lsu_mem_local_op_ld.sum=0 sector, l1tex__t_sectors_pipe_lsu_mem_local_op_st.sum=0 sector, l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum=7,032,042 , l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum=2,199,171 .
+
+Both pass guarded b2 smoke/b512 memcheck, b2 synccheck, full1234 three-repeat exact equivalence and masked equivalence; v208 also passes the masked FP32 reference. No second full seed or short-sequence equivalence is claimed. v2071583.20us is slower than v1901549.06us; v2081710.30us is slower than v1971662.30us and pairedTRT1691.90us. NCU local traffic remains zero, but tensor activity falls and diagnostic durations rise. The register reduction alone is not a gain. Extra repacking/control issue is a hypothesis supported by static SASS, with unlocked dynamic source results recorded below. v209/v210 test persistent half-tree pairing to avoid intermediate regrouping; defaults remain unchanged.
+
+
+### Packed adjacent-node dynamic source and half-tree compile
+
+Unlocked source totals:v207549667719 issued instructions, shared actual=ideal20275200 and zero excessive; v208644309881 issued instructions, shared actual=ideal28663808 and zero excessive. v208 is7.41% above its v197 parent's599875543 instruction record. v207 long/short-scoreboard samples63337/7084 and wait12697; v20870791/3117 and wait11024. These are sampled stall counts, not fractions of total latency. The separate opcode_audit.json quantifies actual issued arithmetic and moves; no exact v190 source capture is claimed for this control.
+
+v209 compilesREG109/STACK0,1424 static instructions, MOV29 versusv20743; v210REG128/STACK0,1616 instructions, MOV52 versusv20872. Both preserve15 new FADD2 operations and four ELECT sites. Their native code changes justify guarded/runtime qualification rather than treating this regrouping as a no-op.

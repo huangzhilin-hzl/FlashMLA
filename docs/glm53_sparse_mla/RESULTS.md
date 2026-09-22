@@ -178,6 +178,10 @@ B300 physical GPU1; b8192, H64, D576/512, TopK2048, chunk3. Each row is a paired
 | v200 | 1553.50 | 1691.62 | 1.0889x | 128 | 0.00 / 0.00 | 33.43% | guarded/full seed1234/mask checks pass; maximal role budget no default gain |
 | v201 | 1665.22 | 1692.22 | 1.0162x | 128 | 0.00 / 0.00 | 46.04% | guarded/full seed1234/mask checks pass; maximal role budget no default gain |
 | v202 | 1661.12 | 1691.46 | 1.0183x | 128 | 0.00 / 0.00 | 46.17% | full2seeds/short/masks bitwise; cache hint mixed warm gain; validated alternative |
+| v205 | 1548.54 | 1691.87 | 1.0926x | 123 | 0.00 / 0.00 | 33.54% | full2seeds/short/masks bitwise; reciprocal handoff alternative; timing regime matters |
+| v206 | 1661.12 | 1691.94 | 1.0186x | 128 | 0.00 / 0.00 | 46.18% | full2seeds/short/masks bitwise; reciprocal handoff alternative; timing regime matters |
+| v207 | 1583.20 | 1691.68 | 1.0685x | 110 | 0.00 / 0.00 | 32.77% | guarded/full seed1234/mask checks pass; packed adjacent nodes slower |
+| v208 | 1710.30 | 1691.90 | 0.9892x | 128 | 0.00 / 0.00 | 44.71% | guarded/full seed1234/mask checks pass; packed adjacent nodes slower |
 
 Raw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. v090/v091/v094/v096/v097/v105/v108/v112/v125 have an observed sustained warm advantage in the extended eager-event, Graph and rotating-order runs, at baseline-level FP8 precision; v190 is the current fast path. Short five-event v125 tuning has a small observed advantage; v105 is near parity. Use the matching execution regime and retained distributions. v086 is near parity warm and its initial cold advantage does not reproduce in its rotating-order audit.
 
@@ -339,7 +343,7 @@ These are separate warm/cold runs with 20 warmups and 100 repeats; sampled row c
 
 ## Same-process rotating-order audits
 
-Ranges below are the minimum and maximum per-round medians or paired ratios, not confidence intervals.
+Ranges below are the minimum and maximum per-round medians or paired ratios, not confidence intervals. Historical audits here include nvidia-smi queries between cases; the endpoint control found roughly209ms idle gaps that change the operating regime. Future helper runs default to queries off. See ITERATIONS.md for the controls and original standalone timing.
 
 | Audit | Candidate | Cache | Rounds | Candidate median range µs | Paired TRT/candidate range |
 |---|---|---|---:|---:|---:|
