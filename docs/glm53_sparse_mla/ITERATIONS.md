@@ -6824,3 +6824,15 @@ This gives index retrieval an independent gather-issuance interval before the ne
 
 
 v256 compiles with the same 123 registers, zero stack and 1464 static instructions as v255; no data-prefetch or local-memory sites appear. Native next-index LDG is now at 0x0bb0, after the second producer barrier at 0x0b90 and before elected gather issuance; the final producer barrier is at 0x1d00. This verifies the intended position survives lowering. Fresh guarded and numerical qualification follows before timing.
+
+
+v256 guarded b2/chunk3 smoke, b512/chunk0 memcheck and fixed/variable-length synccheck pass. Full8192/seed1234 and short1024/chunk0/seed5678 match v255 across three uninstrumented repeats, and masked outputs also match with 86 inherited tolerance failures. Short timing is 1550.624 us versus TRTLLM 1691.680 us, near the fast default and slightly slower than v255; no established gain or promotion. NCU base/stable: 2.643904 ms, 123 registers, 194920 B dynamic shared, 19.290308% occupancy, 33.440916% tensor activity, 0.369760 eligible warps/cycle, long-scoreboard ratio 6.357605, zero local traffic, aggregate shared conflicts 5760438/4461973. Source attribution completes the placement control; no second full seed or expanded long timing.
+
+
+v256 unlocked source issues 545411200 instructions versus v255's 543691755, about 0.32% more. Shared wavefronts remain 20275200 actual/ideal with zero excessive. Long-scoreboard samples total 62118, including compute PV 16858 and producer empty-stage wait 15586. The corrected load placement is real, but these measurements do not establish a throughput gain. Retain v190 as the fast default.
+
+## Iteration257 — apply dual-score overlap to the strict probability path
+
+Based on qualified strict v243, apply fast v252's two score regions, per-stage QK barriers, one elected issuer owner and P-ready/next-KV arbitration. Move the previous-PV wait after current high-probability conversion and before the first shared P store, and retain a final PV wait before the epilogue. Keep v243's high/residual arithmetic, high-then-residual shared stores, interleaved collector fill/lastuse PV order, 512-thread register policy and compute publication barrier unchanged. Hardware KV release is already present in v243.
+
+The strict path issues twice as many PV MMAs and has more scalar probability work. Its overlap tradeoff can differ from fast v252, which remains slower than the fast default. This is a distinct workload balance requiring measurement; no gain is inherited from intended scheduling. Do not apply the slower midpoint-arbitration or KV-prefetch controls. Compile first to inspect donor register pressure, then guarded fixed/variable-length checks and full/short/masked equivalence against strict v243 before timing.

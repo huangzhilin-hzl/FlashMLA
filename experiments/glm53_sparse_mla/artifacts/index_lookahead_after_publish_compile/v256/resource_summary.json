@@ -1,0 +1,21 @@
+{
+  "static_native_instructions": 1464,
+  "LDL": 0,
+  "STL": 0,
+  "prefetch_sites": 0,
+  "load_and_barrier_sites": [
+    "/*0440*/                   BAR.SYNC.DEFER_BLOCKING 0x0 ;",
+    "/*06e0*/                   LDG.E R13, desc[UR76][R8.64] ;",
+    "/*0790*/              @!P0 LDG.E R12, desc[UR76][R6.64+-0x400] ;",
+    "/*0b30*/                   BAR.SYNC.DEFER_BLOCKING 0x2, 0x80 ;",
+    "/*0b90*/                   BAR.SYNC.DEFER_BLOCKING 0x2, 0x80 ;",
+    "/*0bb0*/                   LDG.E R12, desc[UR76][R4.64] ;",
+    "/*1d00*/                   BAR.SYNC.DEFER_BLOCKING 0x2, 0x80 ;",
+    "/*1e50*/                   LDG.E R6, desc[UR76][R6.64] ;",
+    "/*2e30*/                   LDG.E R3, desc[UR76][R2.64] ;",
+    "/*3720*/                   BAR.SYNC.DEFER_BLOCKING 0x1, 0x100 ;",
+    "/*4540*/                   BAR.SYNC.DEFER_BLOCKING 0x1, 0x100 ;",
+    "/*4700*/                   BAR.SYNC.DEFER_BLOCKING 0x1, 0x100 ;",
+    "/*5180*/                   BAR.SYNC.DEFER_BLOCKING 0x1, 0x100 ;"
+  ]
+}
