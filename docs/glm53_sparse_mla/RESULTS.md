@@ -172,7 +172,7 @@ B300 physical GPU1; b8192, H64, D576/512, TopK2048, chunk3. Each row is a paired
 | v191 | 1691.84 | 1691.71 | 0.9999x | 122 | 0.00 / 0.00 | 45.21% | bitwise v184 full2seeds/short/masks; earlier higher precision |
 | v194 | 1560.77 | 1690.82 | 1.0833x | 128 | 0.00 / 0.00 | 33.29% | guarded checks/full seed1234/mask bits pass; register redistribution slower |
 | v195 | 1673.41 | 1691.71 | 1.0109x | 128 | 0.00 / 0.00 | 45.82% | full2seeds/short/masks bitwise; register redistribution gain, superseded |
-| v197 | 1662.30 | 1691.94 | 1.0178x | 128 | 0.00 / 0.00 | 46.15% | bitwise v184 full2seeds/short/masks; current higher precision |
+| v197 | 1662.30 | 1691.94 | 1.0178x | 128 | 0.00 / 0.00 | 46.15% | bitwise v184 full2seeds/short/masks; earlier higher precision |
 | v198 | 1573.95 | 1689.92 | 1.0737x | 128 | 0.00 / 0.00 | 33.08% | guarded checks/full seed1234/mask bits pass; native x64 no gain |
 | v199 | 1673.44 | 1691.78 | 1.0110x | 128 | 0.00 / 0.00 | 45.88% | guarded checks/full seed1234/mask bits pass; native x64 no gain |
 | v200 | 1553.50 | 1691.62 | 1.0889x | 128 | 0.00 / 0.00 | 33.43% | guarded/full seed1234/mask checks pass; maximal role budget no default gain |
@@ -230,6 +230,7 @@ B300 physical GPU1; b8192, H64, D576/512, TopK2048, chunk3. Each row is a paired
 | v266 | 1560.77 | 1691.78 | 1.0839x | 96 | 0.00 / 0.00 | 33.26% | bitwise parent full seed1234/short/masks; eight producers slower; not promoted |
 | v271 | 1541.70 | 1691.97 | 1.0975x | 128 | 2.79 / 1.10 | 33.68% | bitwise v190 full2seeds/short/masks; mixed paired gain; not promoted |
 | v272 | 1496.13 | 1693.70 | 1.1321x | 128 | 1.71 / 0.46 | 34.52% | bitwise v190 full2seeds/short/masks; current fast default; FP8 limits retained |
+| v273 | 1608.03 | 1691.74 | 1.0521x | 128 | 1.71 / 0.46 | 47.33% | bitwise v197 full2seeds/short/masks; current strict default |
 
 Raw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. v090/v091/v094/v096/v097/v105/v108/v112/v125 have an observed sustained warm advantage in the extended eager-event, Graph and rotating-order runs, at baseline-level FP8 precision; v272 is the current fast path. Short five-event v125 tuning has a small observed advantage; v105 is near parity. Use the matching execution regime and retained distributions. v086 is near parity warm and its initial cold advantage does not reproduce in its rotating-order audit.
 
@@ -243,6 +244,10 @@ These are separate warm/cold runs with 20 warmups and 100 repeats; sampled row c
 | v190 | 512 | cold | 1638.50 | 1915.82 | 1.1693x |
 | v272 | 512 | warm | 1615.52 | 1871.07 | 1.1582x |
 | v272 | 512 | cold | 1599.34 | 1914.91 | 1.1973x |
+| v197 | 512 | warm | 1881.23 | 1860.37 | 0.9889x |
+| v197 | 512 | cold | 1826.90 | 1894.53 | 1.0370x |
+| v273 | 512 | warm | 1847.39 | 1865.87 | 1.0100x |
+| v273 | 512 | cold | 1800.35 | 1900.59 | 1.0557x |
 | v013 | 64 | warm | 4482.27 | 1879.84 | 0.4194x |
 | v013 | 64 | cold | 4485.31 | 1896.74 | 0.4229x |
 | v016 | 64 | warm | 2997.23 | 1873.92 | 0.6252x |
@@ -344,6 +349,10 @@ These are separate warm/cold runs with 20 warmups and 100 repeats; sampled row c
 | v190 | 512 | cold | 1640.00 | 1911.01 | 1.1652x |
 | v272 | 512 | warm | 1605.81 | 1878.03 | 1.1695x |
 | v272 | 512 | cold | 1599.79 | 1916.83 | 1.1982x |
+| v197 | 512 | warm | 1816.72 | 1876.00 | 1.0326x |
+| v197 | 512 | cold | 1816.42 | 1901.23 | 1.0467x |
+| v273 | 512 | warm | 1783.78 | 1871.60 | 1.0492x |
+| v273 | 512 | cold | 1792.21 | 1915.46 | 1.0688x |
 | v090 | 512 | warm | 1859.63 | 1882.35 | 1.0122x |
 | v090 | 512 | cold | 1845.01 | 1919.04 | 1.0401x |
 | v091 | 512 | warm | 1852.51 | 1886.94 | 1.0186x |
@@ -409,6 +418,10 @@ Ranges below are the minimum and maximum per-round medians or paired ratios, not
 | query_reuse_round_robin | cute-v271/native | cold | 5 | 1634.38–1646.53 | 1.1654–1.1718x |
 | query_reuse_round_robin | cute-v272/native | warm | 5 | 1603.47–1613.89 | 1.1712–1.2222x |
 | query_reuse_round_robin | cute-v272/native | cold | 5 | 1601.57–1603.58 | 1.1952–1.1992x |
+| strict_query_round_robin | cute-v197/native | warm | 5 | 1845.54–1867.89 | 1.0005–1.0487x |
+| strict_query_round_robin | cute-v197/native | cold | 5 | 1828.86–1832.98 | 1.0401–1.0461x |
+| strict_query_round_robin | cute-v273/native | warm | 5 | 1825.04–1832.48 | 1.0230–1.0624x |
+| strict_query_round_robin | cute-v273/native | cold | 5 | 1792.22–1794.29 | 1.0604–1.0675x |
 | v075_v098_round_robin | cute-v075/native | warm | 3 | 2043.94–2046.66 | 0.9143–0.9177x |
 | v075_v098_round_robin | cute-v075/native | cold | 3 | 2047.81–2048.03 | 0.9091–0.9119x |
 | v075_v098_round_robin | cute-v098/native | warm | 3 | 2005.14–2013.14 | 0.9320–0.9347x |

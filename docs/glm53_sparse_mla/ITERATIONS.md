@@ -7019,3 +7019,35 @@ v272 unlocked SourceCounters records523390320 instructions,20210996 actual/ideal
 
 
 v273 compiles with128 initial registers,8 stack bytes and1672 static native instructions. There are34 MMA sites, two commits,16 LDL/6 STL sites and two UR/R spill/fill pairs. PTX/native control confirms512 threads, donor64/compute176 and initial65536 versus final61440 register pool. Entry local stores again capture scalar shared-address/query state. Under the explicit bounded scalar-spill policy used for v271, proceed to guarded and strict-parent qualification; no runtime or precision claim yet.
+
+
+v273 passes guarded b2 smoke, b512/chunk0 memcheck, fixed/variable-length synccheck and b513/chunk0 guarded all-output equivalence with zero sanitizer errors. Three full8192/seed1234 and short1024/chunk0/seed5678 repeats match strict v197 bitwise. Masked outputs match and pass the original FP32 tolerance. No second full seed yet. Short timing and NCU follow before deciding on extended performance qualification.
+
+
+## Iterations274–275 — persistent grid size and scheduling balance
+
+Based independently on promoted fast v272, change only the maximum grid/query stride from148 to296 (v274) or592 (v275) CTAs. On the8192-row fixture, CTAs process at most28 or14 queries instead of56. This creates more scheduling opportunities across148 SMs while still amortizing allocation/setup over many queries. Storage, register policy, per-query math, sparse order and all barriers/phases remain unchanged. This does not allow two CTAs to be resident in the same shared/TMEM allocation; additional CTAs wait until a slot is freed.
+
+The hypothesis is a tradeoff between less persistent scheduling imbalance and increased setup cost. The losing/mixed two-query v271 already bounds one end of this tradeoff; the intermediate horizons are unmeasured. Query scheduling also changes cache behavior, so any result cannot be attributed solely to load balance. Static partition coverage includes small/odd batches, but fresh guarded and numerical checks remain necessary after offline resource inspection.
+
+
+v273 short timing is approximately1608.03 us versus TRTLLM1691.74 us, about3.3% below v197's historical1662.30 us. NCU base/stable: 2.744384 ms,128 initial registers,203112 B dynamic shared,20.299994% occupancy,47.332865% tensor activity,0.392394 eligible warps/cycle,long-scoreboard ratio7.182793,local read/write sectors1711424/463060 and aggregate shared conflicts7406249/3483649. The short gain warrants a second full seed and original/rotating endpoint-OFF extended timing against v197 before any strict-default promotion.
+
+
+v273 full8192/seed5678 matches v197 bitwise across three repeats, completing full2seed/short/mask exact equivalence. This preserves the strict parent's audited tolerance result on those fixtures. Extended endpoint-OFF and standalone eager/Graph comparisons are still pending; v197 remains the strict default until those complete.
+
+
+v273 unlocked source issues575145562 instructions versus v197's599875543 (about4.12% fewer). Actual/ideal shared wavefronts are28599604 with zero excessive. Long-scoreboard samples total70448, including PV24341, producer empty17790 and QK14132. As with earlier comparisons, dynamic instruction totals include polling; these counters alone cannot attribute the speedup to fewer useful arithmetic operations. Retain opcode deltas separately.
+
+
+Five endpoint-OFF strict Graph round pairs all favor v273. Warm1825.040–1832.480 us versus paired v1971845.536–1867.888 us gives parent/candidate1.009264–1.022492; cold1792.224–1794.288 us versus1828.864–1832.976 us gives1.019441–1.021717. Paired TRT warm medians1868.848–1938.880 us and cold1902.400–1914.896 us. All512-row checks pass. The improvement is smaller than the initial short-run difference; original standalone20/100 eager/Graph remains before promotion.
+
+
+v273 standalone original20/100 eager warm/cold is1783.775985/1792.208016 us versus paired TRT1871.600032/1915.455997 us. The matching v197 audit gives1816.720009/1816.416025 us versus1875.999987/1901.232004 us. Graph v273 is1847.391963/1800.351977 us versus1865.872025/1900.591969 us; v197 is1881.232023/1826.896012 us versus1860.367954/1894.527972 us. All512-row checks pass. The standalone strict warm margin against TRT remains small and operating-condition dependent; do not combine these medians with another timing regime.
+
+Promote v273 as the experimental strict default after guarded fixed/variable/odd-batch checks, exact full2seed/short/mask equivalence, ten favorable endpoint-OFF round pairs and favorable original standalone eager/Graph comparisons. Current documented defaults are fast v272 and strict v273 on CuTeDSL4.6.2. Retain v190/v197 as established predecessors and all benchmark sources unchanged.
+
+v273 opcode deltas versus v197 include approximately11.63 million fewer combined barrier polling/sleep issues and2.95 million fewer branches. Uniform integer additions decline11.42 million while vector integer additions rise5.71 million, with other address/control changes. Thus the24.73-million total reduction includes less polling and changed control allocation rather than reduced mathematical work.
+
+
+v274/v275 offline resources match v272:128 initial registers,8 stack bytes,1560 static instructions,26 MMA sites,two commits and16 LDL/6 STL sites. PTX/native checks confirm512 threads and donor64/compute192. AST comparison differs only in version label and the four grid-limit constants; source query partition covers small/odd/full batches. Qualify each candidate against v272. For v275, use guarded variable-length b1024 and odd b1025 so some CTAs cross query boundaries despite the592-CTA grid; b512 alone would not cover persistence there.

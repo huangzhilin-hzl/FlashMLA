@@ -154,7 +154,7 @@ for directory in sorted(root.glob("v[0-9][0-9][0-9]")):
     if version == "v195":
         status = "full2seeds/short/masks bitwise; register redistribution gain, superseded"
     if version == "v197":
-        status = "bitwise v184 full2seeds/short/masks; current higher precision"
+        status = "bitwise v184 full2seeds/short/masks; earlier higher precision"
     if version in ("v198", "v199"):
         status = "guarded checks/full seed1234/mask bits pass; native x64 no gain"
     if version in ("v200", "v201"):
@@ -183,6 +183,8 @@ for directory in sorted(root.glob("v[0-9][0-9][0-9]")):
         status = "guarded checks/full seed1234/mask parent equivalence; KV-tail P reuse slower"
     if version == "v232":
         status = "guarded checks pass;9 full seed1234 failures,86 mask failures; single-buffer slower"
+    if version == "v273":
+        status = "bitwise v197 full2seeds/short/masks; current strict default"
     if version == "v272":
         status = "bitwise v190 full2seeds/short/masks; current fast default; FP8 limits retained"
     if version == "v271":
