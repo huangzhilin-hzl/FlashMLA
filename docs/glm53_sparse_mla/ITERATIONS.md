@@ -5192,3 +5192,105 @@ The full-word path is being selected as intended; source-level branch bypass
 has lowered to predication and retained issue work. This further separates
 correct branch selection from the additional issuer/control overhead visible
 in the dynamic counts.
+
+
+### Iterations 169–170 compile control — outer lane selection is insufficient
+
+REG109/STACK0 andREG107/STACK0 remain. Explicit lane0 removes only two outer
+ELECT instructions (34→32,42→40); BRA.U.ANY counts remain28/36 and the per-MMA
+control sequences persist. The proposal fails its intended compiler mechanism,
+so reject before runtime benchmarking. No timing or output-equivalence result
+is claimed for these compile-only variants.
+
+## Iterations 171–172 — expose invariant MMA operands
+
+Based on v163/v164, mark the MMA destination, accumulator predicate, and both
+64-bit shared descriptors warp invariant. Preserve descriptors by applying the
+32-bit make_warp_uniform hint separately to their low/high words and reassembling
+them; passing64-bit descriptors directly to this32-bit API would truncate them.
+The invariant follows from each issuer warp's shared query/stage pointers and
+uniform loop indices; operands do not depend on lane IDs or which lane is elected.
+Only the elected thread executes the same MMA, as before.
+
+This directly tests operand uniformity behind the observed per-MMA election
+loops, after the bitmap hint and explicit issuer lane controls failed. Compile
+and compare actual opcode/control lowering first. If unchanged, stop before
+redundant GPU trials; if changed, use the existing512-column guarded protocol,
+full/masked equivalence and paired timing. Baselines:v163/v164. The hint supplies
+a proven precondition, not a runtime repair for nonuniform data.
+
+
+### Iterations 171–172 — rejected: full-warp shuffle inside elected region
+
+Offline compilation changes the intended control sequences: BRA.U.ANY falls to
+zero and ELECT to8, at REG109/STACK0 andREG103/STACK0. However v171's guarded
+b2 smoke reaches the configuration print (after compilation), then times out
+after90 seconds without correctness output. GPU1 returns to0 utilization and
+0 MiB after the timeout; no reset or other process operation was used.
+
+PTX inspection identifies a correctness flaw in this proposal: make_warp_uniform
+lowers to shfl.sync.idx.b32 with membermask -1, placed after elect.sync's
+non-elected-thread branch. Only the elected lane reaches the shuffle while all
+32 lanes are named. The operand being mathematically invariant does not satisfy
+the collective's participation contract. The hypothesis text above incorrectly
+treated this operation as a non-executing hint. Reject v171; v172 shares this
+structural flaw and is not launched. No timing or equivalence is claimed.
+
+Reference: [PTX shfl.sync](https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#data-movement-and-conversion-instructions-shfl-sync)
+specifies that named non-exited lanes must participate.
+
+## Iterations 173–174 — broadcast invariant roots with all issuer lanes active
+
+Start from v163/v164, removing the invalid per-MMA helper approach. Broadcast
+only the retrieved TMEM address and nvalid once, in the full32-lane issuer
+region before any elect_one. The pointer is reconstructed in TMEM address
+space with its original16-byte alignment. All issuer lanes load the same
+allocation slot and per-query sequence length. Descriptors, math and completion
+commits remain unchanged; only the elected lane issues each MMA.
+
+This tests whether marking the common input roots can avoid the per-MMA
+control sequence without putting collectives in single-lane code. Inspect
+PTX placement/SASS first, then guarded smoke, qualified sanitizer and equivalence
+only if the compile result is useful. No performance claim before measurements.
+
+
+### Iterations 173–174 result — root broadcasts compile away
+
+Instruction encoding words are exactly identical to v163/v164, respectively.
+REG109/107 and zero stack remain, as do the28/36 BRA.U.ANY instructions.
+Skip runtime because this adds no executable change and cannot resolve the
+observed regression.
+
+## Iterations 175–176 — construct uniform operands before per-MMA election
+
+Based on v171/v172's operand broadcasts, fix collective participation by moving
+the elected region into mma_ws, after descriptor/destination/accumulator
+broadcasts. All32 issuer lanes execute each broadcast; one elected lane issues
+each MMA. The two completion commits retain separate elect_one regions. The
+QK/PV operand order, collector policy, barriers and masks are unchanged.
+
+This is a bounded compiler-control experiment: it may add shuffle or election
+overhead even if it removes the more expensive per-MMA fallback loops. Inspect
+PTX to ensure each full-mask shuffle precedes election, then guarded qualification
+and exact equivalence before paired timing. It is not a proposed default yet.
+
+
+### Iterations 175–176 result — per-operation collectives do not fix lowering
+
+REG109/98, zero stack. The two variants retain34/42 ELECT and28/36 BRA.U.ANY,
+with6/11 SHFL.IDX added. They fail the targeted removal of per-MMA control loops.
+No GPU launch, correctness or performance claim; skip runtime. The lower
+register count of v176 alone does not justify promotion.
+
+## Iterations 177–178 — express producer/issuer/compute roles by uniform warp ID
+
+Based on v163/v164. Replace role comparisons on thread ID with equivalent
+comparisons on warp ID: producer warps8–11, issuer warp12, compute warps0–7.
+The launch has exactly416 threads, so no partial warp or extra role exists.
+Make the warp ID uniform before any role/election branch, with all32 lanes
+participating. Intra-role thread indexing and all math/memory operations remain
+unchanged.
+
+Earlier operand hints did not resolve the per-MMA election fallback. This tests
+control uniformity at the common role split instead of only data uniformity
+inside an already divergent region. Compare SASS and PTX before qualification.

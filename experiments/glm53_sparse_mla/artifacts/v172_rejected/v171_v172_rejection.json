@@ -1,0 +1,16 @@
+{
+  "v171": {
+    "status": "rejected",
+    "phase": "guarded b2 smoke",
+    "timeout_seconds": 90,
+    "exit_code": 124,
+    "configuration_printed_after_compilation": true,
+    "correctness_result": false,
+    "gpu_idle_after_timeout": true,
+    "reason": "Full-warp shfl.sync inserted after elected-lane branch"
+  },
+  "v172": {
+    "status": "rejected without device launch",
+    "reason": "Same invalid full-warp collective in elected-lane region"
+  }
+}

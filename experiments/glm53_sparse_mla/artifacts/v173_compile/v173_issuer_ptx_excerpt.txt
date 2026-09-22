@@ -1,0 +1,156 @@
+	// end inline asm
+	add.s32 	%r1297, %r1305, 169728;
+	// begin inline asm
+	cp.async.bulk.tensor.2d.shared::cta.global.tile::gather4.mbarrier::complete_tx::bytes.cta_group::1 [%r1297], [%rd408, {%r1222, %r1291, %r1292, %r1293, %r1294}], [%r1223];
+	// end inline asm
+$L__BB0_22:
+	bar.sync 	2, 128;
+	add.s32 	%r1306, %r1311, 1;
+	setp.eq.b32 	%p78, %r1306, 2;
+	selp.b32 	%r1311, 0, %r1306, %p78;
+	selp.b32 	%r1307, 1, 0, %p78;
+	add.s32 	%r1310, %r1310, %r1307;
+	add.s32 	%r1312, %r1312, 1;
+	add.s32 	%r1309, %r1309, 1;
+	setp.eq.b32 	%p79, %r1309, 0;
+	add.s64 	%rd410, %rd410, 512;
+	add.s32 	%r1308, %r1308, 128;
+	@%p79 bra 	$L__BB0_44;
+	bra.uni 	$L__BB0_10;
+$L__BB0_23:
+	setp.lt.u32 	%p7, %r5, 384;
+	@%p7 bra 	$L__BB0_31;
+	ld.shared.b32 	%r1092, [%r8];
+	shfl.sync.idx.b32 	%r1178, %r1092, 0, 31, -1;
+	// begin inline asm
+	{
+	.reg .pred       P1; 
+	LAB_WAIT: 
+	mbarrier.try_wait.parity.shared.b64 P1, [%r4], 0, 10000000; 
+	@P1 bra.uni DONE; 
+	bra.uni     LAB_WAIT; 
+	DONE: 
+	}
+	// end inline asm
+	mul.wide.u32 	%rd344, %r6, 4;
+	add.s64 	%rd345, %rd2, %rd344;
+	ld.global.b32 	%r1093, [%rd345];
+	shfl.sync.idx.b32 	%r1094, %r1093, 0, 31, -1;
+	shr.s32 	%r1095, %r1094, 31;
+	shr.u32 	%r1096, %r1095, 25;
+	add.s32 	%r1097, %r1094, %r1096;
+	shr.s32 	%r1098, %r1097, 7;
+	and.b32 	%r1099, %r1097, -128;
+	setp.ne.b32 	%p54, %r1094, %r1099;
+	setp.gt.s32 	%p55, %r1094, -1;
+	and.pred 	%p56, %p55, %p54;
+	selp.b32 	%r1100, 1, 0, %p56;
+	add.s32 	%r22, %r1098, %r1100;
+	setp.lt.s32 	%p57, %r22, 1;
+	@%p57 bra 	$L__BB0_44;
+	add.s32 	%r1147, %r1178, 256;
+	shr.u32 	%r1101, %r46, 4;
+	and.b32 	%r1102, %r1101, 16383;
+	cvt.u64.u32 	%rd346, %r1102;
+	or.b64 	%rd349, %rd346, 4611756662049538048;
+	mov.b64 	{%r1103, %r1104}, %rd349;
+	shr.u32 	%r1105, %r9, 4;
+	and.b32 	%r1106, %r1105, 16383;
+	cvt.u64.u32 	%rd347, %r1106;
+	or.b64 	%rd381, %rd347, -9223301530671579136;
+	mov.b64 	{%r1107, %r1108}, %rd381;
+	add.s32 	%r1109, %r46, 184320;
+	shr.u32 	%r1110, %r1109, 4;
+	and.b32 	%r1111, %r1110, 16383;
+	cvt.u64.u32 	%rd348, %r1111;
+	or.b64 	%rd387, %rd348, -9223301530671579136;
+	mov.b64 	{%r1112, %r1113}, %rd387;
+	add.s32 	%r1114, %r1103, 2;
+	mov.b64 	%rd351, {%r1114, %r1104};
+	add.s32 	%r1115, %r1103, 4;
+	mov.b64 	%rd353, {%r1115, %r1104};
+	add.s32 	%r1116, %r1103, 6;
+	mov.b64 	%rd355, {%r1116, %r1104};
+	add.s32 	%r1117, %r1103, 512;
+	mov.b64 	%rd357, {%r1117, %r1104};
+	add.s32 	%r1118, %r1103, 514;
+	mov.b64 	%rd359, {%r1118, %r1104};
+	add.s32 	%r1119, %r1103, 516;
+	mov.b64 	%rd361, {%r1119, %r1104};
+	add.s32 	%r1120, %r1103, 518;
+	mov.b64 	%rd363, {%r1120, %r1104};
+	add.s32 	%r1121, %r1103, 1024;
+	mov.b64 	%rd365, {%r1121, %r1104};
+	add.s32 	%r1122, %r1103, 1026;
+	mov.b64 	%rd367, {%r1122, %r1104};
+	add.s32 	%r1123, %r1103, 1028;
+	mov.b64 	%rd369, {%r1123, %r1104};
+	add.s32 	%r1124, %r1103, 1030;
+	mov.b64 	%rd371, {%r1124, %r1104};
+	add.s32 	%r1125, %r1103, 1536;
+	mov.b64 	%rd373, {%r1125, %r1104};
+	add.s32 	%r1126, %r1103, 1538;
+	mov.b64 	%rd375, {%r1126, %r1104};
+	add.s32 	%r1127, %r1103, 1540;
+	mov.b64 	%rd377, {%r1127, %r1104};
+	add.s32 	%r1128, %r1103, 1542;
+	mov.b64 	%rd379, {%r1128, %r1104};
+	add.s32 	%r1129, %r1107, 2;
+	mov.b64 	%rd383, {%r1129, %r1108};
+	add.s32 	%r1130, %r1112, 2;
+	mov.b64 	%rd389, {%r1130, %r1113};
+	add.s32 	%r1131, %r1112, 256;
+	mov.b64 	%rd391, {%r1131, %r1113};
+	add.s32 	%r1132, %r1112, 258;
+	mov.b64 	%rd393, {%r1132, %r1113};
+	add.s32 	%r1182, %r1178, 128;
+	neg.s32 	%r1314, %r22;
+	mov.b32 	%r1315, 0;
+	mov.b32 	%r1316, %r1315;
+	mov.b32 	%r1317, %r1315;
+$L__BB0_26:
+	and.b32 	%r1176, %r1317, 1;
+	shl.b32 	%r1135, %r1317, 3;
+	and.b32 	%r1136, %r1135, 8;
+	add.s32 	%r1137, %r46, %r1136;
+	add.s32 	%r1133, %r1137, 194888;
+	shr.u32 	%r1138, %r1315, 31;
+	add.s32 	%r1139, %r1315, %r1138;
+	and.b32 	%r1140, %r1139, -2;
+	sub.s32 	%r1134, %r1315, %r1140;
+	// begin inline asm
+	{
+	.reg .pred       P1; 
+	LAB_WAIT: 
+	mbarrier.try_wait.parity.shared.b64 P1, [%r1133], %r1134, 10000000; 
+	@P1 bra.uni DONE; 
+	bra.uni     LAB_WAIT; 
+	DONE: 
+	}
+	// end inline asm
+	tcgen05.fence::after_thread_sync;
+	fence.proxy.async.shared::cta;
+	shl.b32 	%r1141, %r1317, 16;
+	and.b32 	%r1142, %r1141, 65536;
+	add.s32 	%r1143, %r46, %r1142;
+	add.s32 	%r23, %r1143, 36864;
+	shl.b32 	%r1144, %r1317, 13;
+	and.b32 	%r1145, %r1144, 8192;
+	add.s32 	%r24, %r46, %r1145;
+	elect.sync 	%r1146|%p58, -1;
+	not.pred 	%p59, %p58;
+	@%p59 bra 	$L__BB0_28;
+	shr.u32 	%r1151, %r23, 4;
+	and.b32 	%r1152, %r1151, 16383;
+	cvt.u64.u32 	%rd385, %r1152;
+	or.b64 	%rd350, %rd385, 4611756662049538048;
+	mov.b64 	{%r1153, %r1154}, %rd350;
+	mov.b32 	%r1148, 69206032;
+	mov.b32 	%r1149, 0;
+	// begin inline asm
+	{ .reg .pred p; setp.ne.u32 p, %r1149, 0; tcgen05.mma.ws.cta_group::1.kind::f8f6f4 [%r1147], %rd349, %rd350, %r1148, p; }
+	// end inline asm
+	add.s32 	%r1155, %r1153, 2;
+	mov.b64 	%rd352, {%r1155, %r1154};
+	mov.b32 	%r1150, 1;
+	// begin inline asm

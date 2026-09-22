@@ -1,0 +1,28 @@
+{
+  "v171": {
+    "baseline": "v163",
+    "identical_encoding_words": false,
+    "counts": {
+      "BSSY.RECONVERGENT": 6,
+      "BSYNC.RECONVERGENT": 6,
+      "ELECT": 8,
+      "BSSY": 11,
+      "BSYNC": 11,
+      "UTCQMMA.WS": 50,
+      "LDTM.STAT.x32.MAX.F32.NAN": 1
+    }
+  },
+  "v172": {
+    "baseline": "v164",
+    "identical_encoding_words": false,
+    "counts": {
+      "BSSY.RECONVERGENT": 6,
+      "BSYNC.RECONVERGENT": 6,
+      "ELECT": 8,
+      "BSSY": 11,
+      "BSYNC": 11,
+      "UTCQMMA.WS": 66,
+      "LDTM.STAT.x32.MAX.F32.NAN": 1
+    }
+  }
+}

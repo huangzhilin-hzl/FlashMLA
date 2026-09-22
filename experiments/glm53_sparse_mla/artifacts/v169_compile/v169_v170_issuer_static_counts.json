@@ -1,0 +1,42 @@
+{
+  "v163": {
+    "BSSY.RECONVERGENT": 6,
+    "BSYNC.RECONVERGENT": 6,
+    "ELECT": 34,
+    "UTCQMMA.WS": 26,
+    "BRA.U.ANY": 28,
+    "BSSY": 3,
+    "BSYNC": 3,
+    "LDTM.STAT.x32.MAX.F32.NAN": 1
+  },
+  "v164": {
+    "BSSY.RECONVERGENT": 6,
+    "BSYNC.RECONVERGENT": 6,
+    "ELECT": 42,
+    "UTCQMMA.WS": 34,
+    "BRA.U.ANY": 36,
+    "BSSY": 3,
+    "BSYNC": 3,
+    "LDTM.STAT.x32.MAX.F32.NAN": 1
+  },
+  "v169": {
+    "BSSY.RECONVERGENT": 6,
+    "BSYNC.RECONVERGENT": 6,
+    "ELECT": 32,
+    "UTCQMMA.WS": 26,
+    "BRA.U.ANY": 28,
+    "BSSY": 3,
+    "BSYNC": 3,
+    "LDTM.STAT.x32.MAX.F32.NAN": 1
+  },
+  "v170": {
+    "BSSY.RECONVERGENT": 6,
+    "BSYNC.RECONVERGENT": 6,
+    "ELECT": 40,
+    "UTCQMMA.WS": 34,
+    "BRA.U.ANY": 36,
+    "BSSY": 3,
+    "BSYNC": 3,
+    "LDTM.STAT.x32.MAX.F32.NAN": 1
+  }
+}
