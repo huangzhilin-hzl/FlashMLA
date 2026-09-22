@@ -1,0 +1,18 @@
+{
+  "static_native_instructions": 1864,
+  "LDL": 0,
+  "STL": 0,
+  "MMA": 70,
+  "commit_sites": 5,
+  "elections": [
+    "elect.sync \t%r98|%p6, -1;",
+    "elect.sync \t%r1357|%p54, -1;",
+    "elect.sync \t%r1145|%p30, -1;"
+  ],
+  "register_budgets": [
+    "setmaxnreg.dec.sync.aligned.u32 \t64;",
+    "setmaxnreg.inc.sync.aligned.u32 \t176;"
+  ],
+  "collector_fill_sites": 8,
+  "collector_lastuse_sites": 8
+}
