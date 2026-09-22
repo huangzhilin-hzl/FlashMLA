@@ -1,0 +1,6 @@
+========= COMPUTE-SANITIZER
+{"repeat": 0, "elements": 32768, "mismatches": 0, "plane_mismatches": [0, 0], "max_abs": 0.0}
+{"repeat": 1, "elements": 32768, "mismatches": 0, "plane_mismatches": [0, 0], "max_abs": 0.0}
+{"repeat": 2, "elements": 32768, "mismatches": 0, "plane_mismatches": [0, 0], "max_abs": 0.0}
+PROBE RECORD COMPLETE
+========= ERROR SUMMARY: 0 errors

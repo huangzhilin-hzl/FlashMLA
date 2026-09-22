@@ -1,0 +1,4 @@
+{"repeat": 0, "elements": 32768, "mismatches": 16166, "plane_mismatches": [0, 16166], "max_abs": 137.0}
+{"repeat": 1, "elements": 32768, "mismatches": 16199, "plane_mismatches": [0, 16199], "max_abs": 152.0}
+{"repeat": 2, "elements": 32768, "mismatches": 0, "plane_mismatches": [0, 0], "max_abs": 0.0}
+PROBE RECORD COMPLETE

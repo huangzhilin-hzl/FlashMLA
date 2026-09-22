@@ -1,0 +1,45 @@
+{
+  "purpose": "Compare normal-M64 A collector reuse within versus across datapath halves.\n\nExact integer FP8 operands and CTA-dependent row permutations distinguish\nnumerical failures from rounding or accidentally identical input matrices.\nNo MLA performance claim; guarding is optional to diagnose instrumentation effects.\n",
+  "args": {
+    "blocks": 1,
+    "mode": "cross",
+    "repeats": 3,
+    "guardrails": false,
+    "compile_only": false,
+    "output_dir": "/tmp/glm53_sparse_mla_dev/artifacts/collector_probe_plain_cross_1"
+  },
+  "source_sha256": "117a0729fe5db182d2e61b56efc0836a2f67866a335a80a8988e9c0697ef9efa",
+  "helper_sha256": "125203775f20305d02e8493dfc4478e09883a8c811bc796bc8d6f05a89c8c090",
+  "records": [
+    {
+      "repeat": 0,
+      "elements": 32768,
+      "mismatches": 16166,
+      "plane_mismatches": [
+        0,
+        16166
+      ],
+      "max_abs": 137.0
+    },
+    {
+      "repeat": 1,
+      "elements": 32768,
+      "mismatches": 16199,
+      "plane_mismatches": [
+        0,
+        16199
+      ],
+      "max_abs": 152.0
+    },
+    {
+      "repeat": 2,
+      "elements": 32768,
+      "mismatches": 0,
+      "plane_mismatches": [
+        0,
+        0
+      ],
+      "max_abs": 0.0
+    }
+  ]
+}

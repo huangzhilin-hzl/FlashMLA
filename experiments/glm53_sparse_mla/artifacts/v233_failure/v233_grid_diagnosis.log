@@ -1,0 +1,9 @@
+{"size": 2, "repeat": 0, "finite": true, "mismatches": 32768, "plane_mismatches": [0, 32768], "max_abs": 0.4561920166015625}
+{"size": 2, "repeat": 1, "finite": true, "mismatches": 32768, "plane_mismatches": [0, 32768], "max_abs": 0.4561920166015625}
+{"size": 2, "repeat": 2, "finite": true, "mismatches": 32768, "plane_mismatches": [0, 32768], "max_abs": 0.4561920166015625}
+{"size": 148, "repeat": 0, "finite": true, "mismatches": 2424713, "plane_mismatches": [0, 2424713], "max_abs": 1.0931396484375}
+{"size": 148, "repeat": 1, "finite": true, "mismatches": 2424713, "plane_mismatches": [0, 2424713], "max_abs": 1.0931396484375}
+{"size": 148, "repeat": 2, "finite": true, "mismatches": 2424713, "plane_mismatches": [0, 2424713], "max_abs": 1.0931396484375}
+{"size": 296, "repeat": 0, "finite": true, "mismatches": 4847748, "plane_mismatches": [0, 4847748], "max_abs": 1.669921875}
+{"size": 296, "repeat": 1, "finite": true, "mismatches": 4846790, "plane_mismatches": [0, 4846790], "max_abs": 1.4375}
+{"size": 296, "repeat": 2, "finite": true, "mismatches": 4846774, "plane_mismatches": [0, 4846774], "max_abs": 2.21875}

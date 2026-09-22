@@ -1,0 +1,10 @@
+
+[91m[1merror[CONTAINER_STRUCTURE_CHANGED]:[0m `tile` has a different structure at the end of this `for` than at the start. A value carried through a `for` must keep the same shape (same fields and the same number of parts) on every pass.
+  [94m-->[0m /tmp/glm53_sparse_mla_dev/probe_normal_collector.py:93
+   |
+91 |         values=cute.make_fragment_like(coords,cutlass.Float32)
+92 |         for plane in cutlass.range(2,unroll_full=True):
+93 |             for chunk in cutlass.range(2,unroll_full=True):
+   |             [91m^[0m
+  [92msuggestion:[0m Give `tile` the same structure on every branch and every pass of the `for`.
+

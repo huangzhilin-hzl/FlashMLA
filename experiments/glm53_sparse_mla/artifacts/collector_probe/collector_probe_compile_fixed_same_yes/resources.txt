@@ -1,0 +1,6 @@
+
+Resource usage:
+ Common:
+  GLOBAL:0
+ Function kernel_cutlass_kernel___main__CollectorProbe_object_at__tensorptrf8E4M3FNgmemalign16o6432321_tensorptrf8E4M3FNgmemalign16o51232321_tensorptrf32gmemalign16o164512327685121_TiledMMA_ThrLayo_0:
+  REG:74 STACK:0 SHARED:1024 LOCAL:0 CONSTANT[0]:960 TEXTURE:0 SURFACE:0 SAMPLER:0
