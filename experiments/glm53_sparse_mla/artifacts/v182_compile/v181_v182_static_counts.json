@@ -1,0 +1,34 @@
+{
+  "v181": {
+    "baseline": "v177",
+    "counts": {
+      "BSSY.RECONVERGENT": 4,
+      "BRA": 45,
+      "BSYNC.RECONVERGENT": 4,
+      "BRA.U": 7,
+      "ELECT": 4,
+      "UTCQMMA.WS": 26,
+      "LDTM.STAT.x32.MAX.F32.NAN": 1,
+      "FMNMX3.NAN": 16,
+      "FMNMX": 2,
+      "FMNMX3": 1,
+      "LDTM.x32": 8
+    }
+  },
+  "v182": {
+    "baseline": "v178",
+    "counts": {
+      "BSSY.RECONVERGENT": 4,
+      "BRA": 45,
+      "BSYNC.RECONVERGENT": 4,
+      "BRA.U": 7,
+      "ELECT": 4,
+      "UTCQMMA.WS": 34,
+      "LDTM.STAT.x32.MAX.F32.NAN": 1,
+      "FMNMX3.NAN": 16,
+      "FMNMX": 2,
+      "FMNMX3": 1,
+      "LDTM.x32": 8
+    }
+  }
+}

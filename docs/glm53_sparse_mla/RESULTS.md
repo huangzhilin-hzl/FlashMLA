@@ -139,7 +139,7 @@ B300 physical GPU1; b8192, H64, D576/512, TopK2048, chunk3. Each row is a paired
 | v143 | 1636.42 | 1691.78 | 1.0338x | 123 | 0.00 / 0.00 | 31.60% | bitwise v138 full2seeds/short/masks; small scheduling alternative |
 | v144 | 1636.48 | 1689.89 | 1.0326x | 123 | 0.00 / 0.00 | 31.65% | bitwise v138 full2seeds/short/masks; small scheduling alternative |
 | v145 | 1781.79 | 1691.90 | 0.9496x | 98 | 0.00 / 0.00 | 42.79% | bitwise v128 full2seeds/short/masks; earlier higher precision |
-| v146 | 1628.10 | 1693.86 | 1.0404x | 123 | 0.00 / 0.00 | 31.78% | bitwise v138 full2seeds/short/masks; current fast path |
+| v146 | 1628.10 | 1693.86 | 1.0404x | 123 | 0.00 / 0.00 | 31.78% | bitwise v138 full2seeds/short/masks; earlier fast path |
 | v147 | 1690.85 | 1693.54 | 1.0016x | 126 | 0.00 / 0.00 | 30.64% | bitwise v138 full seed1234/mask; correction prefetch slower |
 | v148 | 1749.12 | 1691.84 | 0.9673x | 98 | 0.00 / 0.00 | 43.65% | full2seeds/short/masks FP32 PASS; earlier higher precision |
 | v149 | 1771.74 | 1691.42 | 0.9547x | 100 | 0.00 / 0.00 | 42.96% | bitwise v145 full2seeds/short/masks; superseded by v148 |
@@ -153,7 +153,7 @@ B300 physical GPU1; b8192, H64, D576/512, TopK2048, chunk3. Each row is a paired
 | v157 | 1732.61 | 1691.62 | 0.9763x | 100 | 0.00 / 0.00 | 44.08% | bitwise v152 full2seeds/short/masks; packed scaling alternative |
 | v158 | 1627.23 | 1691.65 | 1.0396x | 123 | 0.00 / 0.00 | 31.80% | bitwise v146 full seed1234/masks; Q cache policy, no short gain |
 | v159 | 1740.86 | 1689.98 | 0.9708x | 100 | 0.00 / 0.00 | 43.79% | bitwise v153 full seed1234/masks; Q cache policy slower |
-| v160 | 1724.54 | 1689.70 | 0.9798x | 100 | 0.00 / 0.00 | 44.36% | bitwise v153 full2seeds/short/masks; current higher precision |
+| v160 | 1724.54 | 1689.70 | 0.9798x | 100 | 0.00 / 0.00 | 44.36% | bitwise v153 full2seeds/short/masks; earlier higher precision |
 | v161 | 1634.46 | 1691.84 | 1.0351x | 123 | 0.00 / 0.00 | 31.63% | guarded memory/sync and full seed1234/mask bits pass; load/max slower |
 | v162 | 1730.69 | 1691.94 | 0.9776x | 101 | 0.00 / 0.00 | 44.09% | guarded memory/sync and full seed1234/mask bits pass; load/max slower |
 | v163 | 1855.87 | 1691.78 | 0.9116x | 109 | 0.00 / 0.00 | 27.74% | guarded checks and full seed1234/mask bits pass; mask fallback slower |
@@ -164,8 +164,10 @@ B300 physical GPU1; b8192, H64, D576/512, TopK2048, chunk3. Each row is a paired
 | v178 | 1790.21 | 1693.70 | 0.9461x | 96 | 0.00 / 0.00 | 42.49% | guarded checks/full seed1234/mask bits pass; recovers regression, slower than defaults |
 | v179 | 1631.49 | 1691.78 | 1.0370x | 123 | 0.00 / 0.00 | 31.74% | full seed1234/mask bits and sanitizers pass; role-only control has no short gain |
 | v180 | 1728.96 | 1691.58 | 0.9784x | 101 | 0.00 / 0.00 | 44.17% | full seed1234/mask bits and sanitizers pass; role-only control has no short gain |
+| v183 | 1550.50 | 1691.81 | 1.0911x | 123 | 0.00 / 0.00 | 33.52% | bitwise v146 full2seeds/short/masks; current fast path |
+| v184 | 1693.89 | 1689.76 | 0.9976x | 122 | 0.00 / 0.00 | 45.19% | bitwise v160 full2seeds/short/masks; current higher precision |
 
-Raw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. v090/v091/v094/v096/v097/v105/v108/v112/v125 have an observed sustained warm advantage in the extended eager-event, Graph and rotating-order runs, at baseline-level FP8 precision; v146 is the current fast path. Short five-event v125 tuning has a small observed advantage; v105 is near parity. Use the matching execution regime and retained distributions. v086 is near parity warm and its initial cold advantage does not reproduce in its rotating-order audit.
+Raw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. v090/v091/v094/v096/v097/v105/v108/v112/v125 have an observed sustained warm advantage in the extended eager-event, Graph and rotating-order runs, at baseline-level FP8 precision; v183 is the current fast path. Short five-event v125 tuning has a small observed advantage; v105 is near parity. Use the matching execution regime and retained distributions. v086 is near parity warm and its initial cold advantage does not reproduce in its rotating-order audit.
 
 ## CUDA Graph validation runs
 

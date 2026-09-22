@@ -1,0 +1,53 @@
+{
+  "v177": {
+    "fallback_max": {
+      "static_rows": 16,
+      "instructions_executed": 16777216.0,
+      "predicated_on_thread_instructions": 0.0
+    },
+    "indexed_branch": {
+      "static_rows": 0,
+      "instructions_executed": 0,
+      "predicated_on_thread_instructions": 0
+    },
+    "mma_election_loop": {
+      "static_rows": 0,
+      "instructions_executed": 0,
+      "predicated_on_thread_instructions": 0
+    }
+  },
+  "v183": {
+    "fallback_max": {
+      "static_rows": 16,
+      "instructions_executed": 0.0,
+      "predicated_on_thread_instructions": 0.0
+    },
+    "indexed_branch": {
+      "static_rows": 1,
+      "instructions_executed": 1048576.0,
+      "predicated_on_thread_instructions": 33554432.0
+    },
+    "mma_election_loop": {
+      "static_rows": 0,
+      "instructions_executed": 0,
+      "predicated_on_thread_instructions": 0
+    }
+  },
+  "v184": {
+    "fallback_max": {
+      "static_rows": 16,
+      "instructions_executed": 0.0,
+      "predicated_on_thread_instructions": 0.0
+    },
+    "indexed_branch": {
+      "static_rows": 1,
+      "instructions_executed": 1048576.0,
+      "predicated_on_thread_instructions": 33554432.0
+    },
+    "mma_election_loop": {
+      "static_rows": 0,
+      "instructions_executed": 0,
+      "predicated_on_thread_instructions": 0
+    }
+  }
+}

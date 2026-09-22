@@ -5372,3 +5372,120 @@ occupancy19.298517%/19.324486%,tensor31.736470%/44.165733%,
 eligible0.388634/0.426351,long-scoreboard6.168906/6.469596,zero local sectors,
 aggregate shared conflicts6455352/2110299 and6426750/2131341,
 diagnostic2.786112/2.945408 ms.
+
+
+### Iterations 181–182 compile result — direct branch still if-converted
+
+Both compile successfully atREG123/103 and zero stack. However SASS still
+predicates the entire mask/software-max region instead of branching over it.
+The bra.uni source annotation does not force a native branch. Skip runtime: the
+specific intended issue-slot bypass was not achieved. No correctness/performance
+claim for these compile-only variants.
+
+## Iterations 183–184 — indexed uniform branch to preserve fallback skipping
+
+Based on v181/v182, change only the direct conditional PTX branch to brx.idx.uni
+with a local two-entry .branchtargets table. A selp produces index0 for the
+all-valid word and index1 otherwise, so the index is always in bounds. All
+active lanes within each compute warp share the bitmap and index. Both labels
+are within the same inline-assembly scope/function; no external target exists.
+
+This is a compiler-lowering control for the observed if-conversion, not an
+assumption that indirect branches are generally faster. Inspect generated SASS
+for an actual skip before guarded qualification and exact full/masked checks.
+Reference: [PTX brx.idx](https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#control-flow-instructions-brx-idx).
+
+
+Before any v183/v184 launch, strengthen output constraints to early-clobber
+(=&f with tied score/fullmax inputs). The assembly modifies scores before its
+last reads of bitmap and rowmax; those independent late-read inputs must not
+share output registers. This completes the assembly operand contract. Recompile
+and inspect resources/SASS after this correction; earlier compile files are
+retained with an initial prefix. Neither initial candidate was launched.
+
+
+### Iterations 183–184 corrected compile result
+
+The corrected assembly constraints compile atREG123/122, zero stack and an
+8-byte constant branch table. Both contain one native BRX between load/max and
+the mask fallback. Mask SEL and16 FMNMX3.NAN instructions now sit after that
+branch rather than being individually predicated by the all-valid condition.
+MMA counts remain26/34 with4 ELECT and no per-MMA BRA.U.ANY loops.
+
+Corrected source SHA256:v183
+eaab6acfcb3d0039a4d3a25d458b47e75897320a4e89bb2f56e0484046367e79;
+v184 a033188d7b0685e0edc3980d0fc5f24ef3b2be2564b59f2593face2e553e415d.
+These are the sources entering guarded qualification; no initial-constraint
+variant is used for runtime tests.
+
+
+### Iterations 183–184 initial runtime qualification
+
+Guarded b2 smoke/b512 memcheck and b2 synccheck pass with zero errors. Full
+seed1234 matches v146/v160 in three repeats; masked-input bits also match and
+v184 masked FP32 checks pass. v183 retains the same86 masked FP32-tolerance
+failures as v146; bitwise equivalence is not a full FP32 pass.
+
+Short paired v1831550.50 us versus TRT1691.81 us improves the recorded v146
+short median1628.10 us by77.60 us. v1841693.89 us versus TRT1689.76 us improves
+v1601724.54 us by30.65 us. These initial results justify expanded seed/short
+equivalence,100-repeat eager/Graph measurements, and rotating-order comparisons
+to the current defaults. No promotion from the short medians alone.
+
+
+## Iterations 185–186 — retain indexed fallback, restore original role predicates
+
+Based on corrected v183/v184, restore v146/v160's thread-ID role comparisons
+and ordinary warp_idx call. The explicit branch now lives entirely inside the
+register-only assembly helper, so it may no longer trigger the DSL control
+interaction that required warp-ID role comparisons in v177/v178. The earlier
+role-only control v179/v180 did not improve default timings.
+
+This separates the role-predicate workaround from the useful native fallback
+skip. All assembly constraints, masks, arithmetic and synchronization stay
+unchanged. Compile after current extended timing finishes; inspect whether the
+per-MMA loops return, then qualify only if the proposed simplification survives
+code generation. No runtime result yet.
+
+
+### Iterations 183–184 extended result — promote both experimental defaults
+
+Both full seeds1234/5678, all1024 short-case rows at chunk0/seed5678 and
+masked inputs match v146/v160 bitwise in the recorded audits. Qualified
+sanitisers pass. v183 inherits all fast-path tolerance failures; v184 retains
+v148's independently audited full-reference passes through exact equivalence.
+
+Extended20/100 event warm/cold:v1831655.50/1646.51 us versusTRT1880.22/1916.94;
+v1841829.20/1855.50 versus1871.90/1916.22. Graph:v1831663.04/1644.51 versus
+1869.81/1914.62;v1841901.55/1849.60 versus1867.89/1916.85. The separate Graph
+warm high-precision case still trailsTRT by about1.8%; do not replace it with
+the faster rotating-order measurements or claim universal superiority.
+
+Four rotating-order Graph medians, in round order:
+
+
+v183 warm: candidate1614.02/1614.30/1629.39/1632.34 us; v1461671.46/1673.54/1673.57/1673.57 us; TRT1868.93/1877.73/1878.30/1880.30 us.
+
+v183 cold: candidate1599.28/1619.09/1617.06/1618.05 us; v1461665.28/1675.26/1674.43/1675.02 us; TRT1857.54/1857.73/1857.65/1865.73 us.
+
+v184 warm: candidate1847.42/1847.42/1847.36/1849.23 us; v1601861.86/1861.76/1861.76/1880.06 us; TRT1874.16/1884.53/1883.60/1887.41 us.
+
+v184 cold: candidate1826.66/1824.72/1826.77/1826.62 us; v1601859.65/1857.58/1861.57/1859.66 us; TRT1859.55/1859.63/1865.78/1867.68 us.
+
+Both candidates beat their previous defaults in all eight same-run warm/cold
+comparisons, so promote fast v183 and higher-precision v184. The absolute
+speedup varies with execution regime; original scripts/tolerances are unchanged
+and SHA256 matches the user's source. Continue tuning from these versions.
+
+NCU base/stable(v183/v184):registers123/122,shared194920/203112 bytes,
+occupancy19.293211%/19.323837%,tensor33.523619%/45.188299%,
+eligible0.367788/0.377673,long-scoreboard6.431440/6.972028,zero local sectors,
+aggregate shared conflicts6473487/3937124 and6537068/2735684,
+diagnostic2.639232/2.878304 ms.
+
+Unlocked source:v183541013498 instructions versusv146600988722 andv177703517916;
+v184596787377 instructions. Shared actual equals ideal at20275200/28663808,
+with zero excessive. v183 long-scoreboard62208 includesPV16824,producer-empty
+15589,QK12951;v18472229 includesPV24358,producer-empty17207,QK13805. These
+sample counts are not latency shares. The fallback MAX issue audit is retained
+in v183_mask_issue_audit.json to distinguish actual skipping from predication.
