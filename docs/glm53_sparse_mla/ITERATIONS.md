@@ -6279,3 +6279,26 @@ Short timing: trtllm/native 1691.74us, cute-v216/native 1673.38us.
 NCU base/stable: gpu__time_duration.sum=2.840288 ms, launch__registers_per_thread=128 register/thread, launch__shared_mem_per_block_dynamic=203.112000 Kbyte/block, sm__warps_active.avg.pct_of_peak_sustained_active=19.394107 %, sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed=45.830213 %, smsp__warps_eligible.avg.per_cycle_active=0.367605 warp, smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio=7.094404 inst, l1tex__t_sectors_pipe_lsu_mem_local_op_ld.sum=0 sector, l1tex__t_sectors_pipe_lsu_mem_local_op_st.sum=0 sector, l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum=6,977,759 , l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum=2,862,024 .
 
 v2151667.04us andv2161673.38us are slower than v1971662.30us under the existing short tuning protocol; base/stable NCU durations2.825632/2.840288ms also exceed v1972.817632ms. Eligible warps decline despite fewer static operations and zero local sectors. The first-seed relativeRMSE is slightly higher than v197, so neither accuracy nor measured short performance justifies promotion. Retain these independently checked experiments; do not claim broad reference qualification or expand testing solely to seek a favorable timing. Defaults remain v190/v197.
+
+
+## Probability-code diagnostic before another kernel
+
+Li et al., VC-Attention (arXiv:2609.15810v1,2026-09-14), Eq.7 maps base-two shifted scores to E4M3 codes using round(8z+56−0.35), clipped to0..120 at scale256. This is an approximation, not an equivalent exponent/cast replacement. Its normalized-row bound does not imply this benchmark's elementwise tolerance: https://arxiv.org/html/2609.15810v1#S3.SS3 . The fixed constant comes from their minimax derivation; do not tune it against our seeds.
+
+Add probe_expcast_accuracy.py as a Torch probability-path diagnostic, with original generated Q/KV/indices,128-key stages and original0.01/0.05 reference thresholds. Compare exact online FP32, conventional FP8 at scales448/256, direct codes with exact versus decoded denominators, a separately labelled subnormal-flush interpretation, and our scale448 adaptation. Equation7 literally permits subnormal codes1..7 although the adjacent prose describes normal/zero behavior; keep these interpretations distinct. Use fixed eight-row samples from both full seeds and the short fixture, plus the exact two-row mask fixture. FP32 online control must pass; record all approximate failures before returning.
+
+This diagnostic uses FP32 matrix products and reductions. It does not reproduce TC accumulation, CuTe summation order or end-to-end latency, and it does not claim to reimplement the paper's V-Smooth/model pipeline. A failed approximation can be rejected before writing an MLA kernel; a sample pass would still require full kernel/reference validation.
+
+
+### Direct probability-code diagnostic result — original tolerance rejects the approximation
+
+| Fixture | Exact online failures | FP8/448 failures | ExpCast256 decoded-sum failures | ExpCast256 exact-sum failures | ExpCast448 decoded-sum failures |
+|---|---:|---:|---:|---:|---:|
+| b8192/chunk3/seed1234/8rows | 0 | 0 | 1 | 1 | 0 |
+| b8192/chunk3/seed5678/8rows | 0 | 0 | 0 | 0 | 0 |
+| b1024/chunk0/seed5678/8rows | 0 | 658 | 943 | 995 | 1180 |
+| b2/chunk3/seed1234/masks | 0 | 86 | 187 | 213 | 172 |
+
+All exact-online controls pass. The direct-code approximation increases failures on short/masked inputs compared with the conventional FP8/448 emulation. Flushing subnormal codes does not improve those failure counts; the exact-sum variant retains the exponential and still fails. These are sampled probability-path diagnostics, not full MLA validation or throughput measurements. Reject this direct substitution under the unchanged benchmark tolerance; do not import the video-model fidelity claim as numerical permission for GLM MLA.
+
+The authors’ own September16 blog additionally reports B300 MiniMax-H3 results for the8-bit/ExpCast implementation: https://www.nunchux.ai/blog/attention-is-the-video-bottleneck . That source resolves the narrower B200/H200 emphasis in the paper text, but its workload and BF16 FlashAttention-4 baseline differ from this task. No claimed speedup is transferred to our kernel.
