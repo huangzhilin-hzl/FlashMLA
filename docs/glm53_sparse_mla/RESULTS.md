@@ -211,6 +211,9 @@ B300 physical GPU1; b8192, H64, D576/512, TopK2048, chunk3. Each row is a paired
 | v243 | 1675.26 | 1691.78 | 1.0099x | 128 | 0.00 / 0.00 | 45.71% | guarded/full seed1234/short/mask parent equivalence; hardware KV release no gain |
 | v246 | 1548.42 | 1690.78 | 1.0919x | 111 | 0.00 / 0.00 | 33.55% | guarded fixed/varlen sync and full/short/mask parent equivalence; valid single completion; no default gain |
 | v247 | 1671.04 | 1691.81 | 1.0124x | 128 | 0.00 / 0.00 | 45.81% | guarded fixed/varlen sync and full/short/mask parent equivalence; valid single completion; no default gain |
+| v248 | 1566.69 | 1691.84 | 1.0799x | 115 | 0.00 / 0.00 | 33.08% | guarded fixed/varlen sync and full/short/mask equivalence; delayed bitmap acquire no default gain |
+| v249 | 1669.09 | 1691.65 | 1.0135x | 128 | 0.00 / 0.00 | 45.90% | guarded fixed/varlen sync and full/short/mask equivalence; delayed bitmap acquire no default gain |
+| v250 | 1685.70 | 1690.88 | 1.0031x | 124 | 0.00 / 0.00 | 30.87% | guarded fixed/varlen and full/short/mask exact v242; early QK executes but slower |
 
 Raw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. v090/v091/v094/v096/v097/v105/v108/v112/v125 have an observed sustained warm advantage in the extended eager-event, Graph and rotating-order runs, at baseline-level FP8 precision; v190 is the current fast path. Short five-event v125 tuning has a small observed advantage; v105 is near parity. Use the matching execution regime and retained distributions. v086 is near parity warm and its initial cold advantage does not reproduce in its rotating-order audit.
 

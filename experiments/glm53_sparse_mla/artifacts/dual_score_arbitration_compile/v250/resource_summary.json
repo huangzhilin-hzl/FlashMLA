@@ -1,0 +1,26 @@
+{
+  "static_native_instructions": 1744,
+  "LDL": 0,
+  "STL": 0,
+  "commit_sites": 5,
+  "elections": [
+    "elect.sync \t%r54|%p5, -1;",
+    "elect.sync \t%r1221|%p57, -1;",
+    "elect.sync \t%r992|%p26, -1;",
+    "elect.sync \t%r1101|%p33, -1;",
+    "elect.sync \t%r1124|%p37, -1;",
+    "elect.sync \t%r1158|%p42, -1;"
+  ],
+  "qk_score_addresses": [
+    "add.s32 \t%r60, %r55, 16384;",
+    "mov.b32 \t%r63, 384;",
+    "add.s64 \t%rd6, %rd481, 384;",
+    "mov.b32 \t%r1234, 384;",
+    "add.s32 \t%r1254, %r1304, 38400;",
+    "mov.b64 \t%rd384, {%r1026, %r1005};",
+    "{ .reg .pred p; setp.ne.u32 p, %r996, 0; tcgen05.mma.ws.cta_group::1.kind::f8f6f4 [%r993], %rd384, %rd385, %r994, p; }",
+    "and.b32 \t%r34, %r6, 384;",
+    "and.b32 bit, %r138, 16384;",
+    "mov.b64 \t{%r383, %r384}, %rd102;"
+  ]
+}
