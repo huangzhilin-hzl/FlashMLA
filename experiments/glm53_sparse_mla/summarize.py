@@ -135,6 +135,10 @@ for directory in sorted(root.glob("v[0-9][0-9][0-9]")):
         status = "guarded checks and full seed1234/mask bits pass; mask fallback slower"
     if version in ("v165", "v166"):
         status = "bitwise full seed1234/masks and qualified sanitizers pass; mask branch slower"
+    if version in ("v177", "v178"):
+        status = "guarded checks/full seed1234/mask bits pass; recovers regression, slower than defaults"
+    if version in ("v179", "v180"):
+        status = "full seed1234/mask bits and sanitizers pass; role-only control has no short gain"
     if version == "v142":
         status = "bitwise v138 full seed1234/mask; paired epilogue slower"
     if version == "v138":

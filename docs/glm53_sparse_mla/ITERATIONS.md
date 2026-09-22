@@ -5294,3 +5294,81 @@ unchanged.
 Earlier operand hints did not resolve the per-MMA election fallback. This tests
 control uniformity at the common role split instead of only data uniformity
 inside an already divergent region. Compare SASS and PTX before qualification.
+
+
+### Iterations 177–178 compile result — targeted issuer loops removed
+
+REG113/96, zero stack. ELECT falls34/42→4, BRA.U.ANY falls28/36→0, and
+UTCQMMA.WS remains26/34. No SHFL.IDX survives in SASS. PTX inspection confirms
+there is no newly inserted full-warp collective inside the elected region.
+This meets the intended compiler mechanism and advances to guarded qualification.
+It is not yet numerical or runtime-performance evidence.
+
+## Iterations 179–180 — uniform role control on the current defaults
+
+Apply the same warp-ID role split to v146/v160, retaining their original
+ordinary score loads and unconditional masking. These controls distinguish a
+general role-control effect from recovering v163/v164's mask-branch regression.
+No change to arithmetic, TMEM layout, synchronization or output storage.
+Compile first and skip runtime if encoding-identical; otherwise qualify with
+full/masked output comparisons, sanitizer checks and paired timing.
+
+
+## Iterations 181–182 — explicit uniform branch around the mask fallback
+
+Based on v177/v178. Replace the DSL mask/fallback region with a register-only
+PTX helper using bra.uni. The bitmap is warp invariant because its shared
+index depends only on stage, ctid//64 and the128-thread compute group. No
+collective is used. If the word is all-valid, preserve all32 score registers
+and the hardware-derived maximum through tied assembly operands. Otherwise
+set invalid scores to the same -1e30 bit pattern and reduce all32 scores plus
+rowmax with16 ternary max.NaN operations. The rest of softmax/PV is unchanged.
+
+The maximum reduction tree changes, but max does not introduce rounding for
+finite inputs; use exact full/masked output comparisons to verify generated
+behavior. This is motivated by v177 still issuing predicated mask/maximum work
+after eliminating the issuer loops. Compile and inspect actual branching and
+register/stack costs before guarded qualification and timing.
+
+
+### Iterations 177–178 measured result — recovery without a new default
+
+Guarded b2 smoke/b512 memcheck and b2 synccheck report zero errors. Full8192-row
+seed1234 matches v146/v160 in three repeats, and all masked-input bits match.
+v178 masked FP32 checks pass; v177 retains v146's86 masked tolerance failures.
+
+Short paired v1771700.00 us versus TRT1691.90 us improves v1631855.87 us, but
+is71.90 us slower than v146. v1781790.21 us versus TRT1693.70 us improves
+v1641957.82 us, but is65.67 us slower than v160. The role split recovers a
+large code-generation regression; it does not make the load/max+mask combination
+a better default. No expanded audit or promotion.
+
+NCU base/stable(v177/v178):registers113/96,shared194920/203112 bytes,
+occupancy19.310084%/19.337507%,tensor30.377359%/42.488447%,
+eligible0.476185/0.502616,long-scoreboard5.317375/5.496871,zero local sectors,
+aggregate shared conflicts6458869/1828663 and6460286/1805829,
+diagnostic2.912096/3.059264 ms.
+
+Unlocked source v177 has703517916 instructions versus v163928480677, with
+20275200 actual/ideal shared wavefronts and zero excessive. Long-scoreboard
+65148 includesPV17828,producer-empty16546,QK13350. These are sampled stall
+counts, not latency shares. Static inspection still shows predicated mask and
+software-max instructions occupying issue slots, motivating the explicit
+uniform fallback branch in v181/v182.
+
+### Iterations 179–180 result — role change alone has no short-run gain
+
+REG123/101,zero stack. Both retain4 ELECT and no BRA.U.ANY. Full seed1234
+outputs match v146/v160 in three repeats; masks match exactly, v180 masked FP32
+checks pass, and qualified b512 memcheck/b2 synccheck have zero errors.
+
+Short v1791631.49 us versus TRT1691.78 us is3.39 us slower than v146.
+v1801728.96 us versus TRT1691.58 us is4.42 us slower than v160. No expanded
+audit or promotion. This control supports targeting the mask-branch lowering,
+not a blanket claim that warp-ID roles are faster for every kernel.
+
+NCU base/stable(v179/v180):registers123/101,shared194920/203112 bytes,
+occupancy19.298517%/19.324486%,tensor31.736470%/44.165733%,
+eligible0.388634/0.426351,long-scoreboard6.168906/6.469596,zero local sectors,
+aggregate shared conflicts6455352/2110299 and6426750/2131341,
+diagnostic2.786112/2.945408 ms.

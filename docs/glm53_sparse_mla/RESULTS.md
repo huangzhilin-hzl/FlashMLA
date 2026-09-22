@@ -160,6 +160,10 @@ B300 physical GPU1; b8192, H64, D576/512, TopK2048, chunk3. Each row is a paired
 | v164 | 1957.82 | 1691.87 | 0.8642x | 107 | 0.00 / 0.00 | 38.72% | guarded checks and full seed1234/mask bits pass; mask fallback slower |
 | v165 | 1672.03 | 1689.82 | 1.0106x | 123 | 0.00 / 0.00 | 30.95% | bitwise full seed1234/masks and qualified sanitizers pass; mask branch slower |
 | v166 | 1988.77 | 1689.89 | 0.8497x | 105 | 0.00 / 0.00 | 38.05% | bitwise full seed1234/masks and qualified sanitizers pass; mask branch slower |
+| v177 | 1700.00 | 1691.90 | 0.9952x | 113 | 0.00 / 0.00 | 30.38% | guarded checks/full seed1234/mask bits pass; recovers regression, slower than defaults |
+| v178 | 1790.21 | 1693.70 | 0.9461x | 96 | 0.00 / 0.00 | 42.49% | guarded checks/full seed1234/mask bits pass; recovers regression, slower than defaults |
+| v179 | 1631.49 | 1691.78 | 1.0370x | 123 | 0.00 / 0.00 | 31.74% | full seed1234/mask bits and sanitizers pass; role-only control has no short gain |
+| v180 | 1728.96 | 1691.58 | 0.9784x | 101 | 0.00 / 0.00 | 44.17% | full seed1234/mask bits and sanitizers pass; role-only control has no short gain |
 
 Raw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. v090/v091/v094/v096/v097/v105/v108/v112/v125 have an observed sustained warm advantage in the extended eager-event, Graph and rotating-order runs, at baseline-level FP8 precision; v146 is the current fast path. Short five-event v125 tuning has a small observed advantage; v105 is near parity. Use the matching execution regime and retained distributions. v086 is near parity warm and its initial cold advantage does not reproduce in its rotating-order audit.
 

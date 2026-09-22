@@ -1,0 +1,105 @@
+	add.s32 	%r1304, %r1268, 518;
+	mov.b64 	%rd427, {%r1304, %r1269};
+	add.s32 	%r1305, %r1268, 1024;
+	mov.b64 	%rd429, {%r1305, %r1269};
+	add.s32 	%r1306, %r1268, 1026;
+	mov.b64 	%rd431, {%r1306, %r1269};
+	add.s32 	%r1307, %r1268, 1028;
+	mov.b64 	%rd433, {%r1307, %r1269};
+	add.s32 	%r1308, %r1268, 1030;
+	mov.b64 	%rd435, {%r1308, %r1269};
+	add.s32 	%r1309, %r1268, 1536;
+	mov.b64 	%rd437, {%r1309, %r1269};
+	add.s32 	%r1310, %r1268, 1538;
+	mov.b64 	%rd439, {%r1310, %r1269};
+	add.s32 	%r1311, %r1268, 1540;
+	mov.b64 	%rd441, {%r1311, %r1269};
+	add.s32 	%r1312, %r1268, 1542;
+	mov.b64 	%rd443, {%r1312, %r1269};
+	add.s32 	%r1313, %r1272, 2;
+	mov.b64 	%rd447, {%r1313, %r1273};
+	add.s32 	%r1363, %r1359, 128;
+	neg.s32 	%r1491, %r22;
+	mov.b32 	%r1492, 0;
+	mov.b32 	%r1493, %r1492;
+	mov.b32 	%r1494, %r1492;
+$L__BB0_26:
+	and.b32 	%r1357, %r1494, 1;
+	shl.b32 	%r1316, %r1494, 3;
+	and.b32 	%r1317, %r1316, 8;
+	add.s32 	%r1318, %r78, %r1317;
+	add.s32 	%r1314, %r1318, 203080;
+	shr.u32 	%r1319, %r1492, 31;
+	add.s32 	%r1320, %r1492, %r1319;
+	and.b32 	%r1321, %r1320, -2;
+	sub.s32 	%r1315, %r1492, %r1321;
+	// begin inline asm
+	{
+	.reg .pred       P1; 
+	LAB_WAIT: 
+	mbarrier.try_wait.parity.shared.b64 P1, [%r1314], %r1315, 10000000; 
+	@P1 bra.uni DONE; 
+	bra.uni     LAB_WAIT; 
+	DONE: 
+	}
+	// end inline asm
+	tcgen05.fence::after_thread_sync;
+	fence.proxy.async.shared::cta;
+	shl.b32 	%r1322, %r1494, 16;
+	and.b32 	%r1323, %r1322, 65536;
+	add.s32 	%r1324, %r78, %r1323;
+	add.s32 	%r23, %r1324, 36864;
+	shl.b32 	%r1325, %r1494, 13;
+	and.b32 	%r1326, %r1325, 8192;
+	add.s32 	%r24, %r78, %r1326;
+	elect.sync 	%r1327|%p60, -1;
+	not.pred 	%p61, %p60;
+	@%p61 bra 	$L__BB0_28;
+	shr.u32 	%r1332, %r23, 4;
+	and.b32 	%r1333, %r1332, 16383;
+	cvt.u64.u32 	%rd449, %r1333;
+	or.b64 	%rd414, %rd449, 4611756662049538048;
+	mov.b64 	{%r1334, %r1335}, %rd414;
+	mov.b32 	%r1329, 69206032;
+	mov.b32 	%r1330, 0;
+	// begin inline asm
+	{ .reg .pred p; setp.ne.u32 p, %r1330, 0; tcgen05.mma.ws.cta_group::1.kind::f8f6f4 [%r1328], %rd413, %rd414, %r1329, p; }
+	// end inline asm
+	add.s32 	%r1336, %r1334, 2;
+	mov.b64 	%rd416, {%r1336, %r1335};
+	mov.b32 	%r1331, 1;
+	// begin inline asm
+	{ .reg .pred p; setp.ne.u32 p, %r1331, 0; tcgen05.mma.ws.cta_group::1.kind::f8f6f4 [%r1328], %rd415, %rd416, %r1329, p; }
+	// end inline asm
+	add.s32 	%r1337, %r1334, 4;
+	mov.b64 	%rd418, {%r1337, %r1335};
+	// begin inline asm
+	{ .reg .pred p; setp.ne.u32 p, %r1331, 0; tcgen05.mma.ws.cta_group::1.kind::f8f6f4 [%r1328], %rd417, %rd418, %r1329, p; }
+	// end inline asm
+	add.s32 	%r1338, %r1334, 6;
+	mov.b64 	%rd420, {%r1338, %r1335};
+	// begin inline asm
+	{ .reg .pred p; setp.ne.u32 p, %r1331, 0; tcgen05.mma.ws.cta_group::1.kind::f8f6f4 [%r1328], %rd419, %rd420, %r1329, p; }
+	// end inline asm
+	add.s32 	%r1339, %r1334, 1024;
+	mov.b64 	%rd422, {%r1339, %r1335};
+	// begin inline asm
+	{ .reg .pred p; setp.ne.u32 p, %r1331, 0; tcgen05.mma.ws.cta_group::1.kind::f8f6f4 [%r1328], %rd421, %rd422, %r1329, p; }
+	// end inline asm
+	add.s32 	%r1340, %r1334, 1026;
+	mov.b64 	%rd424, {%r1340, %r1335};
+	// begin inline asm
+	{ .reg .pred p; setp.ne.u32 p, %r1331, 0; tcgen05.mma.ws.cta_group::1.kind::f8f6f4 [%r1328], %rd423, %rd424, %r1329, p; }
+	// end inline asm
+	add.s32 	%r1341, %r1334, 1028;
+	mov.b64 	%rd426, {%r1341, %r1335};
+	// begin inline asm
+	{ .reg .pred p; setp.ne.u32 p, %r1331, 0; tcgen05.mma.ws.cta_group::1.kind::f8f6f4 [%r1328], %rd425, %rd426, %r1329, p; }
+	// end inline asm
+	add.s32 	%r1342, %r1334, 1030;
+	mov.b64 	%rd428, {%r1342, %r1335};
+	// begin inline asm
+	{ .reg .pred p; setp.ne.u32 p, %r1331, 0; tcgen05.mma.ws.cta_group::1.kind::f8f6f4 [%r1328], %rd427, %rd428, %r1329, p; }
+	// end inline asm
+	add.s32 	%r1343, %r1334, 2048;
+	mov.b64 	%rd430, {%r1343, %r1335};

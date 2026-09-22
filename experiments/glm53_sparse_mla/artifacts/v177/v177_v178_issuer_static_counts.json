@@ -1,0 +1,22 @@
+{
+  "v177": {
+    "baseline": "v163",
+    "identical_encoding_words": false,
+    "counts": {
+      "BSSY.RECONVERGENT": 6,
+      "BSYNC.RECONVERGENT": 6,
+      "ELECT": 4,
+      "UTCQMMA.WS": 26
+    }
+  },
+  "v178": {
+    "baseline": "v164",
+    "identical_encoding_words": false,
+    "counts": {
+      "BSSY.RECONVERGENT": 6,
+      "BSYNC.RECONVERGENT": 6,
+      "ELECT": 4,
+      "UTCQMMA.WS": 34
+    }
+  }
+}
