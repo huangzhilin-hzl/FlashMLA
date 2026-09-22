@@ -1,0 +1,113 @@
+{
+  "totals": {
+    "stall_long_sb": 65807.0,
+    "stall_short_sb": 5355.0,
+    "stall_barrier": 2873.0,
+    "stall_mio": 2803.0,
+    "stall_wait": 16275.0,
+    "stall_no_inst": 2155.0,
+    "stall_not_selected": 4023.0,
+    "L1 Wavefronts Shared Excessive": 0.0,
+    "L1 Wavefronts Shared": 28663808.0,
+    "L1 Wavefronts Shared Ideal": 28663808.0,
+    "Instructions Executed": 635349655.0
+  },
+  "top_long_sb": [
+    {
+      "address": "0x7f87575b20a0",
+      "sass": "@!P1  BRA 0x7f87575b32f0",
+      "value": 24635.0,
+      "share_of_metric_sum": 0.37435227255459147,
+      "context": [
+        {
+          "address": "0x7f87575b2060",
+          "sass": "FADD R0, R0, R71"
+        },
+        {
+          "address": "0x7f87575b2070",
+          "sass": "FFMA R99, R99, R100, R0"
+        },
+        {
+          "address": "0x7f87575b2080",
+          "sass": "@!P0  SYNCS.ARRIVE.TRANS64.A1T0 RZ, [UR4+0x31930], RZ"
+        },
+        {
+          "address": "0x7f87575b2090",
+          "sass": "SYNCS.PHASECHK.TRANS64.TRYWAIT P1, [UR4+0x31928], R105"
+        },
+        {
+          "address": "0x7f87575b20a0",
+          "sass": "@!P1  BRA 0x7f87575b32f0"
+        },
+        {
+          "address": "0x7f87575b20b0",
+          "sass": "UIADD3 UR6, UPT, UPT, UR11, 0x1, URZ"
+        }
+      ]
+    },
+    {
+      "address": "0x7f87575b0850",
+      "sass": "@!P0  BRA 0x7f87575b3290",
+      "value": 16518.0,
+      "share_of_metric_sum": 0.25100673180664673,
+      "context": [
+        {
+          "address": "0x7f87575b0810",
+          "sass": "ULEA UR5, UR5, UR4, 0x2"
+        },
+        {
+          "address": "0x7f87575b0820",
+          "sass": "SHF.L.U32 R105, R0, 0x1f, RZ"
+        },
+        {
+          "address": "0x7f87575b0830",
+          "sass": "LDS R0, [UR5+0x31900]"
+        },
+        {
+          "address": "0x7f87575b0840",
+          "sass": "SYNCS.PHASECHK.TRANS64.TRYWAIT P0, [UR4+0x31920], R105"
+        },
+        {
+          "address": "0x7f87575b0850",
+          "sass": "@!P0  BRA 0x7f87575b3290"
+        },
+        {
+          "address": "0x7f87575b0860",
+          "sass": "ISETP.NE.U32.AND P0, PT, R0, -0x1, PT"
+        }
+      ]
+    },
+    {
+      "address": "0x7f87575ae340",
+      "sass": "@!P2  BRA 0x7f87575b3050",
+      "value": 7655.0,
+      "share_of_metric_sum": 0.11632501101706505,
+      "context": [
+        {
+          "address": "0x7f87575ae300",
+          "sass": "UIADD3 UR5, UPT, UPT, UR6, -UR5, URZ"
+        },
+        {
+          "address": "0x7f87575ae310",
+          "sass": "MOV R5, UR5"
+        },
+        {
+          "address": "0x7f87575ae320",
+          "sass": "SHF.L.U32 R5, R5, 0x1f, RZ"
+        },
+        {
+          "address": "0x7f87575ae330",
+          "sass": "SYNCS.PHASECHK.TRANS64.TRYWAIT P2, [UR7+0x31958], R5"
+        },
+        {
+          "address": "0x7f87575ae340",
+          "sass": "@!P2  BRA 0x7f87575b3050"
+        },
+        {
+          "address": "0x7f87575ae350",
+          "sass": "ULEA UR30, UR27, UR4, 0x9"
+        }
+      ]
+    }
+  ]
+}

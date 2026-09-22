@@ -6197,3 +6197,56 @@ The first recurrence probe completed its checksum checks but failed when collect
 All18 configurations completed with exact checksums and native scalar FADD or packed FADD2 confirmed. The packed loop is faster in every measured configuration, by2.2–16.6%; most cases show2–6%. This does not support the tentative idea that packed dependent additions are intrinsically slower on this GPU. The measurement includes loop/control/timestamp/checksum overhead, uses one CTA and fixed scalar-then-packed order, and does not establish isolated instruction latency, peak throughput or the speedup of a full MLA reduction.
 
 The full kernels still lose: adjacent-node v208 adds about35.68M dynamic MOV instructions while saving15.73M issued additions; fixed-half-tree v210 reduces static moves but remains slower than v197. Thus fewer requested arithmetic operations is insufficient. Keep the four packed-tree variants as rejected performance experiments, preserve the diagnostic raw cycles/SASS, and prioritize a different measured instruction bottleneck. Artifacts: experiments/glm53_sparse_mla/artifacts/fp32_add_probe_v2. No default change.
+
+
+## Iterations 211–212 — consolidate each five-request TMA gather group
+
+Based on v190/v197. The v197 unlocked source record issues76,144,640 UMOV instructions out of599,875,543 total. Repeated source regions copy the same four row coordinates into four additional contiguous native UR argument blocks for the four128-byte main requests and the64-byte tail. This is observed native operand preparation; the fraction of instructions is not a fraction of runtime.
+
+Replace five separate inline-asm calls per four-row group with one asm scope containing the same five gather4 requests in the same order. Reuse named PTX destination/column variables across main requests, form the tail descriptor inside that scope, and keep tensor maps, shared layout, byte accounting, elected producer lanes, masks and barriers unchanged. PTXAS may still duplicate native argument blocks; compile and compare SASS first. No unsupported native-register constraint, changed swizzle, new warp collective, or altered arithmetic is introduced.
+
+The official gather4 coordinate vector is {column, row0, row1, row2, row3}; SM100+ shared::cta supports this form: https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#data-movement-and-conversion-instructions-cp-async-bulk-tensor . A single PTX scope alone is not assumed to force UR reuse. Reject without runtime if native code is identical; otherwise qualify accesses/synchronization and exact outputs before timing.
+
+
+### Iterations 211–212 compile result
+
+v211 is native-encoding-identical to v190 (1448 instructions,123 registers,zero stack). v212 has1600 instructions,128 registers andzero stack; encoding changes but the targeted counts do not:217 UMOV,66 R2UR and40 static gather4 requests, all equal to v197. Consolidating the asm scope did not remove duplicated native coordinate tuples. No candidate launch or numerical/performance conclusion; the source transformation failed its intended static objective. Inspect the retained native diff to distinguish allocation/scheduling changes from tuple reuse.
+
+## Iterations 213–214 — keep the four main requests in a real loop
+
+Based on the corresponding v211/v212 source controls and therefore v190/v197. Use one four-iteration PTX loop for main columns0/128/256/384, updating destination by16384 bytes and column by128; the existing tail request follows. A statement-level nounroll pragma is placed at the loop header before instructions, per the official PTX rule: https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#pragma-strings-nounroll . This should permit one native coordinate tuple to be reused across four requests, at the cost of address/column updates, comparison and branches. The extra loop work may offset the saved copies; static inspection and full-kernel timing decide.
+
+The loop has a uniform constant trip count for the elected producer lane; it adds no warp collective. TMA coordinates, request count/order, shared addresses, completion bytes and barriers stay unchanged. First compile/resources, then guarded access/sync and exact full/mask comparisons before short timing if native tuple reuse appears.
+
+The retained v212 diff changes122 native encoding words. It moves tail-descriptor preparation from loop preheader into the elected request region and shifts instruction addresses; the four-row tuple-copy pattern and targeted counts remain unchanged. This is not a binary no-op, but it does not achieve the intended operand reuse and is not promoted or timed.
+
+
+### Iterations 213–214 compile and initial fixture selection
+
+Both compile with the default CuTeDSL4.6.2,123/128 registers andzero stack. v213 static instructions1448→1352, UMOV221→133; v2141600→1512, UMOV217→133. Each has16 static gather4 sites instead of40 because eight main sites loop four times; runtime request count is unchanged. R2UR58/66 and MMA26/34 sites remain unchanged. Native loops retain coordinate URs but add destination/column copies, arithmetic, comparisons and backedges; static code reduction is not yet dynamic issue reduction.
+
+The first b2 guarded smoke was accidentally invoked with chunk0 rather than the established chunk3 smoke fixture. It reached the numerical reference assertion and failed493/65536 elements (maxabs0.0458808). GPU1 preflight was idle; no guardrail exception was reported. Preserve that failure and explicitly compare parent v190 to v213 on this exact short chunk0 input before interpreting the failure. Continue the established chunk3 smoke and b512/chunk0 memory fixture only after this distinction is checked. Tolerance is unchanged and the short-input failure is not counted as a reference pass.
+
+The b2/chunk0 diagnostic subsequently matches v190 exactly across all65536 elements and three repeats with TMEM guardrails enabled. Both new variants pass the established b2/chunk3 guarded smoke, b512/chunk0 guarded memcheck, b2/chunk3 synccheck and full8192/seed1234 three-repeat BF16 equivalence to their parents. The initial short-fixture reference failure remains recorded as inherited numerical behavior, not waived or relabelled a reference pass.
+
+
+### Iterations 213–214 runtime — tuple reuse does not improve latency
+
+v213 short: trtllm/native 1691.52us, cute-v213/native 1678.59us.
+
+v213 NCU base/stable: gpu__time_duration.sum=2.710240 ms, launch__registers_per_thread=123 register/thread, launch__shared_mem_per_block_dynamic=194.920000 Kbyte/block, sm__warps_active.avg.pct_of_peak_sustained_active=19.399033 %, sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed=32.633187 %, smsp__warps_eligible.avg.per_cycle_active=0.391770 warp, smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio=5.402664 inst, l1tex__t_sectors_pipe_lsu_mem_local_op_ld.sum=0 sector, l1tex__t_sectors_pipe_lsu_mem_local_op_st.sum=0 sector, l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum=4,800,358 , l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum=3,986,413 .
+
+v214 short: trtllm/native 1691.52us, cute-v214/native 1751.30us.
+
+v214 NCU base/stable: gpu__time_duration.sum=2.857408 ms, launch__registers_per_thread=128 register/thread, launch__shared_mem_per_block_dynamic=203.112000 Kbyte/block, sm__warps_active.avg.pct_of_peak_sustained_active=19.499890 %, sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed=45.576253 %, smsp__warps_eligible.avg.per_cycle_active=0.422704 warp, smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio=5.694935 inst, l1tex__t_sectors_pipe_lsu_mem_local_op_ld.sum=0 sector, l1tex__t_sectors_pipe_lsu_mem_local_op_st.sum=0 sector, l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum=5,174,883 , l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum=6,668,148 .
+
+Both match their parents on full8192/seed1234 three repeats and the hole/partial-length mask fixture; v214 passes the masked FP32 reference. v2131678.59us is slower than v1901549.06us; v2141751.30us is slower than v1971662.30us and pairedTRT1691.52us. These short timings use the existing tuning protocol, not20/100 headline measurements. The NCU long-scoreboard ratio improves while time worsens, illustrating why that ratio alone is not the objective. Local-memory traffic remainszero. No default change or expansion to second-seed/short accuracy for these slower candidates.
+
+Native v214 has eight main-gather loops with7 instructions in the first loop and6 in each remaining loop, all executing four times. The loop introduces address/column updates, comparisons and backedges and sometimes still copies destination/column operands. Dynamic source profiling will quantify the issue-count tradeoff; a smaller static kernel is not by itself less executed work.
+
+
+### Looped gather dynamic instruction tradeoff
+
+v214 issues635349655 instructions versus v197599875543, an increase of5.91%. UMOV falls76,144,640→46,260,224 (−29,884,416), but UIADD3 rises38,461,440→63,102,976 (+24,641,536), the new loop comparison issues16,777,216 times, and BRA.U rises2,334,720→19,111,936 (+16,777,216). MOV also rises8,706,722→10,437,899. Gather4 requests remain20,971,520 and MMA4,456,448. The final total includes additional changes, including sampled wait-loop execution, so it is not exactly the sum of those selected opcodes.
+
+Source shared wavefronts remain28,663,808 actual=ideal withzero excessive. Long/short-scoreboard samples65,807/5,355 and wait16,275 are diagnostic samples, not latency fractions. The core hypothesis of tuple reuse succeeds locally, but the loop's executed control/address work more than erases the desired issue saving. Do not pursue two-way unrolling solely because the static kernel is smaller; this evidence favors retaining the unrolled default and investigating another bottleneck.

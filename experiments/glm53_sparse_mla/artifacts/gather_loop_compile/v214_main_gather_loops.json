@@ -1,0 +1,262 @@
+[
+  {
+    "target": "0xbe0",
+    "backedge": "0xc40",
+    "trip_count": 4,
+    "native_instruction_count_per_iteration": 7,
+    "instructions": [
+      [
+        "0xbe0",
+        "UMOV UR16, UR6"
+      ],
+      [
+        "0xbf0",
+        "UMOV UR18, UR5"
+      ],
+      [
+        "0xc00",
+        "UIADD3 UR5, UPT, UPT, UR5, 0x80, URZ"
+      ],
+      [
+        "0xc10",
+        "UTMALDG.2D.GATHER4 [UR16], [UR24]"
+      ],
+      [
+        "0xc20",
+        "UIADD3 UR6, UPT, UPT, UR6, 0x4000, URZ"
+      ],
+      [
+        "0xc30",
+        "UISETP.LT.U32.AND UP0, UPT, UR5, 0x200, UPT"
+      ],
+      [
+        "0xc40",
+        "BRA.U UP0, 0xbe0"
+      ]
+    ]
+  },
+  {
+    "target": "0xd20",
+    "backedge": "0xd70",
+    "trip_count": 4,
+    "native_instruction_count_per_iteration": 6,
+    "instructions": [
+      [
+        "0xd20",
+        "UMOV UR8, UR5"
+      ],
+      [
+        "0xd30",
+        "UIADD3 UR5, UPT, UPT, UR5, 0x4000, URZ"
+      ],
+      [
+        "0xd40",
+        "UTMALDG.2D.GATHER4 [UR8], [UR24]"
+      ],
+      [
+        "0xd50",
+        "UIADD3 UR10, UPT, UPT, UR10, 0x80, URZ"
+      ],
+      [
+        "0xd60",
+        "UISETP.LT.U32.AND UP0, UPT, UR10, 0x200, UPT"
+      ],
+      [
+        "0xd70",
+        "BRA.U UP0, 0xd20"
+      ]
+    ]
+  },
+  {
+    "target": "0xe70",
+    "backedge": "0xec0",
+    "trip_count": 4,
+    "native_instruction_count_per_iteration": 6,
+    "instructions": [
+      [
+        "0xe70",
+        "UMOV UR8, UR5"
+      ],
+      [
+        "0xe80",
+        "UIADD3 UR5, UPT, UPT, UR5, 0x4000, URZ"
+      ],
+      [
+        "0xe90",
+        "UTMALDG.2D.GATHER4 [UR8], [UR24]"
+      ],
+      [
+        "0xea0",
+        "UIADD3 UR10, UPT, UPT, UR10, 0x80, URZ"
+      ],
+      [
+        "0xeb0",
+        "UISETP.LT.U32.AND UP0, UPT, UR10, 0x200, UPT"
+      ],
+      [
+        "0xec0",
+        "BRA.U UP0, 0xe70"
+      ]
+    ]
+  },
+  {
+    "target": "0xfc0",
+    "backedge": "0x1010",
+    "trip_count": 4,
+    "native_instruction_count_per_iteration": 6,
+    "instructions": [
+      [
+        "0xfc0",
+        "UMOV UR8, UR5"
+      ],
+      [
+        "0xfd0",
+        "UIADD3 UR5, UPT, UPT, UR5, 0x4000, URZ"
+      ],
+      [
+        "0xfe0",
+        "UTMALDG.2D.GATHER4 [UR8], [UR24]"
+      ],
+      [
+        "0xff0",
+        "UIADD3 UR10, UPT, UPT, UR10, 0x80, URZ"
+      ],
+      [
+        "0x1000",
+        "UISETP.LT.U32.AND UP0, UPT, UR10, 0x200, UPT"
+      ],
+      [
+        "0x1010",
+        "BRA.U UP0, 0xfc0"
+      ]
+    ]
+  },
+  {
+    "target": "0x1110",
+    "backedge": "0x1160",
+    "trip_count": 4,
+    "native_instruction_count_per_iteration": 6,
+    "instructions": [
+      [
+        "0x1110",
+        "UMOV UR8, UR5"
+      ],
+      [
+        "0x1120",
+        "UIADD3 UR5, UPT, UPT, UR5, 0x4000, URZ"
+      ],
+      [
+        "0x1130",
+        "UTMALDG.2D.GATHER4 [UR8], [UR24]"
+      ],
+      [
+        "0x1140",
+        "UIADD3 UR10, UPT, UPT, UR10, 0x80, URZ"
+      ],
+      [
+        "0x1150",
+        "UISETP.LT.U32.AND UP0, UPT, UR10, 0x200, UPT"
+      ],
+      [
+        "0x1160",
+        "BRA.U UP0, 0x1110"
+      ]
+    ]
+  },
+  {
+    "target": "0x1260",
+    "backedge": "0x12b0",
+    "trip_count": 4,
+    "native_instruction_count_per_iteration": 6,
+    "instructions": [
+      [
+        "0x1260",
+        "UMOV UR8, UR5"
+      ],
+      [
+        "0x1270",
+        "UIADD3 UR5, UPT, UPT, UR5, 0x4000, URZ"
+      ],
+      [
+        "0x1280",
+        "UTMALDG.2D.GATHER4 [UR8], [UR24]"
+      ],
+      [
+        "0x1290",
+        "UIADD3 UR10, UPT, UPT, UR10, 0x80, URZ"
+      ],
+      [
+        "0x12a0",
+        "UISETP.LT.U32.AND UP0, UPT, UR10, 0x200, UPT"
+      ],
+      [
+        "0x12b0",
+        "BRA.U UP0, 0x1260"
+      ]
+    ]
+  },
+  {
+    "target": "0x13b0",
+    "backedge": "0x1400",
+    "trip_count": 4,
+    "native_instruction_count_per_iteration": 6,
+    "instructions": [
+      [
+        "0x13b0",
+        "UMOV UR8, UR5"
+      ],
+      [
+        "0x13c0",
+        "UIADD3 UR5, UPT, UPT, UR5, 0x4000, URZ"
+      ],
+      [
+        "0x13d0",
+        "UTMALDG.2D.GATHER4 [UR8], [UR24]"
+      ],
+      [
+        "0x13e0",
+        "UIADD3 UR10, UPT, UPT, UR10, 0x80, URZ"
+      ],
+      [
+        "0x13f0",
+        "UISETP.LT.U32.AND UP0, UPT, UR10, 0x200, UPT"
+      ],
+      [
+        "0x1400",
+        "BRA.U UP0, 0x13b0"
+      ]
+    ]
+  },
+  {
+    "target": "0x1500",
+    "backedge": "0x1550",
+    "trip_count": 4,
+    "native_instruction_count_per_iteration": 6,
+    "instructions": [
+      [
+        "0x1500",
+        "UMOV UR8, UR5"
+      ],
+      [
+        "0x1510",
+        "UIADD3 UR5, UPT, UPT, UR5, 0x4000, URZ"
+      ],
+      [
+        "0x1520",
+        "UTMALDG.2D.GATHER4 [UR8], [UR24]"
+      ],
+      [
+        "0x1530",
+        "UIADD3 UR10, UPT, UPT, UR10, 0x80, URZ"
+      ],
+      [
+        "0x1540",
+        "UISETP.LT.U32.AND UP0, UPT, UR10, 0x200, UPT"
+      ],
+      [
+        "0x1550",
+        "BRA.U UP0, 0x1500"
+      ]
+    ]
+  }
+]
