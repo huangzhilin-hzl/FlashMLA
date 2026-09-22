@@ -6653,3 +6653,60 @@ Based on current190/197 respectively, add tcgen05.commit(empty+stage) immediatel
 P-ready already joins every compute read of the current index/score state and all P stores/O correction. Completed PV drains the issuer's remaining KV reads. Thus producer reuse can be released directly by that completion, while compute still waits PV before reusing the single P buffer or advancing its output. The original one-arrival empty barrier and per-stage phases stay unchanged. PTX commit tracks all prior asynchronous operations of the issuing thread: https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#tcgen05-instructions-tcgen05-commit . Guarded memory/sync plus uninstrumented full, short and masked parent comparisons are required before timing.
 
 Earlier017/018/043 used hardware empty commits together with different QK ordering and extra P buffers,andwere slower. They are not an isolated test of this notification on the current dedicated-issuer pipeline. Current197 source samples concentrate on PV waiting andproducer-empty waiting;those samples identify sites,not latency fractions or a promised speedup. SFU emulation was reconsidered,but this source profile hasonly1047 math-throttle samples versus69999 long-scoreboard samples,anddoes not establish SFU saturation. Prioritize the concrete release dependency before adding approximate exponent arithmetic.
+
+
+A follow-up synchronization opportunity follows from the current issuer order,not a claim of extra overlap. The QK-done commit for tile i+1 tracks all earlier operations by its issuing thread,including PV(i). PTX elect.sync chooses the same leader for the same member mask: https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#parallel-synchronization-and-communication-instructions-elect-sync . After hardware empty publication is qualified,inspect the emitted issuer election masks before testing removal of intermediate compute PV waits. The next QK wait may already provide the required completion before single-P reuse andnext output correction. The final PV must still be drained before the epilogue. No such removal is included in242/243.
+
+
+v242/v243 compile with123/128 registers,zero stack and1448/1600 static instructions,unchanged static sizes from190/197. PTX hasthree completion commits (QK,PV,empty),andnative LDL/STL are absent. Source hashes48af11d0f1d5f301942c54c4cd7da00b5e6c6bd10282eec8332f69091a309325 and010e20171ac7fec56ea033a745b8a20bbde3731276bf4154639f706c07746796 match the completed uploads. Guarded anduninstrumented qualification follows before timing.
+
+
+## Iterations244–245 — let next QK completion cover preceding PV
+
+Based on242/243 respectively, remove only the intermediate compute PV wait andits matching after-thread-sync fence. Retain the trailing before-thread-sync fence for a bounded control. Add one explicit final-PV wait andafter-thread-sync fence outside the loop,before denominator/epilogue work. Keep the single shared probability allocation,hardware empty-stage commits,all arithmetic andissuer order unchanged.
+
+Both242/243 PTX files emit allfour elect.sync sites withfull mask-1. The dedicated issuer is a complete active warp,and deterministic equal-mask election keeps QK/PV operations on the same thread. Since it issues PV(i) before QK(i+1),the latter commit covers both operations. Every compute warp waits QK(i+1) before reading the next scores orreusing P/O. P-ready(i) drains prior score reads before next QK overwrites scores. Hardware empty(i) release handles KV reuse independently,avoiding an early manual release orproducer deadlock. Final PV hasno following QK,so its explicit wait remains essential.
+
+This coalesces completion waits rather than overlapping the next softmax with unfinished PV;no extra P buffer is needed. Require unchanged-pool compile inspection,guarded memory/sync andfull/short/masked uninstrumented parent comparisons before timing. This is distinct from earlier043/017 next-QK-before-PV schedules.
+
+
+v242/v243 guarded b2 smoke,b512 memcheck andb2 synccheck pass withzero sanitizer errors. Full8192/seed1234 andshort1024/chunk0/seed5678 eachmatch190/197 respectively across three repeats. Masked outputs match their parents;243 passes original FP32 tolerance,242 retains the86 fast-path mask failures. No second full-seed audit. Proceed tostandard paired short timing/NCU.
+
+
+v242 short1552.608us versusTRT1691.872us andv2431675.264us versusTRT1691.776us do not improve their defaults1549.06/1662.30us. NCU base/stable242:2.646816ms,REG123,dynamic shared194920B,occupancy19.290166%,tensor33.560362%,eligible0.377227,long-scoreboard6.434340,local0/0,aggregate shared conflicts7043373/2340753. NCU243:2.847264ms,REG128,dynamic shared203112B,occupancy19.397525%,tensor45.714970%,eligible0.372473,long-scoreboard6.921884,local0/0,aggregate shared conflicts7507996/2236584. Direct hardware notification alone is not a measured gain. Retain as the qualified control for244/245's removal of intermediate redundant waits;no promotion orexpanded long timing for242/243.
+
+
+v244/v245 compile with118/128 registers,zero stack and1456/1608 static instructions. Both retain three completion commits andfour deterministic full-mask elections;native LDL/STL are absent. This validates the assumed issuer identity in emitted PTX,not runtime synchronization orperformance. Guarded/full/short/masked qualification follows.
+
+
+The244 qualification sequence stops with synccheck exit86 after guarded smoke andmemcheck success;no244 equivalence/timing andno245 launch follows. A parallel specification audit identifies an independent blocker: retaining per-tile PV-done arrivals while deleting intermediate waits violates the mbarrier reuse rule. Each primary phase must haveatleastone successful test_wait/try_wait before an arrival in the next phase: https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#parallel-synchronization-and-communication-instructions-mbarrier-primary-phase . QK's transitive completion is insufficient to satisfy a wait requirement on the distinct PV-done object. Preserve244/245 as rejected protocols,andinspect the actual sanitizer diagnostic rather than assume it matches this specification finding.
+
+
+The244 synccheck diagnostic is specifically "Barrier error detected. Missing wait." at issuer thread384 in both b2 CTAs,shared address0x2fd28,followed by CUDA launch failure andtwo reported errors. This agrees with the independently identified unused intermediate PV barrier. Retain the raw failed logs;244 was not run uninstrumented orbenchmarked,and245 remains compile-only. Guarded smoke/memcheck success did not qualify the barrier lifecycle.
+
+## Iterations246–247 — remove the orphan PV barrier andwait on final KV release
+
+Based on rejected244/245, remove pv_done allocation,initialization andall per-tile commits. Keep only QK-done andstage-empty completion notifications. At the epilogue wait on empty[last_block%2] with phase(last_block//2)%2,not the old per-tile PV parity. The producer has already waited for the preceding empty phase before refilling each reused KV stage,then publishes full before the issuer can commit the next empty phase. Thus each reused empty phase has a successful waiter. The final compute wait observes the last PV's completion,while no unused single PV object advances through unwaited phases.
+
+The current QK-done wait still covers previous PV andprotects single-P reuse andoutput correction. Its own phase hasallcompute waiters before P-ready allows the next QK. No MMA ordering,arithmetic,mask orbuffering change. Compile resource/commit checks precede guarded memory/sync anduninstrumented full,short andmask equivalence against qualified242/243,not against the rejected244/245. The short fixture andb512/chunk0 sanitizers exercise different final stages andper-stage phases. No inherited correctness from failed controls.
+
+
+The244 barrier address is confirmed in PTX: pv_done is dynamic-shared base+194856,which becomes0x2fd28 after the1024-byte driver allocation shown in resources. This localizes the synccheck failure to the removed waits on that object,not the two stage-empty barriers.
+
+
+v246/v247 compile with111/128 registers,zero stack and1464/1616 static instructions. PTX verifies exactlytwo completion commits (QK andstage-empty),four full-mask elections,andno native local load/store sites. Source hashes areef6b3e6b989d7ee7b1ec66d39ac07ff6f34369b850ba2075b3d5aa90f2ea3b5a anda5f28f2331d57b974fb60835c956b9ead26a411f4b47eadc7663ac68cb580872. Add b512/chunk0 synccheck to the existing b2 check to exercise changing final-stage/parity cases. The full short-input exact comparison remains required. No speed claim from the lower fast-path register count.
+
+
+v246/v247 guarded b2 smoke,b512/chunk0 memcheck,andboth b2/chunk3 andb512/chunk0 synccheck pass withzero sanitizer errors. Full8192/seed1234 andshort1024/chunk0/seed5678 eachmatch qualified242/243 respectively across three exact repeats. Masked outputs also match;247 passes the original FP32 tolerance,246 retains the fast-path86 failures. Removing the orphan PV object fixes the reported lifecycle failure within these checks. No second full-seed audit yet;proceed to paired short timing/NCU before any default decision.
+
+
+v246 short1548.416us versusTRT1690.784us is near current190's1549.06us,not a meaningful established gain. v2471671.040us versusTRT1691.808us is slower than1971662.30us. NCU base/stable246:2.636640ms,REG111,dynamic shared194912B,occupancy19.290895%,tensor33.551283%,eligible0.345986,long-scoreboard6.552434,zero local read/write,aggregate shared conflicts6988541/2157927. NCU247:2.836864ms,REG128,dynamic shared203104B,occupancy19.394181%,tensor45.814777%,eligible0.365609,long-scoreboard6.968090,zero local read/write,aggregate shared conflicts6759236/2226037. The lower fast-path register count andcoalesced wait protocol preserve throughput butdo not warrant default promotion. Collect source attribution for247 to quantify the changed waiting/instruction pattern before the next dependency control;no long timing orsecond full seed merely to seek a win.
+
+
+v247 unlocked source issues608186510 instructions versus197599875543,with28663808 actual/ideal shared wavefronts andzero excessive. Long-scoreboard samples now concentrate on compute QK31829,producer-empty17008 andcompute-full6514 outof71125. The removed intermediate PV wait does not remove its underlying dependency;QK completion covers that work andabsorbs much ofthe waiting. Samples are not latency fractions,andthe instruction increase is not itself an exact latency explanation.
+
+## Iterations248–249 — remove compute's duplicate full-stage acquire
+
+Based on qualified246/247, remove only the compute role's full-stage wait andits matching after-thread-sync fence. Move the bitmap load after the retained QK-done wait andfence,so it is never speculatively read before publication. The issuer retains its full-stage acquire,TMEM after-thread-sync fence andshared async-view fence before QK;QK completion remains the compute handoff. Producer publication barriers,all empty-stage waits/commits,P-ready protocol,final PV drain,arithmetic andlayouts remain unchanged.
+
+The full object still has an issuer waiter in each phase before its stage can be consumed andrefilled;unlike244's orphan PV barrier,no phase loses every waiter. The generic bitmap publication now relies on the issuer-to-compute synchronization chain,which requires fresh memory/synchronization andfull/short/masked numerical checks. This intentionally gives up earlier bitmap prefetch;fewer waits can lose overlap andneed not be faster. Inspect emitted waits/resources before qualification,andpreserve both source profiles for attribution rather than treat the6514 samples as a speedup bound.

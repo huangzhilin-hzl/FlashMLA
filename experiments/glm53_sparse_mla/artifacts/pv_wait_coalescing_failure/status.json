@@ -1,0 +1,5 @@
+{
+  "v244": "rejected: synccheck Missing wait, exit86; no uninstrumented equivalence or timing",
+  "v245": "rejected same protocol; compiled only, no launch",
+  "reference": "https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#parallel-synchronization-and-communication-instructions-mbarrier-primary-phase"
+}

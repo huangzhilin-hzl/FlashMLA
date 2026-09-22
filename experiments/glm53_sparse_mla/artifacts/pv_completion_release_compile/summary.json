@@ -1,0 +1,28 @@
+{
+  "v242": {
+    "kernel_sha256": "48af11d0f1d5f301942c54c4cd7da00b5e6c6bd10282eec8332f69091a309325",
+    "registers": 123,
+    "stack_bytes": 0,
+    "static_instructions": 1448,
+    "local_load_sites": 0,
+    "local_store_sites": 0,
+    "commits": [
+      "tcgen05.commit.cta_group::1.mbarrier::arrive::one.shared::cluster.b64 \t[%r1];",
+      "tcgen05.commit.cta_group::1.mbarrier::arrive::one.shared::cluster.b64 \t[%r2];",
+      "tcgen05.commit.cta_group::1.mbarrier::arrive::one.shared::cluster.b64 \t[%r23+194904];"
+    ]
+  },
+  "v243": {
+    "kernel_sha256": "010e20171ac7fec56ea033a745b8a20bbde3731276bf4154639f706c07746796",
+    "registers": 128,
+    "stack_bytes": 0,
+    "static_instructions": 1600,
+    "local_load_sites": 0,
+    "local_store_sites": 0,
+    "commits": [
+      "tcgen05.commit.cta_group::1.mbarrier::arrive::one.shared::cluster.b64 \t[%r1];",
+      "tcgen05.commit.cta_group::1.mbarrier::arrive::one.shared::cluster.b64 \t[%r2];",
+      "tcgen05.commit.cta_group::1.mbarrier::arrive::one.shared::cluster.b64 \t[%r23+203096];"
+    ]
+  }
+}

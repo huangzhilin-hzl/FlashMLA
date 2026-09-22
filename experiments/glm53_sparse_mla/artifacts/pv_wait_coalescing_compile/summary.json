@@ -1,0 +1,40 @@
+{
+  "v244": {
+    "kernel_sha256": "32fd0ad55dc9afd398211f5cf75449903110195c84680889d13b1f6d5b4a6f1e",
+    "registers": 118,
+    "stack_bytes": 0,
+    "static_instructions": 1456,
+    "local_load_sites": 0,
+    "local_store_sites": 0,
+    "commits": [
+      "tcgen05.commit.cta_group::1.mbarrier::arrive::one.shared::cluster.b64 \t[%r1];",
+      "tcgen05.commit.cta_group::1.mbarrier::arrive::one.shared::cluster.b64 \t[%r2];",
+      "tcgen05.commit.cta_group::1.mbarrier::arrive::one.shared::cluster.b64 \t[%r23+194904];"
+    ],
+    "elections": [
+      "elect.sync \t%r51|%p4, -1;",
+      "elect.sync \t%r1107|%p44, -1;",
+      "elect.sync \t%r1032|%p26, -1;",
+      "elect.sync \t%r1063|%p28, -1;"
+    ]
+  },
+  "v245": {
+    "kernel_sha256": "0cc7508ae673181fe34e728fad44e3b4c2f3e14c1d24216b69047232562a72ec",
+    "registers": 128,
+    "stack_bytes": 0,
+    "static_instructions": 1608,
+    "local_load_sites": 0,
+    "local_store_sites": 0,
+    "commits": [
+      "tcgen05.commit.cta_group::1.mbarrier::arrive::one.shared::cluster.b64 \t[%r1];",
+      "tcgen05.commit.cta_group::1.mbarrier::arrive::one.shared::cluster.b64 \t[%r2];",
+      "tcgen05.commit.cta_group::1.mbarrier::arrive::one.shared::cluster.b64 \t[%r23+203096];"
+    ],
+    "elections": [
+      "elect.sync \t%r57|%p5, -1;",
+      "elect.sync \t%r1271|%p47, -1;",
+      "elect.sync \t%r1196|%p29, -1;",
+      "elect.sync \t%r1233|%p31, -1;"
+    ]
+  }
+}

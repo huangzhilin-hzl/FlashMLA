@@ -1,0 +1,38 @@
+{
+  "v246": {
+    "kernel_sha256": "ef6b3e6b989d7ee7b1ec66d39ac07ff6f34369b850ba2075b3d5aa90f2ea3b5a",
+    "registers": 111,
+    "stack_bytes": 0,
+    "static_instructions": 1464,
+    "local_load_sites": 0,
+    "local_store_sites": 0,
+    "commits": [
+      "tcgen05.commit.cta_group::1.mbarrier::arrive::one.shared::cluster.b64 \t[%r1];",
+      "tcgen05.commit.cta_group::1.mbarrier::arrive::one.shared::cluster.b64 \t[%r22+194896];"
+    ],
+    "elections": [
+      "elect.sync \t%r50|%p4, -1;",
+      "elect.sync \t%r1108|%p44, -1;",
+      "elect.sync \t%r1033|%p26, -1;",
+      "elect.sync \t%r1064|%p28, -1;"
+    ]
+  },
+  "v247": {
+    "kernel_sha256": "a5f28f2331d57b974fb60835c956b9ead26a411f4b47eadc7663ac68cb580872",
+    "registers": 128,
+    "stack_bytes": 0,
+    "static_instructions": 1616,
+    "local_load_sites": 0,
+    "local_store_sites": 0,
+    "commits": [
+      "tcgen05.commit.cta_group::1.mbarrier::arrive::one.shared::cluster.b64 \t[%r1];",
+      "tcgen05.commit.cta_group::1.mbarrier::arrive::one.shared::cluster.b64 \t[%r22+203088];"
+    ],
+    "elections": [
+      "elect.sync \t%r56|%p5, -1;",
+      "elect.sync \t%r1275|%p47, -1;",
+      "elect.sync \t%r1201|%p29, -1;",
+      "elect.sync \t%r1237|%p31, -1;"
+    ]
+  }
+}

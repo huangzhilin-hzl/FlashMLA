@@ -207,6 +207,10 @@ B300 physical GPU1; b8192, H64, D576/512, TopK2048, chunk3. Each row is a paired
 | v235 | 1550.24 | 1690.14 | 1.0902x | 123 | 0.00 / 0.00 | 33.52% | guarded/full seed1234/short/mask exact v190; fast precision limits; producer unroll no gain |
 | v240 | 1673.38 | 1691.90 | 1.0111x | 128 | 0.00 / 0.00 | 45.93% | guarded/full seed1234/short/mask exact v197; zero local traffic; unroll and role budgets slower |
 | v241 | 1673.41 | 1691.97 | 1.0111x | 128 | 0.00 / 0.00 | 45.98% | guarded/full seed1234/short/mask exact v197; zero local traffic; unroll and role budgets slower |
+| v242 | 1552.61 | 1691.87 | 1.0897x | 123 | 0.00 / 0.00 | 33.56% | guarded/full seed1234/short/mask parent equivalence; hardware KV release no gain |
+| v243 | 1675.26 | 1691.78 | 1.0099x | 128 | 0.00 / 0.00 | 45.71% | guarded/full seed1234/short/mask parent equivalence; hardware KV release no gain |
+| v246 | 1548.42 | 1690.78 | 1.0919x | 111 | 0.00 / 0.00 | 33.55% | guarded fixed/varlen sync and full/short/mask parent equivalence; valid single completion; no default gain |
+| v247 | 1671.04 | 1691.81 | 1.0124x | 128 | 0.00 / 0.00 | 45.81% | guarded fixed/varlen sync and full/short/mask parent equivalence; valid single completion; no default gain |
 
 Raw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. v090/v091/v094/v096/v097/v105/v108/v112/v125 have an observed sustained warm advantage in the extended eager-event, Graph and rotating-order runs, at baseline-level FP8 precision; v190 is the current fast path. Short five-event v125 tuning has a small observed advantage; v105 is near parity. Use the matching execution regime and retained distributions. v086 is near parity warm and its initial cold advantage does not reproduce in its rotating-order audit.
 
