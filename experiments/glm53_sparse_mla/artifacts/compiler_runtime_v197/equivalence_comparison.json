@@ -1,0 +1,11 @@
+{
+  "records_compared": 12,
+  "all_input_output_records_identical": true,
+  "kernel_sha256": {
+    "v197": "ab5db755204cc204a45fbb7b94c7e9d9a8e5c53d0c50ae183c5a191a4c0dfaa7"
+  },
+  "versions": [
+    "4.6.2",
+    "4.6.3"
+  ]
+}

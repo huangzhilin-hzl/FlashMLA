@@ -462,3 +462,17 @@ cold1795.65–1799.47 versus1861.86–1868.27. Standalone20/100 Graph warm/cold
 1811.97/1836.06 us versus pairedTRT1884.29/1918.93. Unlike earlier strict
 versions, this recorded standalone warm run also wins; it is not a guarantee
 across unmeasured inputs or clocks. Fast default remains **v190**.
+
+
+A subsequent compiler control repeats standalone v197 Graph20/100 in separate
+processes, alternating4.6.2/4.6.3 order for four rounds. Complete Q/KV/index/length
+and output byte hashes match for12 records: two full seeds, short inputs and
+the masked fixture, three repeats each.4.6.3 passes guarded memory/sync checks
+but is slower in all four cold comparisons and three warm comparisons; one
+warm pair is essentially tied. Keep4.6.2.
+
+The repeated4.6.2 standalone warm values1842.22–1888.35 us include two rounds
+slower than pairedTRT. This materially limits the earlier1811.97 us standalone
+result: the warm advantage is execution-dependent. The same-process rotating
+comparison against v191 remains valid, but does not establish a universal
+standalone lead overTRT. Raw records are in artifacts/compiler_runtime_v197.

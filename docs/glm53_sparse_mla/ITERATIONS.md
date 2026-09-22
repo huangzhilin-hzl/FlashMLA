@@ -5890,3 +5890,48 @@ cold trtllm/native: 1859.62/1859.70/1858.51/1863.57 us.
 NCU base/stable: gpu__time_duration.sum=2.816832 ms, launch__registers_per_thread=128 register/thread, launch__shared_mem_per_block_dynamic=203.112000 Kbyte/block, sm__warps_active.avg.pct_of_peak_sustained_active=19.397456 %, sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed=46.170841 %, smsp__warps_eligible.avg.per_cycle_active=0.382082 warp, smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio=6.816106 inst, l1tex__t_sectors_pipe_lsu_mem_local_op_ld.sum=0 sector, l1tex__t_sectors_pipe_lsu_mem_local_op_st.sum=0 sector, l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum=6,954,999 , l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum=2,849,184 .
 
 v202 wins7/8 same-run comparisons but loses one warm round by1.86 us. Its separate Graph warm1869.94 us is substantially above v1971811.97 us in the preceding independent record; the pairedTRT differs too. Cold performance improves, but a uniform additive gain is not established. Keep v202 as a fully validated alternative; default remains v197.
+
+
+### Isolated v197 compiler control — identical audited bytes, no4.6.3 speedup
+
+New4.6.3 passes guarded b2 smoke/b512 memcheck and b2 synccheck. All12 input/output records match4.6.2 exactly: both full seeds,1024-row short case and the two-row hole/partial-tile fixture, each repeated three times. Kernel SHA256 ab5db755204cc204a45fbb7b94c7e9d9a8e5c53d0c50ae183c5a191a4c0dfaa7. Input hashes include Q,KV,indices and lengths; output hash covers every BF16 byte. Hashing and copies are outside performance measurements.
+
+462 warm cute-v197/native: 1842.22/1888.35/1869.90/1863.70 us.
+
+462 warm trtllm/native: 1865.20/1869.02/1868.83/1872.02 us.
+
+462 cold cute-v197/native: 1831.17/1832.82/1832.78/1835.14 us.
+
+462 cold trtllm/native: 1917.09/1910.96/1916.93/1916.99 us.
+
+463 warm cute-v197/native: 1874.02/1888.34/1892.54/1878.27 us.
+
+463 warm trtllm/native: 1869.28/1867.94/1864.82/1869.70 us.
+
+463 cold cute-v197/native: 1838.98/1843.07/1839.01/1846.37 us.
+
+463 cold trtllm/native: 1916.93/1914.86/1915.10/1916.99 us.
+
+Each round launches independent processes in alternating compiler order, using original Graph20/100 and the pairedTRT baseline.4.6.3 loses all four cold comparisons by6.22–11.23 us; warm is slower in three rounds and essentially tied in one(0.016 us difference). Retain installed4.6.2. Static instruction totals are both1600, but4.6.3 changes control/address instructions and adds WARPSYNC instructions; dynamic source sampling below also changes total issued instructions; do not attribute the entire latency difference to one opcode.
+
+The installed4.6.2 standalone warm measurements here span1842.22–1888.35 us. Two of four exceed their pairedTRT, including one near tie. This supplements the previously faster standalone1811.97 us record: a warm win is not uniformly reproduced. The same-process five-round audit still supports v197 over v191, but it does not justify a universal standalone warm advantage overTRT. Preserve both distributions and execution contexts.
+
+
+The unlocked source control reports 603280446 issued instructions on4.6.3 versus599875543 on4.6.2 (+0.568%). Shared wavefronts remain actual=ideal28663808, excessive0. Long-scoreboard samples total69446: PV24255, producer-empty16400, QK12765. Default base/stable NCU reports128 initial registers,203112B dynamic shared memory,19.411364% active warps,46.113538% tensor activity,0.380506 eligible warps,6.758706 long-scoreboard ratio and zero local-memory sectors. Its2.827520ms diagnostic duration is above4.6.2's2.817632ms. These samples corroborate unchanged broad wait locations, not a causal decomposition of the small runtime regression.
+
+
+## Iterations 203–204 — explicit uniform length across every pipeline role
+
+Based on current defaults v190/v197. Apply make_warp_uniform to the query length in producer, issuer and compute branches, before their loops and outside every elect_one region. All active lanes in each selected warp read the same lens[qi], and role predicates are warp-uniform. This preserves variable lengths and masks; no full-length specialization is introduced. The earlier v173/v174 issuer-only control was binary-identical on a different parent. This control includes producer and compute loop bounds, motivated by compiler-sensitive scalar control/address operations. Compile first on installed4.6.2 and compare native instruction encodings/resources. If identical, record a no-op without GPU execution. If changed, require guarded qualification, full equivalence and masked audit before timing. v204 also corrects an obsolete compiler-version comment without changing allocation.
+
+
+### Iterations 203–204 result — complete native-code no-op
+
+Installed4.6.2 emits identical native instruction encodings for v190/v203 (2896 encoding words) and v197/v204 (3200 words), excluding function-name text. Resources remain123/128 registers respectively, STACK0 and LOCAL0. The compiler already infers enough uniformity for this expression in all roles. No candidate GPU execution, numerical claim or performance measurement is added. Records: artifacts/uniform_lengths.
+
+
+## Iterations 205–206 — remove the final shared-reciprocal handoff
+
+Based on defaults v190/v197. Retain the final partial-sum store, its256-thread barrier and all TMEM completion/deallocation synchronization. Each output thread then reads the four partial denominators for its own head and computes one reciprocal with the identical parenthesization and division expression. Remove the64-thread reciprocal producer, shared denominator write/read and second256-thread barrier. Keep the shared-memory allocation/layout unchanged to isolate this control.
+
+This exchanges192 extra per-CTA reciprocals and additional shared reads for one barrier and a branch/handoff per query. It is not the earlier per-element division removed by v044: each new reciprocal is reused across all128 output elements owned by that thread. The operation is outside the16-tile attention loop, so any benefit is expected to be small. Compile/resources, bounded guarded smoke/memcheck, synccheck, full bitwise and hole/partial-tile audit precede timing; no numerical equivalence is assumed from expression similarity.
