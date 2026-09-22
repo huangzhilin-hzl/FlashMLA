@@ -5843,3 +5843,50 @@ v201 short: trtllm/native 1692.22 us, cute-v201/native 1665.22 us.
 v201 NCU base/stable: gpu__time_duration.sum=2.826272 ms, launch__registers_per_thread=128 register/thread, launch__shared_mem_per_block_dynamic=203.112000 Kbyte/block, sm__warps_active.avg.pct_of_peak_sustained_active=19.403410 %, sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed=46.039772 %, smsp__warps_eligible.avg.per_cycle_active=0.380690 warp, smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio=6.910416 inst, l1tex__t_sectors_pipe_lsu_mem_local_op_ld.sum=0 sector, l1tex__t_sectors_pipe_lsu_mem_local_op_st.sum=0 sector, l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum=7,253,624 , l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum=3,016,140 .
 
 v2001553.50 us improves its32/192 parent v1941560.77 but remains above v1831550.50 and current v1901549.06. v2011665.22 improves v1951673.41 but is slower than v1971662.30. No default change. The donor64 result supports keeping more registers for producer/issuer roles; compute192 over176 does not improve the observed high-precision short case.
+
+
+## Isolated compiler runtime control — v197 under4.6.2 and4.6.3
+
+The successful register-role kernels compile to different SASS under the two
+compilers. Test the same v197 source under isolated4.6.3 only after guarded
+smoke/memory and sync qualification. Compare complete byte hashes of Q,KV,
+indices,lens and BF16 output across two separate compiler processes, for both
+full seeds and the1024-row short case, three output repeats each. This avoids
+loading conflicting compiler libraries into one Python interpreter. Hashing
+and host copies are validation-only and excluded from benchmark timing.
+
+The comparison helper records source hashes, loaded compiler path, package and
+torch versions. Exact output equality inherits v197's audited precision scope;
+it is not a separate FP32-reference proof. Keep compiler-labelled artifacts
+separate from the default4.6.2 benchmark records. Compare paired TRT timings
+under the same original benchmark method if qualification succeeds.
+
+The compiler hash control also includes the exact two-row hole/partial-tile
+fixture from audit_mask_precision.py, with input bytes hashed after mutation.
+
+
+### Iteration 202 result — validated cache-policy alternative, not promoted
+
+REG128/STACK0 and STG.E.NA.EFL2.256. Ordinary b2 smoke, b512 memcheck and b2 synccheck pass. Both full seeds, short case and masked inputs match v197 bitwise; all original higher-precision audit limits are inherited.
+
+full_event: trtllm/native warm 1691.46 us, cute-v202/native warm 1661.12 us.
+
+cuda-event_event100: trtllm/native warm 1881.30 us, cute-v202/native warm 1817.22 us, trtllm/native cold 1913.89 us, cute-v202/native cold 1814.46 us.
+
+cuda-graph_event100: trtllm/native warm 1873.74 us, cute-v202/native warm 1869.94 us, trtllm/native cold 1916.90 us, cute-v202/native cold 1826.11 us.
+
+warm cute-v197/native: 1812.78/1811.09/1808.58/1818.64 us.
+
+warm cute-v202/native: 1810.02/1810.05/1810.43/1809.84 us.
+
+warm trtllm/native: 1865.97/1874.02/1878.16/1882.13 us.
+
+cold cute-v197/native: 1798.99/1796.21/1812.45/1798.13 us.
+
+cold cute-v202/native: 1792.03/1793.97/1794.54/1793.84 us.
+
+cold trtllm/native: 1859.62/1859.70/1858.51/1863.57 us.
+
+NCU base/stable: gpu__time_duration.sum=2.816832 ms, launch__registers_per_thread=128 register/thread, launch__shared_mem_per_block_dynamic=203.112000 Kbyte/block, sm__warps_active.avg.pct_of_peak_sustained_active=19.397456 %, sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed=46.170841 %, smsp__warps_eligible.avg.per_cycle_active=0.382082 warp, smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio=6.816106 inst, l1tex__t_sectors_pipe_lsu_mem_local_op_ld.sum=0 sector, l1tex__t_sectors_pipe_lsu_mem_local_op_st.sum=0 sector, l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum=6,954,999 , l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum=2,849,184 .
+
+v202 wins7/8 same-run comparisons but loses one warm round by1.86 us. Its separate Graph warm1869.94 us is substantially above v1971811.97 us in the preceding independent record; the pairedTRT differs too. Cold performance improves, but a uniform additive gain is not established. Keep v202 as a fully validated alternative; default remains v197.
