@@ -1,0 +1,11 @@
+{
+  "threads": 512,
+  "initial_registers": 128,
+  "stack_bytes": 8,
+  "donor_registers": 64,
+  "compute_registers": 176,
+  "initial_pool": 65536,
+  "final_pool": 61440,
+  "source_sha256": "52feefdfff7f6496ae1c7f95e4414417449063c5092df23b7c809719396353c0",
+  "candidate_launched": false
+}

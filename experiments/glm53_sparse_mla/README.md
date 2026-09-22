@@ -33,10 +33,10 @@ export CUTE_DSL_ARCH=sm_103a
 
 # Fast single-P path with closely matching TRTLLM precision; see all-row limits below.
 /opt/sglang/bin/python bench.py \
-  --kernel-version v190 --block-k 128 \
+  --kernel-version v272 --block-k 128 \
   --backends trtllm cute --scope native --check-rows 512 \
   --warmup-iters 20 --repeat-iters 100 --cache both --timing cuda-graph \
-  --output-json artifacts/v190_accuracy512_graph.json
+  --output-json artifacts/v272_accuracy512_graph.json
 
 # Higher precision, retaining the audited full-reference tolerance passes.
 /opt/sglang/bin/python bench.py --kernel-version v197 --block-k 128 \
@@ -45,7 +45,7 @@ export CUTE_DSL_ARCH=sm_103a
   --output-json artifacts/v197_accuracy512_graph.json
 
 # Short event-based tuning run, followed by one warmed NCU invocation.
-bash run_iteration.sh v190 128
+bash run_iteration.sh v272 128
 ```
 
 `run_iteration.sh` saves raw JSON, logs, NCU details/CSV and an immutable per-run
@@ -80,7 +80,8 @@ The full 8192-row/seed1234 audit checks all 268,435,456 output elements:
 | v138, paired x32 correction loads | Full bitwise equality to v125 on both seeds, short case and masks | Earlier fast path |
 | v146, early bitmap acquisition | Full bitwise equality to v138 on both seeds, short case and masks | Earlier fast path |
 | v183, hardware max with indexed mask fallback | Full bitwise equality to v146 on both seeds, short case and masks | Earlier fast path |
-| v190, output evict-first | Full bitwise equality to v183 on both seeds, short case and masks | Current fast path |
+| v190, output evict-first | Full bitwise equality to v183 on both seeds, short case and masks | Earlier fast path |
+| v272, independent-role persistent query loops | Full bitwise equality to v190 on both seeds, short case and masks | Current fast path |
 | v049, P scale256 | 11 | Earlier timing reference |
 | v053, residual FP8 | 0 | Original higher-precision path |
 | v065, residual FP8 with V collector reuse | 0 via full bitwise equivalence to v053 | Exact-equivalence optimization |
@@ -333,7 +334,7 @@ evict-first. Full2seeds/short/mask bitwise equivalence and qualified sanitizers
 pass. Two rotating-order audits favor it in8/10 warm and9/10 cold round medians,
 but the gain is small and includes regressions in individual orders. Hardware
 counters show about8.8% less DRAM read traffic in the recorded warmed profile.
-It is a validated experimental alternative; v190 is now the established default.
+It is a validated experimental alternative; v272 is now the established fast default.
 KV evict-last (`v130`) has no consistent gain. Mandatory future-QK lookahead
 (`v131`) delays PV and regresses to2.038ms; readiness-conditional lookahead
 (`v132`) recovers to1.661ms but still does not improvev125. See the iteration log
@@ -416,7 +417,7 @@ defaults in all eight warm/cold comparisons. Separate high-precision Graph
 warm1901.55 us still trailsTRT1867.89 us; timing-regime limits remain.
 
 
-The preceding experimental defaults were **v190 (fast)** and **v191 (higher precision)**; the fast default remains v190.
+The preceding experimental defaults were **v190 (fast)** and **v191 (higher precision)**; the fast default is now v272 after the persistence audit below.
 They add output L2 evict-first to v183/v184 and match their predecessors bitwise
 on both full seeds, short-case rows and masks. Qualified memory and sync checks
 pass. All fast-path tolerance limitations remain; exact equivalence is not an
@@ -450,7 +451,7 @@ five local wheels in one invocation. Never infer a runtime gain from compilation
 separate compile controls. Moving compute register allocation into its actual
 role branch permits native x32/x64 kernels to compile with installed4.6.2 as
 well. v194/v195/v197 runtime records use4.6.2; the4.6.3 instruction streams are
-not interchangeable evidence. Current defaults arev190/v197 after the higher-precision register-allocation audit below.
+not interchangeable evidence. Current defaults are v272/v197 after the persistence and higher-precision register-allocation audits below.
 
 
 The current higher-precision default is **v197**, with role-local register
@@ -461,7 +462,7 @@ comparisons beat v191/v184/v195. Warm1810.59–1816.67 us versusTRT1867.94–188
 cold1795.65–1799.47 versus1861.86–1868.27. Standalone20/100 Graph warm/cold
 1811.97/1836.06 us versus pairedTRT1884.29/1918.93. Unlike earlier strict
 versions, this recorded standalone warm run also wins; it is not a guarantee
-across unmeasured inputs or clocks. Fast default remains **v190**.
+across unmeasured inputs or clocks. Fast default is now **v272** after the persistence audit below.
 
 
 A subsequent compiler control repeats standalone v197 Graph20/100 in separate
@@ -494,3 +495,26 @@ warm rotation latency from roughly1.81ms to1.85ms. It still beats v191 in all12
 warm/cold comparisons with queries off. Earlier rotation numbers include these
 inter-case gaps. Future comparisons use --endpoint-telemetry off and no sampler
 unless explicitly labelled as diagnostics. The original benchmark is unchanged.
+
+
+## Current fast path: persistent independent-role query loops
+
+v272 retains the shared/TMEM allocation in148 CTAs. Producer, issuer and compute
+roles each advance their own query loop, carrying barrier phases across query rows.
+The compute epilogue rendezvous precedes the next Q load; existing empty/full and
+QK/PV/P-ready handoffs protect reused storage. No cross-query input values are cached
+and sparse entries stay in their original order. Dynamic register limits are
+donor64/compute192 within512 threads. The8-byte scalar metadata stack produces real
+local requests; persistence still improves the measured complete workload.
+
+Guarded fixed/variable-length and odd-batch synchronization plus memory checks pass.
+Both full8192 seeds, the full1024 short case and masked outputs are bitwise equal to
+v190. Its9/6 full-target failures,7650 short-case failures and86 masked failures
+remain; use v197 when the audited strict tolerance is required.
+
+Five endpoint-OFF rotating Graph orders show warm1603.472–1613.888 us and
+cold1601.568–1603.584 us, beating paired v190 in all10 comparisons by approximately
+1.3%–2.8%. Standalone20/100 eager warm/cold is1605.808/1599.792 us versus
+TRT1878.032/1916.832 us; Graph is1615.520/1599.344 us versus1871.072/1914.912 us.
+The two-query control v271 remains mixed versus v190 and is not promoted. These
+are measured results on this B300 fixture with unlocked clocks, not universal guarantees.

@@ -6995,3 +6995,27 @@ v271 passes guarded b2 smoke, b512/chunk0 memcheck and fixed/variable-length syn
 
 
 v271 short timing is 1541.695952 us versus TRTLLM1691.967964 us, a small provisional improvement over v190's historical1549.06 us. NCU base/stable: 2.627168 ms, 128 initial registers, 194920 B dynamic shared, 19.837321% occupancy, 33.678097% tensor activity, 0.365125 eligible warps/cycle, long-scoreboard ratio6.620661, local read/write sectors2785280/1098916 and aggregate shared conflicts6729168/5563984. These local sectors are real L1TEX requests, not necessarily DRAM traffic. The short difference is too small for promotion. Qualify v272's longer reuse horizon, then collect a second full seed and same-process paired timing with endpoint telemetry off for any plausible winner.
+
+
+v272 also passes guarded b2 smoke, b512/chunk0 memcheck, fixed/variable-length synccheck and b513/chunk0 guarded all-output equivalence with zero sanitizer errors. Three full8192/seed1234 and short1024/chunk0/seed5678 repeats match v190 bitwise; masked outputs match with inherited86 tolerance failures. The longer persistent horizon is qualified for short timing/NCU. Second full seed and extended paired timing remain pending.
+
+
+v272 short timing is approximately1496.13 us versus TRTLLM1693.70 us, about3.4% below v190's historical1549.06 us and faster than the two-query control. NCU base/stable: 2.569376 ms, 128 initial registers, 194920 B dynamic shared, 20.302735% occupancy, 34.522878% tensor activity, 0.369007 eligible warps/cycle, long-scoreboard ratio6.790014, local read/write sectors1711424/464048 and aggregate shared conflicts7007652/5413771. Retaining CTAs reduces some allocation/setup work and changes scheduling; this comparison does not isolate those causes. The result warrants second-full-seed qualification and five rotating-order warm/cold comparisons against v190/v271 with endpoint telemetry off. Do not promote from the short run alone.
+
+
+v271/v272 both match v190 on full8192/seed5678 across three repeats, completing exact equivalence on both full seeds plus the prior short/mask fixtures. This inherits v190's known numerical limits and is not a strict FP32-tolerance pass. Five-round same-process Graph warm/cold timing with20 warmups/100 repeats,512 checked rows and endpoint telemetry off follows against v190 and paired TRTLLM. The original standalone eager/Graph regime must also be checked before any promotion.
+
+
+Five-round endpoint-OFF Graph audits show v271 is mixed versus v190: warm parent/candidate ratios0.993596–1.003189 and cold0.992527–1.002163. Do not promote the two-query control. v272 wins all five warm and all five cold rounds: warm1603.472–1613.888 us versus paired v1901628.480–1654.784 us (parent/candidate1.012968–1.028029); cold1601.568–1603.584 us versus1634.224–1646.064 us (1.019189–1.026593). Paired TRT warm medians1882.832–1959.824 us and cold1914.256–1922.864 us. The512-row reference check passes all cases, but full fast-path tolerance failures remain inherited. These results support a modest consistent persistence gain; original standalone eager/Graph20/100 verification remains before default promotion.
+
+## Iteration273 — strict path with independent-role persistence
+
+Apply v272's148-CTA independent query loops to strict v197 while retaining its512-thread donor64/compute176 resource policy, high/residual probabilities, collector order, all arithmetic and per-tile/compute-epilogue synchronization. Q loading moves to the compute query entry; absolute tile/Q phase counters and state-reuse reasoning follow v271/v272. No strict precision gain is inferred from the fast path. First compile/resource inspection, then guarded fixed/variable/odd-batch and exact strict-parent qualification before timing.
+
+
+Standalone original20/100 eager v272 warm/cold medians are1605.807960/1599.792004 us versus paired TRT1878.031969/1916.831970 us. Same audit v190 is1632.447958/1639.999986 us versus1878.143966/1911.008000 us. Graph v272 is1615.520000/1599.344015 us versus1871.071994/1914.911985 us; v190 is1650.592029/1638.495982 us versus1867.887974/1915.823996 us. All512-row checks pass. Combined with exact full2seed/short/mask equivalence, guarded boundary checks and ten winning endpoint-OFF round pairs, promote v272 as the experimental fast default. Keep v197 as the strict default and CuTeDSL4.6.2 unchanged. This updates documented defaults, not an installed FlashMLA replacement.
+
+v272 unlocked SourceCounters records523390320 instructions,20210996 actual/ideal shared wavefronts and zero excessive. Long-scoreboard samples total61861; the sampled producer empty-stage branch accounts for16348 and compute QK branch13355. No isolated latency or percentage-of-time attribution follows from sampled stall counts. NCU base/stable local traffic remains the measured cost of the8-byte metadata frame.
+
+
+v273 compiles with128 initial registers,8 stack bytes and1672 static native instructions. There are34 MMA sites, two commits,16 LDL/6 STL sites and two UR/R spill/fill pairs. PTX/native control confirms512 threads, donor64/compute176 and initial65536 versus final61440 register pool. Entry local stores again capture scalar shared-address/query state. Under the explicit bounded scalar-spill policy used for v271, proceed to guarded and strict-parent qualification; no runtime or precision claim yet.

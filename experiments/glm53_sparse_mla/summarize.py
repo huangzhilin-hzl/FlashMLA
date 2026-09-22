@@ -144,7 +144,7 @@ for directory in sorted(root.glob("v[0-9][0-9][0-9]")):
     if version == "v184":
         status = "bitwise v160 full2seeds/short/masks; earlier higher precision"
     if version == "v190":
-        status = "bitwise v183 full2seeds/short/masks; current fast path"
+        status = "bitwise v183 full2seeds/short/masks; earlier fast path"
     if version == "v191":
         status = "bitwise v184 full2seeds/short/masks; earlier higher precision"
     if version in ("v185", "v186"):
@@ -183,8 +183,10 @@ for directory in sorted(root.glob("v[0-9][0-9][0-9]")):
         status = "guarded checks/full seed1234/mask parent equivalence; KV-tail P reuse slower"
     if version == "v232":
         status = "guarded checks pass;9 full seed1234 failures,86 mask failures; single-buffer slower"
+    if version == "v272":
+        status = "bitwise v190 full2seeds/short/masks; current fast default; FP8 limits retained"
     if version == "v271":
-        status = "bitwise v190 full seed1234/short/masks; small provisional short gain; pending paired audit"
+        status = "bitwise v190 full2seeds/short/masks; mixed paired gain; not promoted"
     if version in ("v265", "v266"):
         status = "bitwise parent full seed1234/short/masks; eight producers slower; not promoted"
     if version in ("v263", "v264"):
@@ -250,8 +252,8 @@ for directory in sorted(root.glob("v[0-9][0-9][0-9]")):
     if version == "v033":
         status = "non-isolated timing; do not rank"
     print(f"| {version} | {candidate['median_us']:.2f} | {baseline['median_us']:.2f} | {candidate['speedup_vs_trtllm']:.4f}x | {metrics['launch__registers_per_thread']} | {traffic} | {tensor:.2f}% | {status} |")
-print("\nRaw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. v090/v091/v094/v096/v097/v105/v108/v112/v125 have an observed sustained warm advantage in the extended eager-event, Graph and rotating-order runs, at baseline-level FP8 precision; v190 is the current fast path. Short five-event v125 tuning has a small observed advantage; v105 is near parity. Use the matching execution regime and retained distributions. v086 is near parity warm and its initial cold advantage does not reproduce in its rotating-order audit.\n")
-graph_paths = sorted(root.glob("v[0-9][0-9][0-9]_validation*/*graph*.json"))
+print("\nRaw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. v090/v091/v094/v096/v097/v105/v108/v112/v125 have an observed sustained warm advantage in the extended eager-event, Graph and rotating-order runs, at baseline-level FP8 precision; v272 is the current fast path. Short five-event v125 tuning has a small observed advantage; v105 is near parity. Use the matching execution regime and retained distributions. v086 is near parity warm and its initial cold advantage does not reproduce in its rotating-order audit.\n")
+graph_paths = sorted(root.glob("*_validation*/*graph*.json"))
 if graph_paths:
     print("## CUDA Graph validation runs\n")
     print("These are separate warm/cold runs with 20 warmups and 100 repeats; sampled row counts are shown explicitly.\n")
@@ -267,7 +269,7 @@ if graph_paths:
             checked_rows = len(result["correctness"][candidate["case"]]["rows"])
             print(f"| {version} | {checked_rows} | {candidate['cache']} | {candidate['median_us']:.2f} | {baseline['median_us']:.2f} | {candidate['speedup_vs_trtllm']:.4f}x |")
     print()
-event_paths = sorted(p for p in root.glob("v[0-9][0-9][0-9]_validation*/*_event100.json") if "graph" not in p.name)
+event_paths = sorted(p for p in root.glob("*_validation*/*_event100.json") if "graph" not in p.name)
 if event_paths:
     print("## Extended eager CUDA-event runs\n")
     print("20 warmups and 100 repeats; the unchanged original timing function.\n")
