@@ -188,6 +188,7 @@ B300 physical GPU1; b8192, H64, D576/512, TopK2048, chunk3. Each row is a paired
 | v214 | 1751.30 | 1691.52 | 0.9659x | 128 | 0.00 / 0.00 | 45.58% | guarded/full seed1234/mask checks pass; looped TMA coordinate reuse slower |
 | v215 | 1667.04 | 1691.84 | 1.0149x | 128 | 0.00 / 0.00 | 46.08% | full seed1234/masked FP32 and guarded checks pass; half residual conversion slower |
 | v216 | 1673.38 | 1691.74 | 1.0110x | 128 | 0.00 / 0.00 | 45.83% | full seed1234/masked FP32 and guarded checks pass; half residual conversion slower |
+| v217 | 1666.24 | 1693.98 | 1.0167x | 128 | 0.00 / 0.00 | 46.03% | guarded/full seed1234/mask equivalence pass; intermediate register budget no short gain |
 
 Raw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. v090/v091/v094/v096/v097/v105/v108/v112/v125 have an observed sustained warm advantage in the extended eager-event, Graph and rotating-order runs, at baseline-level FP8 precision; v190 is the current fast path. Short five-event v125 tuning has a small observed advantage; v105 is near parity. Use the matching execution regime and retained distributions. v086 is near parity warm and its initial cold advantage does not reproduce in its rotating-order audit.
 

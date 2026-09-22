@@ -6302,3 +6302,22 @@ This diagnostic uses FP32 matrix products and reductions. It does not reproduce 
 All exact-online controls pass. The direct-code approximation increases failures on short/masked inputs compared with the conventional FP8/448 emulation. Flushing subnormal codes does not improve those failure counts; the exact-sum variant retains the exponential and still fails. These are sampled probability-path diagnostics, not full MLA validation or throughput measurements. Reject this direct substitution under the unchanged benchmark tolerance; do not import the video-model fidelity claim as numerical permission for GLM MLA.
 
 The authors’ own September16 blog additionally reports B300 MiniMax-H3 results for the8-bit/ExpCast implementation: https://www.nunchux.ai/blog/attention-is-the-video-bottleneck . That source resolves the narrower B200/H200 emphasis in the paper text, but its workload and BF16 FlashAttention-4 baseline differ from this task. No claimed speedup is transferred to our kernel.
+
+
+## Iterations 217–218 — inspect intermediate role register budgets
+
+Based on the current512-thread v197, whose donor64/compute176 allocation removed extra UR/R transfers compared with donor32/compute192. The previously tested64/192 candidate did not improve timing. Test the intervening compute184 allocation first with donor64 (63488 total final registers), then donor56 (61440, the same final total as v197). Both fit the initial65536-register CTA pool; keep allocation in the actual role branches and all four complete warpgroups.
+
+This is a bounded compile inspection of discrete allocator thresholds, not an assumption that more compute registers is faster. Arithmetic, maps, synchronization and precision stay unchanged. Compare code/resources and native operands excluding only USETMAXREG limits. If the only difference is the requested limit, skip GPU timing; if transfers/control or spills change, decide qualification based on that evidence. No kernel launch before initial pool, requested budgets and per-role accesses are inspected.
+
+
+### Register midpoint compile results
+
+Both candidates have initialREG128/STACK0/LOCAL0, providing65536 CTA registers. v217 uses donor64/compute184 with63488 requested, and v218 uses56/184 with61440; native USETMAXREG instructions confirm both limits. v217 static instructions1600→1584, UMOV217→207, R2UR66→60 and MOV38→31, withno MOV.SPILL/R2UR.FILL. v218 has1592 instructions, UMOV210, R2UR60, MOV31 plus two MOV.SPILL and two R2UR.FILL sites. Those are UR/R transfers, not evidence of local-memory traffic.
+
+The changes exceed the two limit immediates, so v217 warrants guarded/full/mask qualification before timing. Keep v218 as a compile-only allocator control: it reintroduces transfers and has more static work than v217, and has no runtime precision or performance claim.
+
+
+### Iteration 217 runtime result
+
+Guarded b2 smoke/b512 memcheck, b2 synccheck, full8192/seed1234 three-repeat BF16 equivalence and mask equivalence all pass; masked FP32 passes. Short v2171666.24us versus pairedTRT1693.98us does not improve the recorded v1971662.30us tuning result. No expanded second-seed/short validation or promotion for this candidate. Static movement reduction alone is insufficient. NCU base/stable: gpu__time_duration.sum=2.824928 ms, launch__registers_per_thread=128 register/thread, launch__shared_mem_per_block_dynamic=203.112000 Kbyte/block, sm__warps_active.avg.pct_of_peak_sustained_active=19.409021 %, sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed=46.034713 %, smsp__warps_eligible.avg.per_cycle_active=0.380385 warp, smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio=6.902128 inst, l1tex__t_sectors_pipe_lsu_mem_local_op_ld.sum=0 sector, l1tex__t_sectors_pipe_lsu_mem_local_op_st.sum=0 sector, l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum=7,255,284 , l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum=3,013,938 .
