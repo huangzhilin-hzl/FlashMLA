@@ -7051,3 +7051,31 @@ v273 opcode deltas versus v197 include approximately11.63 million fewer combined
 
 
 v274/v275 offline resources match v272:128 initial registers,8 stack bytes,1560 static instructions,26 MMA sites,two commits and16 LDL/6 STL sites. PTX/native checks confirm512 threads and donor64/compute192. AST comparison differs only in version label and the four grid-limit constants; source query partition covers small/odd/full batches. Qualify each candidate against v272. For v275, use guarded variable-length b1024 and odd b1025 so some CTAs cross query boundaries despite the592-CTA grid; b512 alone would not cover persistence there.
+
+
+v274 passes guarded b2 smoke, b512/chunk0 memcheck, fixed/variable-length synccheck and b513/chunk0 guarded all-output equivalence with zero sanitizer errors. Three full8192/seed1234 and short1024/chunk0/seed5678 repeats match v272 bitwise; masks match with inherited86 tolerance failures. Short timing/NCU follows before any second-full-seed or expanded timing.
+
+
+v274 short timing is approximately1493.25 us versus TRTLLM1691.81 us, very close to v2721496.13 us. NCU base/stable:2.556320 ms,128 initial registers,194920 B dynamic shared,20.284241% occupancy,34.505288% tensor activity,0.368787 eligible warps/cycle,long-scoreboard ratio6.783200,local read/write sectors1751680/488444 and aggregate shared conflicts7004418/5419207. The small difference does not establish a gain. Qualify the592-CTA control, then use same-process timing rather than promote from these short medians.
+
+
+## Iterations276–277 — compiler uniformity for persistent query state
+
+Based on fast v272 and strict v273, mark the CTA index, each role's query induction value, absolute tile counter and Q phase as warp-uniform. These values are invariant across every lane of each participating warp: each role traverses the same assigned query sequence, and seq_lens is immutable per-query input. Arithmetic, loop/grid bounds, memory and synchronization remain unchanged.
+
+The installed CuTeDSL4.6.2 implementation of make_warp_uniform lowers a compiler hint through arch_make_warp_uniform, rather than executing a user-authored shuffle. Earlier v203/v204 hints on nonpersistent lengths did not change native code; these new query-loop induction/phase values did not exist there. Native v272/v273 stores query/address metadata in an8-byte local frame and mixes vector/uniform integer operations. Test whether the new loop invariance information reduces that frame or control instructions. Compare native code/resources first; an identical binary is a compile-only control, not a new timing result. Any changed candidate still requires fresh guarded/numerical qualification.
+
+
+v275 passes guarded b2 smoke, b1024/chunk0 memcheck, fixed b2 and variable b1024 synccheck, and b1025/chunk0 guarded all-output exact comparisons, all with zero sanitizer errors. These larger variable/odd fixtures exercise multiple queries in some592-grid CTAs. Three full8192/seed1234 and short1024/chunk0/seed5678 repeats match v272, and masks match with inherited86 failures. No second full seed yet; short timing/NCU follows.
+
+
+v275 short timing is approximately1496.06 us versus TRTLLM1690.05 us, essentially matching v272. NCU base/stable:2.559392 ms,128 initial registers,194920 B dynamic shared,20.241743% occupancy,34.545641% tensor activity,0.368599 eligible warps/cycle,long-scoreboard ratio6.770897,local read/write sectors1832192/536240 and aggregate shared conflicts6968234/5432561. Neither grid control establishes a gain from the short test. Because both remain close to the default, complete the second full seed and one same-process warm/cold rotating comparison to resolve the scheduling tradeoff; no promotion yet.
+
+
+v274/v275 also match v272 on full8192/seed5678 across three repeats, completing full2seed/short/mask exact equivalence. The first same-process endpoint-OFF five-round warm/cold grid-size comparison follows. No default change is justified by the near-equal short results alone.
+
+
+Five endpoint-OFF grid-size round pairs are mixed. v274 parent/candidate ratios are warm0.994964–1.010075 and cold0.998972–1.003191; v275 warm0.995549–1.005113 and cold0.995489–1.001989. v272 warm medians are1599.600–1613.648 us and cold1599.584–1604.560 us; v2741597.552–1607.696/1599.456–1603.072 us; v2751605.360–1609.840/1599.568–1606.832 us. All512-row checks pass. Neither larger grid establishes a consistent gain; retain148-CTA v272 and do not run further standalone timing for these controls. Full2seed/short/mask equivalence is retained as a validated alternative, not evidence of a speedup.
+
+
+v276/v277 retain their parents'128 registers,8-byte stack,1560/1672 static instruction counts and16 LDL/6 STL sites. Raw native encodings are not identical: each differs in ten64-bit words. Text comparison attributes these to signedness changes in query comparisons and wide address multiply-adds (.U32 qualifiers disappear), consistent with make_warp_uniform returning Int32. Instruction selection order, resource use and local sites do not improve. Retain both as compile-only controls without claiming numerical validation or a latency result; do not run new timing just to remeasure the same resource structure.

@@ -183,6 +183,8 @@ for directory in sorted(root.glob("v[0-9][0-9][0-9]")):
         status = "guarded checks/full seed1234/mask parent equivalence; KV-tail P reuse slower"
     if version == "v232":
         status = "guarded checks pass;9 full seed1234 failures,86 mask failures; single-buffer slower"
+    if version in ("v274", "v275"):
+        status = "bitwise v272 full2seeds/short/masks; larger grids mixed; not promoted"
     if version == "v273":
         status = "bitwise v197 full2seeds/short/masks; current strict default"
     if version == "v272":

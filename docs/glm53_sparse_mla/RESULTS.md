@@ -231,6 +231,8 @@ B300 physical GPU1; b8192, H64, D576/512, TopK2048, chunk3. Each row is a paired
 | v271 | 1541.70 | 1691.97 | 1.0975x | 128 | 2.79 / 1.10 | 33.68% | bitwise v190 full2seeds/short/masks; mixed paired gain; not promoted |
 | v272 | 1496.13 | 1693.70 | 1.1321x | 128 | 1.71 / 0.46 | 34.52% | bitwise v190 full2seeds/short/masks; current fast default; FP8 limits retained |
 | v273 | 1608.03 | 1691.74 | 1.0521x | 128 | 1.71 / 0.46 | 47.33% | bitwise v197 full2seeds/short/masks; current strict default |
+| v274 | 1493.25 | 1691.81 | 1.1330x | 128 | 1.75 / 0.49 | 34.51% | bitwise v272 full2seeds/short/masks; larger grids mixed; not promoted |
+| v275 | 1496.06 | 1690.05 | 1.1297x | 128 | 1.83 / 0.54 | 34.55% | bitwise v272 full2seeds/short/masks; larger grids mixed; not promoted |
 
 Raw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. v090/v091/v094/v096/v097/v105/v108/v112/v125 have an observed sustained warm advantage in the extended eager-event, Graph and rotating-order runs, at baseline-level FP8 precision; v272 is the current fast path. Short five-event v125 tuning has a small observed advantage; v105 is near parity. Use the matching execution regime and retained distributions. v086 is near parity warm and its initial cold advantage does not reproduce in its rotating-order audit.
 
@@ -412,6 +414,12 @@ Ranges below are the minimum and maximum per-round medians or paired ratios, not
 
 | Audit | Candidate | Cache | Rounds | Candidate median range µs | Paired TRT/candidate range |
 |---|---|---|---:|---:|---:|
+| persistent_grid_round_robin | cute-v272/native | warm | 5 | 1599.60–1613.65 | 1.1657–1.2240x |
+| persistent_grid_round_robin | cute-v272/native | cold | 5 | 1599.58–1604.56 | 1.1940–1.2070x |
+| persistent_grid_round_robin | cute-v274/native | warm | 5 | 1597.55–1607.70 | 1.1774–1.2224x |
+| persistent_grid_round_robin | cute-v274/native | cold | 5 | 1599.46–1603.07 | 1.1961–1.2075x |
+| persistent_grid_round_robin | cute-v275/native | warm | 5 | 1605.36–1609.84 | 1.1716–1.2195x |
+| persistent_grid_round_robin | cute-v275/native | cold | 5 | 1599.57–1606.83 | 1.1963–1.2059x |
 | query_reuse_round_robin | cute-v190/native | warm | 5 | 1628.48–1654.78 | 1.1562–1.1903x |
 | query_reuse_round_robin | cute-v190/native | cold | 5 | 1634.22–1646.06 | 1.1650–1.1766x |
 | query_reuse_round_robin | cute-v271/native | warm | 5 | 1638.98–1652.69 | 1.1488–1.1911x |

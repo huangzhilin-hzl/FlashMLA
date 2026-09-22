@@ -1,0 +1,112 @@
+{
+  "v276": {
+    "text_differences": [
+      {
+        "pc": "0560",
+        "parent": "UISETP.GT.U32.AND UP0, UPT, UR5, 0x1fff, UPT",
+        "candidate": "UISETP.GT.AND UP0, UPT, UR5, 0x1fff, UPT"
+      },
+      {
+        "pc": "0690",
+        "parent": "UIMAD.WIDE.U32 UR6, UR5, 0x4, UR76",
+        "candidate": "UIMAD.WIDE UR6, UR5, 0x4, UR76"
+      },
+      {
+        "pc": "1d90",
+        "parent": "UISETP.GE.U32.AND UP0, UPT, UR7, 0x1f6c, UPT",
+        "candidate": "UISETP.GE.AND UP0, UPT, UR7, 0x1f6c, UPT"
+      },
+      {
+        "pc": "1e40",
+        "parent": "UISETP.GT.U32.AND UP0, UPT, UR5, 0x1fff, UPT",
+        "candidate": "UISETP.GT.AND UP0, UPT, UR5, 0x1fff, UPT"
+      },
+      {
+        "pc": "2360",
+        "parent": "UIMAD.WIDE.U32 UR6, UR5, 0x4, UR6",
+        "candidate": "UIMAD.WIDE UR6, UR5, 0x4, UR6"
+      },
+      {
+        "pc": "2f20",
+        "parent": "UISETP.GE.U32.AND UP0, UPT, UR8, 0x1f6c, UPT",
+        "candidate": "UISETP.GE.AND UP0, UPT, UR8, 0x1f6c, UPT"
+      },
+      {
+        "pc": "3000",
+        "parent": "UISETP.GT.U32.AND UP0, UPT, UR5, 0x1fff, UPT",
+        "candidate": "UISETP.GT.AND UP0, UPT, UR5, 0x1fff, UPT"
+      },
+      {
+        "pc": "3560",
+        "parent": "UIMAD.WIDE.U32 UR6, UR5, 0x4, UR6",
+        "candidate": "UIMAD.WIDE UR6, UR5, 0x4, UR6"
+      },
+      {
+        "pc": "4eb0",
+        "parent": "IMAD.WIDE.U32 R88, R39, 0x2, R88",
+        "candidate": "IMAD.WIDE R88, R39, 0x2, R88"
+      },
+      {
+        "pc": "5690",
+        "parent": "UISETP.GE.U32.AND UP0, UPT, UR7, 0x1f6c, UPT",
+        "candidate": "UISETP.GE.AND UP0, UPT, UR7, 0x1f6c, UPT"
+      }
+    ],
+    "note": "Raw instruction encodings differ at ten words; do not label binary-identical."
+  },
+  "v277": {
+    "text_differences": [
+      {
+        "pc": "0520",
+        "parent": "UISETP.GT.U32.AND UP0, UPT, UR5, 0x1fff, UPT",
+        "candidate": "UISETP.GT.AND UP0, UPT, UR5, 0x1fff, UPT"
+      },
+      {
+        "pc": "0650",
+        "parent": "UIMAD.WIDE.U32 UR6, UR5, 0x4, UR76",
+        "candidate": "UIMAD.WIDE UR6, UR5, 0x4, UR76"
+      },
+      {
+        "pc": "1d50",
+        "parent": "UISETP.GE.U32.AND UP0, UPT, UR7, 0x1f6c, UPT",
+        "candidate": "UISETP.GE.AND UP0, UPT, UR7, 0x1f6c, UPT"
+      },
+      {
+        "pc": "1e00",
+        "parent": "UISETP.GT.U32.AND UP0, UPT, UR5, 0x1fff, UPT",
+        "candidate": "UISETP.GT.AND UP0, UPT, UR5, 0x1fff, UPT"
+      },
+      {
+        "pc": "2450",
+        "parent": "UIMAD.WIDE.U32 UR6, UR5, 0x4, UR6",
+        "candidate": "UIMAD.WIDE UR6, UR5, 0x4, UR6"
+      },
+      {
+        "pc": "2ee0",
+        "parent": "UISETP.GE.U32.AND UP0, UPT, UR8, 0x1f6c, UPT",
+        "candidate": "UISETP.GE.AND UP0, UPT, UR8, 0x1f6c, UPT"
+      },
+      {
+        "pc": "2fc0",
+        "parent": "UISETP.GT.U32.AND UP0, UPT, UR5, 0x1fff, UPT",
+        "candidate": "UISETP.GT.AND UP0, UPT, UR5, 0x1fff, UPT"
+      },
+      {
+        "pc": "3590",
+        "parent": "UIMAD.WIDE.U32 UR6, UR5, 0x4, UR6",
+        "candidate": "UIMAD.WIDE UR6, UR5, 0x4, UR6"
+      },
+      {
+        "pc": "55d0",
+        "parent": "IMAD.WIDE.U32 R88, R39, 0x2, R88",
+        "candidate": "IMAD.WIDE R88, R39, 0x2, R88"
+      },
+      {
+        "pc": "5db0",
+        "parent": "UISETP.GE.U32.AND UP0, UPT, UR7, 0x1f6c, UPT",
+        "candidate": "UISETP.GE.AND UP0, UPT, UR7, 0x1f6c, UPT"
+      }
+    ],
+    "note": "Raw instruction encodings differ at ten words; do not label binary-identical."
+  }
+}
