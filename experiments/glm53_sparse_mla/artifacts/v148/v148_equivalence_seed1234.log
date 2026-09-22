@@ -1,0 +1,3 @@
+{"repeat": 0, "finite": true, "elements": 268435456, "bitwise_mismatches": 7817, "max_abs_difference": 0.001953125, "pass": false}
+{"repeat": 1, "finite": true, "elements": 268435456, "bitwise_mismatches": 7817, "max_abs_difference": 0.001953125, "pass": false}
+{"repeat": 2, "finite": true, "elements": 268435456, "bitwise_mismatches": 7817, "max_abs_difference": 0.001953125, "pass": false}

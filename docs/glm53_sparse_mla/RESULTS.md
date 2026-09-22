@@ -132,15 +132,17 @@ B300 physical GPU1; b8192, H64, D576/512, TopK2048, chunk3. Each row is a paired
 | v133 | 1802.05 | 1689.86 | 0.9377x | 122 | 0.00 / 0.00 | 42.27% | bitwise v128 full2seeds/short/masks; small cache-policy alternative |
 | v134 | 1652.93 | 1691.84 | 1.0235x | 85 | 0.00 / 0.00 | 31.28% | bitwise v125 full seed1234/mask; no net scheduling gain |
 | v136 | 2960.13 | 1691.74 | 0.5715x | 114 | 0.00 / 0.00 | 17.27% | guarded smoke/b512 and eight rows pass; slower; no full audit |
-| v138 | 1639.46 | 1691.49 | 1.0317x | 123 | 0.00 / 0.00 | 31.57% | bitwise v125 full2seeds/short/masks; current fast path |
+| v138 | 1639.46 | 1691.49 | 1.0317x | 123 | 0.00 / 0.00 | 31.57% | bitwise v125 full2seeds/short/masks; earlier fast path |
 | v140 | 1822.75 | 1690.88 | 0.9277x | 123 | 0.00 / 0.00 | 41.79% | bitwise v128 full seed1234/mask; paired correction slower |
 | v141 | 1636.54 | 1691.94 | 1.0338x | 123 | 0.00 / 0.00 | 31.57% | bitwise v138 full2seeds/short/masks; small cache-policy alternative |
 | v142 | 1644.74 | 1690.78 | 1.0280x | 123 | 0.00 / 0.00 | 31.49% | bitwise v138 full seed1234/mask; paired epilogue slower |
 | v143 | 1636.42 | 1691.78 | 1.0338x | 123 | 0.00 / 0.00 | 31.60% | bitwise v138 full2seeds/short/masks; small scheduling alternative |
 | v144 | 1636.48 | 1689.89 | 1.0326x | 123 | 0.00 / 0.00 | 31.65% | bitwise v138 full2seeds/short/masks; small scheduling alternative |
-| v145 | 1781.79 | 1691.90 | 0.9496x | 98 | 0.00 / 0.00 | 42.79% | bitwise v128 full2seeds/short/masks; current higher precision |
-| v146 | 1628.10 | 1693.86 | 1.0404x | 123 | 0.00 / 0.00 | 31.78% | bitwise v138 full seed1234/mask; expanded audit pending |
+| v145 | 1781.79 | 1691.90 | 0.9496x | 98 | 0.00 / 0.00 | 42.79% | bitwise v128 full2seeds/short/masks; earlier higher precision |
+| v146 | 1628.10 | 1693.86 | 1.0404x | 123 | 0.00 / 0.00 | 31.78% | bitwise v138 full2seeds/short/masks; current fast path |
 | v147 | 1690.85 | 1693.54 | 1.0016x | 126 | 0.00 / 0.00 | 30.64% | bitwise v138 full seed1234/mask; correction prefetch slower |
+| v148 | 1749.12 | 1691.84 | 0.9673x | 98 | 0.00 / 0.00 | 43.65% | full2seeds/short/masks FP32 PASS; current higher precision |
+| v149 | 1771.74 | 1691.42 | 0.9547x | 100 | 0.00 / 0.00 | 42.96% | bitwise v145 full2seeds/short/masks; superseded by v148 |
 
 Raw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. v090/v091/v094/v096/v097/v105/v108/v112/v125 have an observed sustained warm advantage in the extended eager-event, Graph and rotating-order runs, at baseline-level FP8 precision; v125 is the current fast path. Short five-event v125 tuning has a small observed advantage; v105 is near parity. Use the matching execution regime and retained distributions. v086 is near parity warm and its initial cold advantage does not reproduce in its rotating-order audit.
 
@@ -224,6 +226,12 @@ These are separate warm/cold runs with 20 warmups and 100 repeats; sampled row c
 | v141 | 512 | cold | 1689.62 | 1925.84 | 1.1398x |
 | v145 | 512 | warm | 1955.74 | 1867.89 | 0.9551x |
 | v145 | 512 | cold | 1922.10 | 1915.04 | 0.9963x |
+| v146 | 512 | warm | 1714.21 | 1867.89 | 1.0897x |
+| v146 | 512 | cold | 1709.50 | 1919.25 | 1.1227x |
+| v148 | 512 | warm | 1924.24 | 1867.82 | 0.9707x |
+| v148 | 512 | cold | 1894.53 | 1894.32 | 0.9999x |
+| v149 | 512 | warm | 1943.74 | 1865.90 | 0.9600x |
+| v149 | 512 | cold | 1914.74 | 1899.58 | 0.9921x |
 
 ## Extended eager CUDA-event runs
 
@@ -267,6 +275,12 @@ These are separate warm/cold runs with 20 warmups and 100 repeats; sampled row c
 | v141 | 512 | cold | 1721.17 | 1917.01 | 1.1138x |
 | v145 | 512 | warm | 1921.14 | 1880.14 | 0.9787x |
 | v145 | 512 | cold | 1922.64 | 1914.94 | 0.9960x |
+| v146 | 512 | warm | 1714.32 | 1881.14 | 1.0973x |
+| v146 | 512 | cold | 1714.99 | 1914.91 | 1.1166x |
+| v148 | 512 | warm | 1883.06 | 1880.13 | 0.9984x |
+| v148 | 512 | cold | 1892.50 | 1902.13 | 1.0051x |
+| v149 | 512 | warm | 1914.56 | 1869.23 | 0.9763x |
+| v149 | 512 | cold | 1912.61 | 1916.59 | 1.0021x |
 
 ## Same-process rotating-order audits
 
@@ -376,5 +390,17 @@ Ranges below are the minimum and maximum per-round medians or paired ratios, not
 | v138_v143_v144_round_robin | cute-v143/native | cold | 4 | 1672.99–1681.55 | 1.1058–1.1144x |
 | v138_v143_v144_round_robin | cute-v144/native | warm | 4 | 1679.34–1681.65 | 1.1125–1.1194x |
 | v138_v143_v144_round_robin | cute-v144/native | cold | 4 | 1673.12–1682.56 | 1.1080–1.1115x |
+| v138_v144_v146_round_robin | cute-v138/native | warm | 4 | 1681.57–1682.62 | 1.1126–1.1177x |
+| v138_v144_v146_round_robin | cute-v138/native | cold | 4 | 1679.47–1684.61 | 1.1046–1.1072x |
+| v138_v144_v146_round_robin | cute-v144/native | warm | 4 | 1677.50–1679.50 | 1.1158–1.1204x |
+| v138_v144_v146_round_robin | cute-v144/native | cold | 4 | 1672.82–1681.62 | 1.1071–1.1129x |
+| v138_v144_v146_round_robin | cute-v146/native | warm | 4 | 1671.20–1673.34 | 1.1189–1.1239x |
+| v138_v144_v146_round_robin | cute-v146/native | cold | 4 | 1666.53–1675.41 | 1.1098–1.1171x |
+| v145_v148_v149_round_robin | cute-v145/native | warm | 4 | 1898.54–1898.77 | 0.9816–0.9861x |
+| v145_v148_v149_round_robin | cute-v145/native | cold | 4 | 1891.30–1892.46 | 0.9805–0.9819x |
+| v145_v148_v149_round_robin | cute-v148/native | warm | 4 | 1876.62–1880.00 | 0.9932–0.9970x |
+| v145_v148_v149_round_robin | cute-v148/native | cold | 4 | 1869.84–1876.03 | 0.9892–0.9932x |
+| v145_v148_v149_round_robin | cute-v149/native | warm | 4 | 1888.26–1900.70 | 0.9849–0.9912x |
+| v145_v148_v149_round_robin | cute-v149/native | cold | 4 | 1882.27–1884.19 | 0.9848–0.9866x |
 
 See [ITERATIONS.md](ITERATIONS.md) for changes, failed hypotheses, correctness limits and source references.

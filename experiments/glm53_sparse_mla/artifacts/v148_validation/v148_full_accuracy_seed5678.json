@@ -1,0 +1,33 @@
+{
+  "purpose": "accuracy only; no latency claim",
+  "args": {
+    "kernel_versions": [
+      "v148"
+    ],
+    "include_trtllm": false,
+    "block_k": 128,
+    "local_tokens": 8192,
+    "chunk": 3,
+    "seed": 5678,
+    "batch_rows": 256,
+    "output_json": "artifacts/v148_full_accuracy_seed5678.json"
+  },
+  "benchmark_sha256": "d843320fb5147a807135282a1b87bb4c247cdd7a6a16b9107d546c48c8a8fb66",
+  "atol": 0.01,
+  "rtol": 0.05,
+  "cases": {
+    "v148": {
+      "kernel_sha256": "5679627a05cf123a0158330e1c249d4ea3774e151456b7cf44fdace1d690aa64",
+      "finite": true,
+      "mismatches": 0,
+      "max_abs": 0.005017399787902832,
+      "squared_error_sum": 6.673653883998303,
+      "examples": [],
+      "checked_rows": 8192,
+      "checked_elements": 268435456,
+      "rmse": 0.00015767465893209203,
+      "relative_rmse": 0.001735983959498323,
+      "pass": true
+    }
+  }
+}

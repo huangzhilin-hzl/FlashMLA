@@ -4574,3 +4574,129 @@ long-scoreboard 5.930648, zero local sectors, aggregate shared conflicts
 6334422/1762472, diagnostic 2.896416 ms. Reduced aggregate long-scoreboard ratio
 is not a speedup: the changed register lifetimes and schedule regress overall.
 No expanded audit or promotion for this prefetch placement.
+
+### Iteration 146 expanded result — promote earlier bitmap acquisition
+
+Full seeds1234/5678 and full short/chunk0 seed5678 match v138 bitwise in three
+repeats each; masks and qualified sanitizers pass equivalence/safety checks.
+All previous fast-path FP8 tolerance failures remain. Eager warm/cold1714.32/
+1714.99 us versus TRT1881.14/1914.91 us; Graph1714.21/1709.50 us versus
+TRT1867.89/1919.25 us. The separate eager warm median is slightly worse than v138,
+so the promotion rests on the full paired evidence, not an all-regime claim.
+Four same-process rotated Graph orders:
+
+| Cache | v138 us, rounds0–3 | v144 us, rounds0–3 | v146 us, rounds0–3 | TRT us, rounds0–3 |
+|---|---|---|---|---|
+| warm | 1682.62 / 1681.57 / 1681.58 / 1682.29 | 1677.70 / 1677.50 / 1679.30 / 1679.50 | 1673.17 / 1672.37 / 1673.34 / 1671.20 | 1872.05 / 1879.46 / 1878.13 / 1878.19 |
+| cold | 1683.36 / 1684.61 / 1683.41 / 1679.47 | 1673.55 / 1681.62 / 1672.82 / 1673.15 | 1675.41 / 1666.53 / 1675.12 / 1667.42 | 1859.44 / 1861.70 / 1861.70 / 1859.58 |
+
+v146 beats the established v138 default in all warm/cold orders and v144 in all
+warm orders; cold effects versus v144 are mixed. Promote v146 as the fast path.
+Unlocked source:600988722 instructions versus v138602477910; shared wavefronts
+remain20275200 actual/ideal, zero excessive. Long-scoreboard samples65833 include
+producer-empty17818, PV16908 and QK13664. SASS places the bitmap LDS immediately
+before the QK phase check; v138 loads it after the score LDTM. Source motion is
+therefore reflected in executed code, while the small sample differences do not
+uniquely explain every microsecond of the timing gain.
+
+## Iteration 150 — combine early bitmap acquisition with consolidated producers
+
+Based on v146, transplant v144's one-barrier producer protocol. Preserve the
+full-stage acquisition, early bitmap read, QK acquisition and all arithmetic.
+The prior changes were validated independently; their performance interaction
+requires a new paired run and exact-equivalence checks.
+
+## Iteration 151 — remove a redundant TMEM code-motion fence
+
+Based on v146, remove only the compute-side after-thread-sync TMEM fence between
+full acquisition and bitmap LDS. Retain full acquisition and the fence after QK
+acquisition, which still precedes every subsequent tcgen05 operation. The intervening
+bitmap LDS is an ordinary shared load. This is an inference from the documented
+[tcgen05 fence semantics](https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#tcgen05-special-sync-operations):
+the remaining after fence orders subsequent tcgen05 operations after both prior
+waits. First inspect generated code; if the instruction sequence is identical,
+do not invent a performance gain or run redundant benchmark trials.
+
+### v128 versus v145 unlocked source comparison
+
+A subsequent v128 profile uses the same unlocked SourceCounters/WarpStateStats
+recipe as v145. Dynamic instructions fall from713767944 to673569020 (-5.63%);
+actual/ideal shared wavefronts fall from43868160 to28663808 (-34.66%), with zero
+excessive wavefronts in both. This supports reduced validity-load work, rather
+than removal of a bank-conflict layout problem. v128 long-scoreboard samples75429
+includePV26556, producer-empty18065 andQK14202, versus v14573515/26090/17173/14184.
+Sample counts fluctuate and are not direct elapsed-time savings.
+
+### Iteration 148 initial result — faster residual PV order, new rounding
+
+REG98/STACK0. Seed1234 has7817 BF16 outputs different from v145, maximum absolute
+output difference0.001953125, identically across three repeats. This is expected
+from the changed accumulation order and invalidates inheritance of bitwise results.
+Masks have one different BF16 output but both versions pass the original FP32
+tolerance with max_abs0.00400185585. Qualified b2 synccheck/b512 memcheck report
+zero errors. Short1749.12 us versus TRT1691.84 us improves32.67 us from v145.
+NCU base/stable:98 registers,203112 shared bytes,occupancy19.341%,tensor43.647%,
+eligible0.461838,long-scoreboard6.168047,zero local sectors,aggregate shared
+conflicts6297198/2319846,diagnostic2.978976 ms. Independent full-reference
+checks on two target seeds and the short case are running before promotion.
+
+### Iteration 149 initial result — early bitmap also helps higher precision
+
+REG100/STACK0. Full seed1234 and masks match v145 bitwise; masked FP32 tolerance
+passes. Qualified b2 synccheck/b512 memcheck report zero errors. Short1771.74 us
+versus TRT1691.42 us improves10.05 us from v145. NCU base/stable:100 registers,
+203112 shared bytes,occupancy19.327%,tensor42.957%,eligible0.462870,long-scoreboard
+6.258764,zero local sectors,aggregate shared conflicts6484087/2356232,diagnostic
+3.023744 ms. Expanded equivalence and rotated timing are pending.
+
+### Iteration 151 compile inspection — generated code changes
+
+Both v150 and v151 compile at REG123/STACK0. The v146/v151 disassembly contains
+2880 encoding words each, but the words differ. Inspection shows a NOP removed
+between full acquisition and bitmap address calculation, plus changed control
+bits and subsequent instruction/branch offsets. Equal padded code size does not
+mean identical executed code, so bounded numerical/synchronization and timing
+checks are warranted. This is not yet a measured speedup.
+
+## Iteration 152 — combine immediate residual collector use and early bitmap
+
+Based on v148, move only the bitmap read to before QK acquisition, as tested in
+v149. Retain v148's interleaved high/residual accumulation order. The appropriate
+bitwise baseline is v148, not v145; v148's independent FP32 checks are separate.
+This tests whether the two observed high-precision improvements compose without
+register spills or a scheduling regression.
+
+### Iteration 148 expanded result — independently validated higher-precision improvement
+
+Independent FP32-reference audits pass the unchanged atol0.01/rtol0.05 tolerance:
+all268435456 elements on each target seed1234/5678, and all33554432 short-case
+seed5678/chunk0 elements. Maximum absolute errors are0.005918741226,
+0.005017399788 and0.008034229279; relative RMSE0.001735969640,
+0.001735983959 and0.001678571923. Masks also pass; no bitwise equivalence to
+v145 is claimed. Qualified sanitizers already pass.
+
+Eager20/100 warm/cold1883.06/1892.50 us versus TRT1880.13/1902.13 us; Graph
+1924.24/1894.53 us versus TRT1867.82/1894.32 us. Four rotated Graph orders:
+
+| Cache | v145 us, rounds0–3 | v148 us, rounds0–3 | v149 us, rounds0–3 | TRT us, rounds0–3 |
+|---|---|---|---|---|
+| warm | 1898.66 / 1898.54 / 1898.77 / 1898.59 | 1876.62 / 1877.95 / 1880.00 / 1878.06 | 1888.26 / 1889.76 / 1888.42 / 1900.70 | 1863.78 / 1872.24 / 1871.89 / 1872.02 |
+| cold | 1892.38 / 1891.30 / 1892.14 / 1892.46 | 1874.00 / 1869.84 / 1876.03 / 1871.92 | 1882.27 / 1882.27 / 1884.19 / 1884.16 | 1855.68 / 1857.06 / 1855.84 / 1855.55 |
+
+v148 beats v145 and v149 in every recorded order. Promote v148 as the higher-
+precision default; TRT remains ahead in these rotated tests, by roughly0.3–0.7%
+warm and0.7–1.1% cold. The eager cold win does not establish a universal lead.
+Unlocked source:679841906 instructions (more than v145673569020), shared wavefronts
+28663808 actual/ideal, zero excessive; long-scoreboard71642, includingPV24945,
+producer-empty16415 andQK14190. Faster latency despite more total instructions is
+consistent with a scheduling gain; counters alone do not prove the exact internal
+collector mechanism.
+
+### Iteration 149 expanded result — validated, superseded by the PV-order change
+
+Full seed5678 and short/chunk0 seed5678 match v145 bitwise in three repeats,
+in addition to seed1234, masks and qualified sanitizers. Eager warm/cold1914.56/
+1912.61 us versus TRT1869.23/1916.59 us; Graph1943.74/1914.74 us versus
+TRT1865.90/1899.58 us. Rotation improves on v145 in three of four warm orders
+and all four cold orders, but v148 is faster throughout. Retain as an independently
+validated input to the v152 combination, without making it the default.
