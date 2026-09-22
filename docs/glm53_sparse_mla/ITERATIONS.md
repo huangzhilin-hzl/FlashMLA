@@ -7078,4 +7078,78 @@ v274/v275 also match v272 on full8192/seed5678 across three repeats, completing 
 Five endpoint-OFF grid-size round pairs are mixed. v274 parent/candidate ratios are warm0.994964–1.010075 and cold0.998972–1.003191; v275 warm0.995549–1.005113 and cold0.995489–1.001989. v272 warm medians are1599.600–1613.648 us and cold1599.584–1604.560 us; v2741597.552–1607.696/1599.456–1603.072 us; v2751605.360–1609.840/1599.568–1606.832 us. All512-row checks pass. Neither larger grid establishes a consistent gain; retain148-CTA v272 and do not run further standalone timing for these controls. Full2seed/short/mask equivalence is retained as a validated alternative, not evidence of a speedup.
 
 
-v276/v277 retain their parents'128 registers,8-byte stack,1560/1672 static instruction counts and16 LDL/6 STL sites. Raw native encodings are not identical: each differs in ten64-bit words. Text comparison attributes these to signedness changes in query comparisons and wide address multiply-adds (.U32 qualifiers disappear), consistent with make_warp_uniform returning Int32. Instruction selection order, resource use and local sites do not improve. Retain both as compile-only controls without claiming numerical validation or a latency result; do not run new timing just to remeasure the same resource structure.
+v276/v277 retain their parents'128 registers,8-byte stack,1560/1672 static instruction counts and16 LDL/6 STL sites. Raw native encodings are not identical: each differs in ten64-bit words. Text comparison attributes these to signedness changes in query comparisons and wide address multiply-adds (.U32 qualifiers disappear), consistent with changed compiler range/signedness inference through the uniformity hint. The installed block_idx already returns Int32, so these qualifiers alone do not establish a source-level type change. Instruction selection order, resource use and local sites do not improve. Retain both as compile-only controls without claiming numerical validation or a latency result; do not run new timing just to remeasure the same resource structure.
+
+
+## Iterations278–279 — release TMEM inside the compute role
+
+Based on fast v272 and strict v273, move the final warp0 retrieve/dealloc block into the compute-role branch, after its complete query loop. Keep the retrieval,512-column allocation, grid, arithmetic, register budgets and all barriers unchanged. This isolates the lifetime and branch-reconvergence consequences of freeing TMEM outside all role branches. The final compute epilogue already waits for its last PV and drains TMEM reads with the256-thread barrier; producer/issuer have no future TMEM operations after that last query. The nonpersistent v190/v197 implementations also free within compute, but this does not substitute for fresh persistent-kernel checks.
+
+Hypothesis: the outer final release keeps address/control state alive across role branches and contributes to the8-byte metadata frame in v272/v273. Inspect resources and native changes first. Changed candidates require guarded fixed/variable/odd-batch checks and full numerical equivalence before timing. No runtime validation or improvement is claimed at creation.
+
+
+v278/v279 offline compile retains128 initial registers and8 stack bytes, but reduces local sites from16 LDL/6 STL to10 LDL/4 STL. Fast static instructions decline1560→1552; strict remains1672. R2UR sites change84→77 and71→66; strict MOV.SPILL/R2UR.FILL increases2→4 (uniform-register exchange, distinct from actual LDL/STL). MMA/commit counts remain26/2 and34/2. PTX checks preserve512 threads, donor64 and compute192/176. AST restoration confirms only final-release nesting changes beyond labels. The remaining8-byte metadata frame is permitted for bounded guarded evaluation under the same policy as v272/v273. Static counts alone do not establish a runtime gain.
+
+
+v278 passes guarded b2 smoke, b512/chunk0 memcheck, fixed/variable synccheck and b513/chunk0 guarded three-repeat exact equivalence. Full8192/seed1234 and short1024/chunk0/seed5678 match v272 across three repeats; masks match with inherited86 tolerance failures. Short timing is1490.21 us versus paired TRT1691.78 us, close to v2721496.13 us. NCU base/stable is2.560576 ms,128 registers,194920 B dynamic shared,20.294631% occupancy,34.541358% tensor activity,0.364540 eligible warps/cycle and long-scoreboard ratio6.849191. Local read/write sectors892432/442908 versus v2721711424/464048 confirms lower local traffic (not necessarily DRAM); aggregate shared conflicts7317679/4531451. The small short-latency change alone does not establish a gain. Qualify strict control next, then use paired extended timing if warranted.
+
+
+v279 passes guarded b2 smoke, b512/chunk0 memcheck, fixed/variable synccheck and b513/chunk0 guarded three-repeat exact equivalence. Three full8192/seed1234 and short1024/chunk0/seed5678 repeats match v273; masked inputs match and both strict cases pass the original FP32 tolerance. No second full seed yet; short timing/NCU follows.
+
+
+## Iterations280–281 — read the initial CTA index within each role
+
+Based on guarded/first-seed validated v278/v279, remove the common entry block_idx value and read %ctaid.x through a side-effecting inline PTX helper at each role's query-loop entry. Keep Int32, matching installed CuTeDSL4.6.2 block_idx implementation. This reads an immutable CTA identifier, not volatile %warpid. The helper requests separate IR reads; only native inspection can show whether ptxas retains the distinction. Grid, query partition, loop step, arithmetic, synchronization and compute-local release remain unchanged.
+
+The remaining native8-byte frame in v278/v279 now has accesses only at offset0, initialized from SR_CTAID.X and updated by each role's query induction. Hypothesis: a common entry SSA value encourages cross-role register/local allocation; role-local initialization may avoid that metadata spill. This follows the successful fresh-%tid.x control in the diagnostic timeline but does not assume the same outcome in production. Compile/resource comparison precedes fresh runtime qualification. Reference: [PTX special registers](https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#special-registers-ctaid).
+
+
+v279 short timing is1603.74 us versus TRT1691.68 us, close to v2731608.03 us. NCU base/stable:2.741664 ms,128 registers,203112 B dynamic shared,20.298008% occupancy,47.449692% tensor activity,0.387995 eligible warps/cycle,long-scoreboard ratio7.211559. Local read/write sectors892432/442464, aggregate shared conflicts7924260/3068947. Both controls substantially reduce local reads but show only small short-run changes. Complete second full seed and separate five-round endpoint-OFF paired audits for fast/strict before deciding whether the release placement merits promotion.
+
+
+v278/v279 also match their respective promoted parents on full8192/seed5678 across three repeats, completing full2seed/short/mask equivalence. Five-round endpoint-OFF audits are next; no default change is justified yet.
+
+
+v280/v281 offline compilation removes the local frame completely:128 initial registers,zero stack andzero LDL/STL,1512/1648 static instructions (versus v2781552/v2791672). R2UR66/61,UIADD3 117/121; four MOV.SPILL/R2UR.FILL sites remain as uniform-register exchanges. MMA/commit counts stay26/2 and34/2. Resource/PTX gates confirm512 threads,donor64,compute192/176. This is a compile result, not yet runtime evidence. Fresh guarded qualification follows, with promoted parents and intermediate release-only controls retained for the eventual same-process comparisons.
+
+
+v280 passes guarded b2 smoke, b512/chunk0 memcheck, fixed/variable synccheck and b513/chunk0 three-repeat guarded equivalence. Full8192/seed1234 and short1024/chunk0/seed5678 match v278 across three repeats; masks match with inherited86 tolerance failures. Native inspection confirms three separate SR_CTAID.X reads, one per role, instead of an entry spill. Short timing/NCU follows; strict v281 still awaits runtime checks.
+
+
+v280 short timing is1491.14 us versus TRT1691.81 us, essentially matching release-only v2781490.21 us. NCU confirmszero local read/write sectors. Base/stable duration2.555648 ms,128 registers,194920 B dynamic shared,20.303805% occupancy,34.282769% tensor activity,0.365321 eligible warps/cycle,long-scoreboard ratio6.849607,aggregate shared conflicts7557640/4546154. Eliminating the frame is real but has not yet yielded a clear short-run latency reduction; retain all three fast variants for rotating timing.
+
+
+v281 passes guarded b2 smoke, b512/chunk0 memcheck, fixed/variable synccheck and b513/chunk0 guarded three-repeat exact equivalence. Three full8192/seed1234 and short1024/chunk0/seed5678 repeats match v279; masks match and both strict outputs pass original FP32 tolerance. Second full seed and extended timing remain. Local AST audit verifies the four isolated source transformations278–281 after reversing only their intended changes and normalizing labels.
+
+
+v281 short timing is1600.74 us versus TRT1691.84 us, slightly below release-only v2791603.74 us and promoted v2731608.03 us. NCU confirmszero local read/write sectors. Base/stable duration2.740448 ms,128 registers,203112 B dynamic shared,20.295732% occupancy,47.467442% tensor activity,0.389410 eligible warps/cycle,long-scoreboard ratio7.237910,aggregate shared conflicts8194404/3094743. As on fast v280, the local-traffic elimination is verified but requires rotating longer timing to establish any latency gain.
+
+
+v280/v281 full8192/seed5678 also matches v278/v279 across three repeats, completing full2seed/short/mask exact equivalence. Thus their verified math remains that of promoted v272/v273 respectively. Proceed with separate fast and strict endpoint-OFF five-round Graph audits, each including the promoted parent, release-only control and fresh-CTA-read candidate.
+
+
+Fast endpoint-OFF five-round Graph audit: release-only v278 beats v272 in all ten warm/cold pairs, but margins are small: parent/candidate warm1.001390–1.008936,cold1.000140–1.003866. v278 warm1593.520–1601.008 us,cold1596.912–1599.488 us; parent1601.744–1607.760/1597.696–1603.696 us. Spill-free v280 warm1593.984–1604.768 us (ratios1.001864–1.004868),cold1579.104–1600.608 us (0.998181–1.013131),with one cold regression. TRT medians warm1872.544–1960.160 us,cold1914.768–1923.184 us. All512-row checks pass. Neither the local-traffic drop nor zero spill predicts every timing outcome. v278 warrants original standalone eager/Graph confirmation; v280 remains a validated zero-local alternative without a demonstrated consistent incremental gain. No default change yet.
+
+
+Strict endpoint-OFF five-round Graph audit: v279 parent/candidate ratios warm0.995536–1.011178,cold1.001096–1.004188; v281 warm0.997798–1.011311,cold1.003330–1.006380. Each loses one warm pair against promoted v273, while v281 beats intermediate v279 in all ten warm/cold pairs. v273 medians warm1825.056–1845.408 us,cold1795.968–1799.488 us; v2791822.576–1835.072/1791.712–1795.984 us; v2811818.576–1830.912/1788.032–1791.984 us. TRT1873.824–1957.904/1912.656–1921.024 us. All512-row checks pass. Because the spill-free strict candidate improves its intermediate consistently and beats the promoted parent in nine of ten pairs, original standalone eager/Graph comparison is warranted to resolve the small operating-condition-sensitive difference. No promotion yet.
+
+## Iterations282–283 — give producer and issuer more registers
+
+Based on spill-free v280/v281, test donor72/compute184 for fast v282 and donor80/compute176 for strict v283. Both fit exactly65536 registers with256 threads per side; all512 threads retain the initial128-register allocation. The fast control trades8 registers per compute thread for8 per donor. The strict control keeps compute176 and increases donor64→80, using the4096-register slack of its parent. Complete warpgroups and role-local allocation ordering remain unchanged.
+
+Hypothesis: the expanded donor budget may change address/descriptor register allocation and instruction scheduling even though local traffic is already zero. This is distinct from prior64/192 controls that increased strict compute allocation, and from old nonpersistent variants that still retained common role/query state. Inspect generated code before runtime; a real fragment spill or no useful native change is grounds to retain a compile-only control. No source arithmetic, grid, input conversion or barrier changes.
+
+
+Original standalone20/100 confirms the two selected candidates across eager/Graph warm/cold. Fast v278 eager1585.936010/1599.775970 us versus paired TRT1871.999979/1915.168047; Graph1599.632025/1592.960000 versus1869.215965/1919.136047. Matching v272 eager1596.543968/1601.552010,Graph1611.119986/1597.343981. Strict v281 eager1765.760005/1790.031970 versus TRT1879.967988/1916.415989; Graph1846.816003/1801.616013 versus1865.791976/1915.808022. Matching v273 eager1782.783985/1800.224006,Graph1858.559966/1808.095992. All512-row checks pass.
+
+Promote experimental defaults to fast v278 and strict v281 on CuTeDSL4.6.2. The full2seed/short/mask equivalence preserves each precision class; no benchmark or tolerance changes. Fast promotion follows ten favorable rotated pairs and four favorable standalone conditions. Strict promotion follows all ten improvements over the intermediate v279, nine of ten over v273 and all four favorable standalone conditions; retain the single warm regression explicitly, since these sub-percent differences are operating-condition dependent. Retain v279/v280 as validated alternatives.
+
+v281 unlocked source issues580492664 instructions versus v273575145562 (about0.93% more), despite removing local accesses and24 static instructions. Shared actual/ideal wavefronts28599604 remain equal withzero excessive. Long-scoreboard samples71121 include PV24864,producer empty18511,QK13911. Dynamic counts include polling and cannot be read as useful arithmetic cost; retain opcode breakdown before attributing the change.
+
+v282 donor72/compute184 introduces16 stack bytes,5 LDL/3 STL sites and1560 static instructions, versus parent v280 zero stack/local and1512 instructions. MOV.SPILL/R2UR.FILL rises4→10 and R2UR66→77. v283 donor80/compute176 remainszero stack/local but grows1648→1672 static instructions and4→12 uniform spill/fill sites (R2UR61→69). No reduction in native control cost is established; both remain compile-only without numerical/performance claims. Preserve raw resources and local-site inspection, rather than launching a full audit merely to test a larger register budget.
+
+
+v278 unlocked source issues524266785 instructions versus v272523390320 (about0.17% more), with shared actual/ideal wavefronts20210996 andzero excessive. Long-scoreboard total62144 includes producer empty16709 and QK13628; the top17355-sample branch has no immediately adjacent wait in the short context, so do not label it without fuller inspection. Together with v281, this reinforces that a small latency improvement need not reduce aggregate dynamic instructions, especially when spin/poll counts change.
+
+
+Source opcode deltas clarify the aggregate increases: v278 vs v272 reduces combined LDL/LDL.LU by597964 issues but adds1126638 combined three-op polling/sleep issues and401218 BRA issues. v281 vs v273 removes821072 LDL/LDL.LU and112416 STL issues, while polling/sleep grows3797169 and BRA1303670. The verifiedzero local traffic and small measured speedup can therefore coexist with a larger aggregate dynamic instruction count; these are separate sampled regimes and not a direct time decomposition.

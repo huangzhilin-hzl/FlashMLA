@@ -1,0 +1,12 @@
+@dsl_user_op
+def block_idx(
+    *, loc: Optional[ir.Location] = None, ip: Optional[ir.InsertionPoint] = None
+) -> Tuple[Int32, Int32, Int32]:
+    """
+    Returns the CTA identifier within a grid.
+    """
+    return (
+        Int32(nvvm.read_ptx_sreg_ctaid_x(T.i32(), loc=loc, ip=ip)),
+        Int32(nvvm.read_ptx_sreg_ctaid_y(T.i32(), loc=loc, ip=ip)),
+        Int32(nvvm.read_ptx_sreg_ctaid_z(T.i32(), loc=loc, ip=ip)),
+    )

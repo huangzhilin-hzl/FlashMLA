@@ -229,12 +229,16 @@ B300 physical GPU1; b8192, H64, D576/512, TopK2048, chunk3. Each row is a paired
 | v265 | 1675.71 | 1691.74 | 1.0096x | 96 | 0.00 / 0.00 | 45.75% | bitwise parent full seed1234/short/masks; eight producers slower; not promoted |
 | v266 | 1560.77 | 1691.78 | 1.0839x | 96 | 0.00 / 0.00 | 33.26% | bitwise parent full seed1234/short/masks; eight producers slower; not promoted |
 | v271 | 1541.70 | 1691.97 | 1.0975x | 128 | 2.79 / 1.10 | 33.68% | bitwise v190 full2seeds/short/masks; mixed paired gain; not promoted |
-| v272 | 1496.13 | 1693.70 | 1.1321x | 128 | 1.71 / 0.46 | 34.52% | bitwise v190 full2seeds/short/masks; current fast default; FP8 limits retained |
-| v273 | 1608.03 | 1691.74 | 1.0521x | 128 | 1.71 / 0.46 | 47.33% | bitwise v197 full2seeds/short/masks; current strict default |
+| v272 | 1496.13 | 1693.70 | 1.1321x | 128 | 1.71 / 0.46 | 34.52% | bitwise v190 full2seeds/short/masks; earlier fast default; FP8 limits retained |
+| v273 | 1608.03 | 1691.74 | 1.0521x | 128 | 1.71 / 0.46 | 47.33% | bitwise v197 full2seeds/short/masks; earlier strict default |
 | v274 | 1493.25 | 1691.81 | 1.1330x | 128 | 1.75 / 0.49 | 34.51% | bitwise v272 full2seeds/short/masks; larger grids mixed; not promoted |
 | v275 | 1496.06 | 1690.05 | 1.1297x | 128 | 1.83 / 0.54 | 34.55% | bitwise v272 full2seeds/short/masks; larger grids mixed; not promoted |
+| v278 | 1490.21 | 1691.78 | 1.1353x | 128 | 0.89 / 0.44 | 34.54% | bitwise v272 full2seeds/short/masks; current fast default; FP8 limits retained |
+| v279 | 1603.74 | 1691.68 | 1.0548x | 128 | 0.89 / 0.44 | 47.45% | bitwise v273 full2seeds/short/masks; mixed warm; not promoted |
+| v280 | 1491.14 | 1691.81 | 1.1346x | 128 | 0.00 / 0.00 | 34.28% | bitwise fast parent full2seeds/short/masks; zero local traffic; mixed cold; not promoted |
+| v281 | 1600.74 | 1691.84 | 1.0569x | 128 | 0.00 / 0.00 | 47.47% | bitwise strict parent full2seeds/short/masks; zero local traffic; current strict default |
 
-Raw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. v090/v091/v094/v096/v097/v105/v108/v112/v125 have an observed sustained warm advantage in the extended eager-event, Graph and rotating-order runs, at baseline-level FP8 precision; v272 is the current fast path. Short five-event v125 tuning has a small observed advantage; v105 is near parity. Use the matching execution regime and retained distributions. v086 is near parity warm and its initial cold advantage does not reproduce in its rotating-order audit.
+Raw JSON records exact tensor shapes, seed, software versions, candidate SHA256 and unchanged benchmark SHA256. The baseline B0 used 20 warmups/100 repeats and measured 1860.70 µs warm / 1854.66 µs cold; use the paired baseline for each ratio because clocks vary. v090/v091/v094/v096/v097/v105/v108/v112/v125 have an observed sustained warm advantage in the extended eager-event, Graph and rotating-order runs, at baseline-level FP8 precision; v278 is the current fast path. Short five-event v125 tuning has a small observed advantage; v105 is near parity. Use the matching execution regime and retained distributions. v086 is near parity warm and its initial cold advantage does not reproduce in its rotating-order audit.
 
 ## CUDA Graph validation runs
 
@@ -242,6 +246,14 @@ These are separate warm/cold runs with 20 warmups and 100 repeats; sampled row c
 
 | Version | Checked rows | Cache | Candidate µs | Paired TRT µs | TRT/candidate |
 |---|---:|---|---:|---:|---:|
+| v272 | 512 | warm | 1611.12 | 1872.00 | 1.1619x |
+| v272 | 512 | cold | 1597.34 | 1918.86 | 1.2013x |
+| v273 | 512 | warm | 1858.56 | 1866.38 | 1.0042x |
+| v273 | 512 | cold | 1808.10 | 1916.19 | 1.0598x |
+| v278 | 512 | warm | 1599.63 | 1869.22 | 1.1685x |
+| v278 | 512 | cold | 1592.96 | 1919.14 | 1.2048x |
+| v281 | 512 | warm | 1846.82 | 1865.79 | 1.0103x |
+| v281 | 512 | cold | 1801.62 | 1915.81 | 1.0634x |
 | v190 | 512 | warm | 1650.59 | 1867.89 | 1.1316x |
 | v190 | 512 | cold | 1638.50 | 1915.82 | 1.1693x |
 | v272 | 512 | warm | 1615.52 | 1871.07 | 1.1582x |
@@ -347,6 +359,14 @@ These are separate warm/cold runs with 20 warmups and 100 repeats; sampled row c
 
 | Version | Checked rows | Cache | Candidate µs | Paired TRT µs | TRT/candidate |
 |---|---:|---|---:|---:|---:|
+| v272 | 512 | warm | 1596.54 | 1890.26 | 1.1840x |
+| v272 | 512 | cold | 1601.55 | 1916.99 | 1.1970x |
+| v273 | 512 | warm | 1782.78 | 1880.67 | 1.0549x |
+| v273 | 512 | cold | 1800.22 | 1917.28 | 1.0650x |
+| v278 | 512 | warm | 1585.94 | 1872.00 | 1.1804x |
+| v278 | 512 | cold | 1599.78 | 1915.17 | 1.1971x |
+| v281 | 512 | warm | 1765.76 | 1879.97 | 1.0647x |
+| v281 | 512 | cold | 1790.03 | 1916.42 | 1.0706x |
 | v190 | 512 | warm | 1632.45 | 1878.14 | 1.1505x |
 | v190 | 512 | cold | 1640.00 | 1911.01 | 1.1652x |
 | v272 | 512 | warm | 1605.81 | 1878.03 | 1.1695x |
@@ -414,6 +434,12 @@ Ranges below are the minimum and maximum per-round medians or paired ratios, not
 
 | Audit | Candidate | Cache | Rounds | Candidate median range µs | Paired TRT/candidate range |
 |---|---|---|---:|---:|---:|
+| fast_compute_release_round_robin | cute-v272/native | warm | 5 | 1601.74–1607.76 | 1.1647–1.2238x |
+| fast_compute_release_round_robin | cute-v272/native | cold | 5 | 1597.70–1603.70 | 1.1957–1.2037x |
+| fast_compute_release_round_robin | cute-v278/native | warm | 5 | 1593.52–1601.01 | 1.1751–1.2255x |
+| fast_compute_release_round_robin | cute-v278/native | cold | 5 | 1596.91–1599.49 | 1.1971–1.2043x |
+| fast_compute_release_round_robin | cute-v280/native | warm | 5 | 1593.98–1604.77 | 1.1669–1.2297x |
+| fast_compute_release_round_robin | cute-v280/native | cold | 5 | 1579.10–1600.61 | 1.1985–1.2178x |
 | persistent_grid_round_robin | cute-v272/native | warm | 5 | 1599.60–1613.65 | 1.1657–1.2240x |
 | persistent_grid_round_robin | cute-v272/native | cold | 5 | 1599.58–1604.56 | 1.1940–1.2070x |
 | persistent_grid_round_robin | cute-v274/native | warm | 5 | 1597.55–1607.70 | 1.1774–1.2224x |
@@ -426,6 +452,12 @@ Ranges below are the minimum and maximum per-round medians or paired ratios, not
 | query_reuse_round_robin | cute-v271/native | cold | 5 | 1634.38–1646.53 | 1.1654–1.1718x |
 | query_reuse_round_robin | cute-v272/native | warm | 5 | 1603.47–1613.89 | 1.1712–1.2222x |
 | query_reuse_round_robin | cute-v272/native | cold | 5 | 1601.57–1603.58 | 1.1952–1.1992x |
+| strict_compute_release_round_robin | cute-v273/native | warm | 5 | 1825.06–1845.41 | 1.0154–1.0728x |
+| strict_compute_release_round_robin | cute-v273/native | cold | 5 | 1795.97–1799.49 | 1.0650–1.0696x |
+| strict_compute_release_round_robin | cute-v279/native | warm | 5 | 1822.58–1835.07 | 1.0267–1.0733x |
+| strict_compute_release_round_robin | cute-v279/native | cold | 5 | 1791.71–1795.98 | 1.0675–1.0708x |
+| strict_compute_release_round_robin | cute-v281/native | warm | 5 | 1818.58–1830.91 | 1.0269–1.0765x |
+| strict_compute_release_round_robin | cute-v281/native | cold | 5 | 1788.03–1791.98 | 1.0697–1.0732x |
 | strict_query_round_robin | cute-v197/native | warm | 5 | 1845.54–1867.89 | 1.0005–1.0487x |
 | strict_query_round_robin | cute-v197/native | cold | 5 | 1828.86–1832.98 | 1.0401–1.0461x |
 | strict_query_round_robin | cute-v273/native | warm | 5 | 1825.04–1832.48 | 1.0230–1.0624x |

@@ -1,0 +1,16 @@
+{
+  "v282": {
+    "source_sha256": "a8d7e73a7218bec6fb6c38e8ae959fd49bfd626aca71d09d6b0bec94dfd6b485",
+    "candidate_launched": false,
+    "local_sites": 8,
+    "initial_register_pool": 65536,
+    "final_register_pool": 65536
+  },
+  "v283": {
+    "source_sha256": "bd1f77b69f5a8780000b84665b6179a7c1521e41160f8c9664466efe91af70f9",
+    "candidate_launched": false,
+    "local_sites": 0,
+    "initial_register_pool": 65536,
+    "final_register_pool": 65536
+  }
+}
