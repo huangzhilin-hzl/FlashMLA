@@ -7342,3 +7342,24 @@ Add validate_fixed_topk.py for explicit mode assertions and direct parent equiva
 
 
 Final corrected-source CPU compilation preserves every native encoding in all four modes versus the initial comment-only drafts. Dynamic294/295 remain native-identical to284/287. Full mode removes six scalar global LDG sites (7→1,excluding UTMALDG); fast local sites reduce15→13,strict remains0. PTX bounds/budgets512threads,64/192 or64/176 are verified,with full and dynamic mode/source SHA metadata retained. These resource checks permit bounded runtime evaluation when GPU1 becomes idle,not promotion.
+
+
+GPU1 later dropped to802 MiB withzero utilization and passed the normal dual-sample preflight. v294 completes standard smoke,memory,fixed/variable/odd-batch guards plus specialized b512 full memcheck,b513 masked-full synccheck,and b513 dynamic-mode synccheck. Each specialized audit explicitly verifies its expected dispatch mode and all three output repeats match284. Full8192/seed1234 selects full mode and matches284 across three repeats; short1024/chunk0/seed5678 selects dynamic mode and matches; old masks match with inherited86 failures. Native short timing/NCU now follows before second seed and expanded audits.
+
+
+v294 short timing/NCU did not start: fresh preflight observed86667 MiB allocated with6–7% utilization and exited3. Preserve all successful qualification outputs and the occupied-device preflight separately. Explicit mode verification confirms full=True for fixed memcheck,masked-full synccheck and full8192 equivalence,full=False for dynamic synccheck and short1024 equivalence; three all-output passes each. Performance and setup-check timing remain pending; do not rerun completed guards simply because a later timing gate was blocked.
+
+## Iterations296–297 — unified SW128 Q/KV layout with a padded shared tail
+
+Based on promoted fast284/strict287, use shared shapes Q64x640 and two KV128x640 stages, all SW128, instead of separate512 SW128 plus64 SW64 allocations. Global FP8 tensors and576-byte row stride stay unchanged. Each load still issues five128-or64-panel requests, now five128-byte boxes at columns0/128/256/384/512; the last box has64 valid bytes and64 out-of-bound zero bytes. Four tensor maps shrink to two (256 bytes). P and strict residual P keep SW64; PV consumes the same first512 channels.
+
+This uses legal128-byte TMA boxes, not a576-byte box exceeding the swizzle span. PTX [out-of-bound tensor access](https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#tensor-out-of-boundary-access) specifies zero fill, and gather4 uses four row bounding boxes with dimension1 equal to1. [CUDA13.0 tensor-map encoding](https://docs.nvidia.com/cuda/archive/13.0.0/cuda-driver-api/group__CUDA__TENSOR__MEMORY.html) supplies the descriptor constraints. The existing primary descriptor already uses these dimensions and swizzle; remove only separate tail descriptors. Runtime validation is still required.
+
+QK retains exactly18 ordered K32 products covering logical columns0..575, without adding the two padded products. PV and softmax arithmetic, all barrier arrival counts/phases, query scheduling and output stores are unchanged; only expected TMA completion bytes increase to40960 per Q and81920 per KV stage. Source transforms and unchanged helper/runner ASTs are archived. Each query still has five Q transfers and each KV stage160 gather4 requests.
+
+Hypothesis: a unified descriptor/layout reduces address and descriptor preparation, especially the SW64 tail branch. Cost:20480 additional shared bytes per CTA and11.11% more shared transfer bytes for Q/KV. This remains a single-CTA-per-SM design; resource acceptance and useful latency cannot be inferred from simpler source. Compile with all GPUs hidden, inspect shared/register/local resources, then qualify against284/287 before any timing. GPU1 remains occupied. No runtime result or promotion.
+
+
+CPU-only compilation succeeds with128 registers and the original stack/local-site classes: fast8 bytes,11 LDL/4 STL; strictzero stack/local. Static instructions2841592→2961576 and2871728→2971704. UIADD3 falls127→123 and159→155; ULOP3 falls18→15 and41→38. Fast uniform exchange remains4 pairs; strict increases4→5,with R2UR62→63. Both preserve26/34 MMA sites and2 commits,512 threads and64/192 or64/176 role budgets. Smaller code is insufficient evidence of a speedup.
+
+The CPU CuTe layout audit verifies every16-byte vector endpoint for all64/128 rows and640 columns against the SW128 address formula; every first512 address matches the parent layout. Exhaustive host byte enumeration proves bijective coverage of the padded allocations. Transfer accounting yields Q40960 andKV81920 expected completion bytes; QK consumes exactly columns0..575 in the original order. These checks do not validate actual TMA completion or race freedom. GPU qualification and NCU/performance remain pending.

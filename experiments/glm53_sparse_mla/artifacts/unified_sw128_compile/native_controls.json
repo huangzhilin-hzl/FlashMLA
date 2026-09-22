@@ -1,0 +1,60 @@
+{
+  "v296": {
+    "sha256": "d1bcefaf8b6e074844d7c6e1cd6c5f24cb0c9bdd354cff9f2486bc9dfbd066c0",
+    "parent": "v284",
+    "counts": {
+      "UTCQMMA.WS": 26,
+      "MOV.SPILL": 4,
+      "R2UR.FILL": 4,
+      "R2UR": 79,
+      "UIADD3": 123,
+      "ULOP3": 15,
+      "LDL": 11,
+      "STL": 4
+    },
+    "parent_counts": {
+      "UTCQMMA.WS": 26,
+      "MOV.SPILL": 4,
+      "R2UR.FILL": 4,
+      "R2UR": 79,
+      "UIADD3": 127,
+      "ULOP3": 18,
+      "LDL": 11,
+      "STL": 4
+    },
+    "local_sites": 15,
+    "ptx_mma": 26,
+    "ptx_commits": 2,
+    "bounds_and_role_budgets_verified": true,
+    "runtime_launched": false
+  },
+  "v297": {
+    "sha256": "3c4657c5a623489f5080debee86f50665a0e8ae156fe1eb0344a97d2a3ee5ac1",
+    "parent": "v287",
+    "counts": {
+      "UTCQMMA.WS": 34,
+      "MOV.SPILL": 5,
+      "R2UR.FILL": 5,
+      "R2UR": 63,
+      "UIADD3": 155,
+      "ULOP3": 38,
+      "LDL": 0,
+      "STL": 0
+    },
+    "parent_counts": {
+      "UTCQMMA.WS": 34,
+      "MOV.SPILL": 4,
+      "R2UR.FILL": 4,
+      "R2UR": 62,
+      "UIADD3": 159,
+      "ULOP3": 41,
+      "LDL": 0,
+      "STL": 0
+    },
+    "local_sites": 0,
+    "ptx_mma": 34,
+    "ptx_commits": 2,
+    "bounds_and_role_budgets_verified": true,
+    "runtime_launched": false
+  }
+}

@@ -628,8 +628,10 @@ Both kernels retain their precision class; compiler remains CuTeDSL4.6.2.
 
 v294/v295 compile separate fixed2048 and dynamic-length paths. The dynamic paths
 have exactly the native instruction encodings of284/287. Offline fixed-path code
-shrinks to1496/1592 instructions with unchanged register/stack class, but no GPU
-numerical or performance validation has completed yet; these are not defaults.
+shrinks to1496/1592 instructions with unchanged register/stack class. v294 passes
+the first full seed, short case, masks, and memory/synchronization guards. Explicit
+mode checks also pass full-length masked and dynamic odd-batch fixtures. v295 has
+not run. v294 timing was blocked by GPU occupancy; neither is a default.
 The runner performs torch.all(lens==2048).item() during construction. Its GPU
 reduction/host synchronization is setup cost, excluded from native-call timing.
 Rebuild this runner when lengths change; this is a specialization contract, not a

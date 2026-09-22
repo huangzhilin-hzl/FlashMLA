@@ -1,0 +1,6 @@
+{
+  "CUDA_VISIBLE_DEVICES": "",
+  "initialize_cuda": false,
+  "kernel_launch": false,
+  "reason": "min_blocks_per_mp=1 does not take CuTeDSL device-attribute carveout branch; explicitly hide all devices and compile fake tensors."
+}

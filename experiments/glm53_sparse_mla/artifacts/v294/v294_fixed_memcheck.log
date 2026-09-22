@@ -1,0 +1,6 @@
+========= COMPUTE-SANITIZER
+{"version": "v294", "fixture": "full", "repeat": 0, "elements": 16777216, "finite": true, "bitwise_mismatches": 0, "pass": true}
+{"version": "v294", "fixture": "full", "repeat": 1, "elements": 16777216, "finite": true, "bitwise_mismatches": 0, "pass": true}
+{"version": "v294", "fixture": "full", "repeat": 2, "elements": 16777216, "finite": true, "bitwise_mismatches": 0, "pass": true}
+[RESULT] artifacts/v294_fixed_memcheck.json
+========= ERROR SUMMARY: 0 errors

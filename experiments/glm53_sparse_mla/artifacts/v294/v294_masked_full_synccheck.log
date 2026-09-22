@@ -1,0 +1,6 @@
+========= COMPUTE-SANITIZER
+{"version": "v294", "fixture": "masked-full", "repeat": 0, "elements": 16809984, "finite": true, "bitwise_mismatches": 0, "pass": true}
+{"version": "v294", "fixture": "masked-full", "repeat": 1, "elements": 16809984, "finite": true, "bitwise_mismatches": 0, "pass": true}
+{"version": "v294", "fixture": "masked-full", "repeat": 2, "elements": 16809984, "finite": true, "bitwise_mismatches": 0, "pass": true}
+[RESULT] artifacts/v294_masked_full_synccheck.json
+========= ERROR SUMMARY: 0 errors

@@ -1,0 +1,4 @@
+{"version": "v294", "fixture": "dynamic", "repeat": 0, "elements": 33554432, "finite": true, "bitwise_mismatches": 0, "pass": true}
+{"version": "v294", "fixture": "dynamic", "repeat": 1, "elements": 33554432, "finite": true, "bitwise_mismatches": 0, "pass": true}
+{"version": "v294", "fixture": "dynamic", "repeat": 2, "elements": 33554432, "finite": true, "bitwise_mismatches": 0, "pass": true}
+[RESULT] artifacts/v294_short_equivalence.json

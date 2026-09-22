@@ -1,0 +1,4 @@
+{"version": "v294", "fixture": "full", "repeat": 0, "elements": 268435456, "finite": true, "bitwise_mismatches": 0, "pass": true}
+{"version": "v294", "fixture": "full", "repeat": 1, "elements": 268435456, "finite": true, "bitwise_mismatches": 0, "pass": true}
+{"version": "v294", "fixture": "full", "repeat": 2, "elements": 268435456, "finite": true, "bitwise_mismatches": 0, "pass": true}
+[RESULT] artifacts/v294_equivalence.json

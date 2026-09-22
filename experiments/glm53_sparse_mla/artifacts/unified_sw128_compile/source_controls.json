@@ -1,0 +1,51 @@
+{
+  "v296": {
+    "parent": "v284",
+    "sha256": "d1bcefaf8b6e074844d7c6e1cd6c5f24cb0c9bdd354cff9f2486bc9dfbd066c0",
+    "unchanged_top_level_functions": [
+      "tmem_before_sync",
+      "tmem_after_sync",
+      "gather4",
+      "store_output256",
+      "load_q_tile",
+      "mma_ws",
+      "mask_reduce32",
+      "make_runner"
+    ],
+    "transform_checks_passed": true,
+    "shared_q_bytes": 40960,
+    "shared_k_stage_bytes": 81920,
+    "extra_shared_bytes": 20480,
+    "qk_k32_tiles": 18,
+    "mathematical_qk_channels": 576,
+    "q_tma_requests_per_query": 5,
+    "gather4_requests_per_stage": 160,
+    "tensor_map_bytes": 256,
+    "candidate_launched": false
+  },
+  "v297": {
+    "parent": "v287",
+    "sha256": "3c4657c5a623489f5080debee86f50665a0e8ae156fe1eb0344a97d2a3ee5ac1",
+    "unchanged_top_level_functions": [
+      "role_cta_id",
+      "tmem_before_sync",
+      "tmem_after_sync",
+      "gather4",
+      "store_output256",
+      "load_q_tile",
+      "mma_ws",
+      "mask_reduce32",
+      "make_runner"
+    ],
+    "transform_checks_passed": true,
+    "shared_q_bytes": 40960,
+    "shared_k_stage_bytes": 81920,
+    "extra_shared_bytes": 20480,
+    "qk_k32_tiles": 18,
+    "mathematical_qk_channels": 576,
+    "q_tma_requests_per_query": 5,
+    "gather4_requests_per_stage": 160,
+    "tensor_map_bytes": 256,
+    "candidate_launched": false
+  }
+}

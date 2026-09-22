@@ -1,0 +1,4 @@
+SW128 padded640 vector-address audit passed for rows 64
+SW128 padded640 vector-address audit passed for rows 128
+PASS: bijective padded storage, unchanged first512 layout, exact576 QK channels,
+      Q40960/KV81920 completion bytes and20480 extra shared bytes per CTA

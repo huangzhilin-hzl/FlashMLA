@@ -1,0 +1,43 @@
+{
+  "purpose": "kernel equivalence only; not FP32-reference accuracy or timing",
+  "args": {
+    "baseline": "v284",
+    "candidate": "v294",
+    "block_k": 128,
+    "local_tokens": 513,
+    "chunk": 0,
+    "seed": 5678,
+    "repeats": 3,
+    "output_json": "artifacts/v294_odd_guarded_equivalence.json"
+  },
+  "kernel_sha256": {
+    "v284": "51778ed69fe960ed98b88f0e890b7db619973102e8e0eb4aeb8082ebf86dbf16",
+    "v294": "0d08a5cab43092651ea8647d7bb2a30d1fbdb903866dd6642920a64f6697f458"
+  },
+  "repeats": [
+    {
+      "repeat": 0,
+      "finite": true,
+      "elements": 16809984,
+      "bitwise_mismatches": 0,
+      "max_abs_difference": 0.0,
+      "pass": true
+    },
+    {
+      "repeat": 1,
+      "finite": true,
+      "elements": 16809984,
+      "bitwise_mismatches": 0,
+      "max_abs_difference": 0.0,
+      "pass": true
+    },
+    {
+      "repeat": 2,
+      "finite": true,
+      "elements": 16809984,
+      "bitwise_mismatches": 0,
+      "max_abs_difference": 0.0,
+      "pass": true
+    }
+  ]
+}

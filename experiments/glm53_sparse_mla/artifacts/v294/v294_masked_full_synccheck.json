@@ -1,0 +1,53 @@
+{
+  "purpose": "dispatch and exact equivalence; not a FP32-reference or native timing audit",
+  "args": {
+    "versions": [
+      "v294"
+    ],
+    "fixture": "masked-full",
+    "local_tokens": 513,
+    "seed": 1234,
+    "repeats": 3,
+    "measure_setup_check": false,
+    "output_json": "artifacts/v294_masked_full_synccheck.json"
+  },
+  "expected_fixed_topk_2048": true,
+  "benchmark_sha256": "d843320fb5147a807135282a1b87bb4c247cdd7a6a16b9107d546c48c8a8fb66",
+  "versions": {
+    "v294": {
+      "parent": "v284",
+      "fixed_topk_2048": true,
+      "kernel_sha256": {
+        "v284": "51778ed69fe960ed98b88f0e890b7db619973102e8e0eb4aeb8082ebf86dbf16",
+        "v294": "0d08a5cab43092651ea8647d7bb2a30d1fbdb903866dd6642920a64f6697f458"
+      },
+      "repeats": [
+        {
+          "repeat": 0,
+          "elements": 16809984,
+          "finite": true,
+          "bitwise_mismatches": 0,
+          "pass": true
+        },
+        {
+          "repeat": 1,
+          "elements": 16809984,
+          "finite": true,
+          "bitwise_mismatches": 0,
+          "pass": true
+        },
+        {
+          "repeat": 2,
+          "elements": 16809984,
+          "finite": true,
+          "bitwise_mismatches": 0,
+          "pass": true
+        }
+      ]
+    }
+  },
+  "length_range": [
+    2048,
+    2048
+  ]
+}

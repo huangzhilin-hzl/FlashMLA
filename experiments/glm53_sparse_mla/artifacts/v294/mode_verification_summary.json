@@ -1,0 +1,27 @@
+{
+  "fixed_memcheck": {
+    "full_topk": true,
+    "repeats": 3,
+    "elements_per_repeat": 16777216
+  },
+  "masked_full_synccheck": {
+    "full_topk": true,
+    "repeats": 3,
+    "elements_per_repeat": 16809984
+  },
+  "dynamic_mode_synccheck": {
+    "full_topk": false,
+    "repeats": 3,
+    "elements_per_repeat": 16809984
+  },
+  "equivalence": {
+    "full_topk": true,
+    "repeats": 3,
+    "elements_per_repeat": 268435456
+  },
+  "short_equivalence": {
+    "full_topk": false,
+    "repeats": 3,
+    "elements_per_repeat": 33554432
+  }
+}
