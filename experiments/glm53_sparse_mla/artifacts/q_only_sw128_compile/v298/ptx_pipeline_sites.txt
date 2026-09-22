@@ -1,0 +1,81 @@
+	mbarrier.arrive.expect_tx.shared.b64 %rd420, [%r17+198984], %r1129;
+	cp.async.bulk.tensor.2d.shared::cta.global.tile::gather4.mbarrier::complete_tx::bytes.cta_group::1 [%r1131], [%rd8, {%r1132, %r1136, %r1137, %r1138, %r1139}], [%r1133];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile::gather4.mbarrier::complete_tx::bytes.cta_group::1 [%r1134], [%rd8, {%r1135, %r1136, %r1137, %r1138, %r1139}], [%r1133];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile::gather4.mbarrier::complete_tx::bytes.cta_group::1 [%r1140], [%rd8, {%r1141, %r1136, %r1137, %r1138, %r1139}], [%r1133];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile::gather4.mbarrier::complete_tx::bytes.cta_group::1 [%r1142], [%rd8, {%r1143, %r1136, %r1137, %r1138, %r1139}], [%r1133];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile::gather4.mbarrier::complete_tx::bytes.cta_group::1 [%r1144], [%rd421, {%r1132, %r1136, %r1137, %r1138, %r1139}], [%r1133];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile::gather4.mbarrier::complete_tx::bytes.cta_group::1 [%r1145], [%rd8, {%r1132, %r1147, %r1148, %r1149, %r1150}], [%r1133];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile::gather4.mbarrier::complete_tx::bytes.cta_group::1 [%r1146], [%rd8, {%r1135, %r1147, %r1148, %r1149, %r1150}], [%r1133];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile::gather4.mbarrier::complete_tx::bytes.cta_group::1 [%r1151], [%rd8, {%r1141, %r1147, %r1148, %r1149, %r1150}], [%r1133];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile::gather4.mbarrier::complete_tx::bytes.cta_group::1 [%r1152], [%rd8, {%r1143, %r1147, %r1148, %r1149, %r1150}], [%r1133];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile::gather4.mbarrier::complete_tx::bytes.cta_group::1 [%r1153], [%rd421, {%r1132, %r1147, %r1148, %r1149, %r1150}], [%r1133];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile::gather4.mbarrier::complete_tx::bytes.cta_group::1 [%r1154], [%rd8, {%r1132, %r1156, %r1157, %r1158, %r1159}], [%r1133];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile::gather4.mbarrier::complete_tx::bytes.cta_group::1 [%r1155], [%rd8, {%r1135, %r1156, %r1157, %r1158, %r1159}], [%r1133];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile::gather4.mbarrier::complete_tx::bytes.cta_group::1 [%r1160], [%rd8, {%r1141, %r1156, %r1157, %r1158, %r1159}], [%r1133];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile::gather4.mbarrier::complete_tx::bytes.cta_group::1 [%r1161], [%rd8, {%r1143, %r1156, %r1157, %r1158, %r1159}], [%r1133];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile::gather4.mbarrier::complete_tx::bytes.cta_group::1 [%r1162], [%rd421, {%r1132, %r1156, %r1157, %r1158, %r1159}], [%r1133];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile::gather4.mbarrier::complete_tx::bytes.cta_group::1 [%r1163], [%rd8, {%r1132, %r1165, %r1166, %r1167, %r1168}], [%r1133];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile::gather4.mbarrier::complete_tx::bytes.cta_group::1 [%r1164], [%rd8, {%r1135, %r1165, %r1166, %r1167, %r1168}], [%r1133];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile::gather4.mbarrier::complete_tx::bytes.cta_group::1 [%r1169], [%rd8, {%r1141, %r1165, %r1166, %r1167, %r1168}], [%r1133];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile::gather4.mbarrier::complete_tx::bytes.cta_group::1 [%r1170], [%rd8, {%r1143, %r1165, %r1166, %r1167, %r1168}], [%r1133];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile::gather4.mbarrier::complete_tx::bytes.cta_group::1 [%r1171], [%rd421, {%r1132, %r1165, %r1166, %r1167, %r1168}], [%r1133];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile::gather4.mbarrier::complete_tx::bytes.cta_group::1 [%r1172], [%rd8, {%r1132, %r1174, %r1175, %r1176, %r1177}], [%r1133];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile::gather4.mbarrier::complete_tx::bytes.cta_group::1 [%r1173], [%rd8, {%r1135, %r1174, %r1175, %r1176, %r1177}], [%r1133];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile::gather4.mbarrier::complete_tx::bytes.cta_group::1 [%r1178], [%rd8, {%r1141, %r1174, %r1175, %r1176, %r1177}], [%r1133];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile::gather4.mbarrier::complete_tx::bytes.cta_group::1 [%r1179], [%rd8, {%r1143, %r1174, %r1175, %r1176, %r1177}], [%r1133];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile::gather4.mbarrier::complete_tx::bytes.cta_group::1 [%r1180], [%rd421, {%r1132, %r1174, %r1175, %r1176, %r1177}], [%r1133];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile::gather4.mbarrier::complete_tx::bytes.cta_group::1 [%r1181], [%rd8, {%r1132, %r1183, %r1184, %r1185, %r1186}], [%r1133];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile::gather4.mbarrier::complete_tx::bytes.cta_group::1 [%r1182], [%rd8, {%r1135, %r1183, %r1184, %r1185, %r1186}], [%r1133];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile::gather4.mbarrier::complete_tx::bytes.cta_group::1 [%r1187], [%rd8, {%r1141, %r1183, %r1184, %r1185, %r1186}], [%r1133];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile::gather4.mbarrier::complete_tx::bytes.cta_group::1 [%r1188], [%rd8, {%r1143, %r1183, %r1184, %r1185, %r1186}], [%r1133];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile::gather4.mbarrier::complete_tx::bytes.cta_group::1 [%r1189], [%rd421, {%r1132, %r1183, %r1184, %r1185, %r1186}], [%r1133];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile::gather4.mbarrier::complete_tx::bytes.cta_group::1 [%r1190], [%rd8, {%r1132, %r1192, %r1193, %r1194, %r1195}], [%r1133];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile::gather4.mbarrier::complete_tx::bytes.cta_group::1 [%r1191], [%rd8, {%r1135, %r1192, %r1193, %r1194, %r1195}], [%r1133];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile::gather4.mbarrier::complete_tx::bytes.cta_group::1 [%r1196], [%rd8, {%r1141, %r1192, %r1193, %r1194, %r1195}], [%r1133];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile::gather4.mbarrier::complete_tx::bytes.cta_group::1 [%r1197], [%rd8, {%r1143, %r1192, %r1193, %r1194, %r1195}], [%r1133];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile::gather4.mbarrier::complete_tx::bytes.cta_group::1 [%r1198], [%rd421, {%r1132, %r1192, %r1193, %r1194, %r1195}], [%r1133];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile::gather4.mbarrier::complete_tx::bytes.cta_group::1 [%r1199], [%rd8, {%r1132, %r1201, %r1202, %r1203, %r1204}], [%r1133];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile::gather4.mbarrier::complete_tx::bytes.cta_group::1 [%r1200], [%rd8, {%r1135, %r1201, %r1202, %r1203, %r1204}], [%r1133];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile::gather4.mbarrier::complete_tx::bytes.cta_group::1 [%r1205], [%rd8, {%r1141, %r1201, %r1202, %r1203, %r1204}], [%r1133];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile::gather4.mbarrier::complete_tx::bytes.cta_group::1 [%r1206], [%rd8, {%r1143, %r1201, %r1202, %r1203, %r1204}], [%r1133];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile::gather4.mbarrier::complete_tx::bytes.cta_group::1 [%r1207], [%rd421, {%r1132, %r1201, %r1202, %r1203, %r1204}], [%r1133];
+	{ .reg .pred p; setp.ne.u32 p, %r1038, 0; tcgen05.mma.ws.cta_group::1.kind::f8f6f4 [%r1036], %rd367, %rd368, %r1037, p; }
+	{ .reg .pred p; setp.ne.u32 p, %r1039, 0; tcgen05.mma.ws.cta_group::1.kind::f8f6f4 [%r1036], %rd369, %rd370, %r1037, p; }
+	{ .reg .pred p; setp.ne.u32 p, %r1039, 0; tcgen05.mma.ws.cta_group::1.kind::f8f6f4 [%r1036], %rd371, %rd372, %r1037, p; }
+	{ .reg .pred p; setp.ne.u32 p, %r1039, 0; tcgen05.mma.ws.cta_group::1.kind::f8f6f4 [%r1036], %rd373, %rd374, %r1037, p; }
+	{ .reg .pred p; setp.ne.u32 p, %r1039, 0; tcgen05.mma.ws.cta_group::1.kind::f8f6f4 [%r1036], %rd375, %rd376, %r1037, p; }
+	{ .reg .pred p; setp.ne.u32 p, %r1039, 0; tcgen05.mma.ws.cta_group::1.kind::f8f6f4 [%r1036], %rd377, %rd378, %r1037, p; }
+	{ .reg .pred p; setp.ne.u32 p, %r1039, 0; tcgen05.mma.ws.cta_group::1.kind::f8f6f4 [%r1036], %rd379, %rd380, %r1037, p; }
+	{ .reg .pred p; setp.ne.u32 p, %r1039, 0; tcgen05.mma.ws.cta_group::1.kind::f8f6f4 [%r1036], %rd381, %rd382, %r1037, p; }
+	{ .reg .pred p; setp.ne.u32 p, %r1039, 0; tcgen05.mma.ws.cta_group::1.kind::f8f6f4 [%r1036], %rd383, %rd384, %r1037, p; }
+	{ .reg .pred p; setp.ne.u32 p, %r1039, 0; tcgen05.mma.ws.cta_group::1.kind::f8f6f4 [%r1036], %rd385, %rd386, %r1037, p; }
+	{ .reg .pred p; setp.ne.u32 p, %r1039, 0; tcgen05.mma.ws.cta_group::1.kind::f8f6f4 [%r1036], %rd387, %rd388, %r1037, p; }
+	{ .reg .pred p; setp.ne.u32 p, %r1039, 0; tcgen05.mma.ws.cta_group::1.kind::f8f6f4 [%r1036], %rd389, %rd390, %r1037, p; }
+	{ .reg .pred p; setp.ne.u32 p, %r1039, 0; tcgen05.mma.ws.cta_group::1.kind::f8f6f4 [%r1036], %rd391, %rd392, %r1037, p; }
+	{ .reg .pred p; setp.ne.u32 p, %r1039, 0; tcgen05.mma.ws.cta_group::1.kind::f8f6f4 [%r1036], %rd393, %rd394, %r1037, p; }
+	{ .reg .pred p; setp.ne.u32 p, %r1039, 0; tcgen05.mma.ws.cta_group::1.kind::f8f6f4 [%r1036], %rd395, %rd396, %r1037, p; }
+	{ .reg .pred p; setp.ne.u32 p, %r1039, 0; tcgen05.mma.ws.cta_group::1.kind::f8f6f4 [%r1036], %rd397, %rd398, %r1037, p; }
+	{ .reg .pred p; setp.ne.u32 p, %r1039, 0; tcgen05.mma.ws.cta_group::1.kind::f8f6f4 [%r1036], %rd399, %rd400, %r1037, p; }
+	{ .reg .pred p; setp.ne.u32 p, %r1039, 0; tcgen05.mma.ws.cta_group::1.kind::f8f6f4 [%r1036], %rd401, %rd402, %r1037, p; }
+	tcgen05.commit.cta_group::1.mbarrier::arrive::one.shared::cluster.b64 	[%r2];
+	{ .reg .pred p; setp.ne.u32 p, %r1074, 0; tcgen05.mma.ws.cta_group::1.kind::f8f6f4 [%r1072], %rd405, %rd406, %r1073, p; }
+	{ .reg .pred p; setp.ne.u32 p, %r1075, 0; tcgen05.mma.ws.cta_group::1.kind::f8f6f4 [%r1072], %rd407, %rd408, %r1073, p; }
+	{ .reg .pred p; setp.ne.u32 p, %r1075, 0; tcgen05.mma.ws.cta_group::1.kind::f8f6f4 [%r1072], %rd414, %rd409, %r1073, p; }
+	{ .reg .pred p; setp.ne.u32 p, %r1075, 0; tcgen05.mma.ws.cta_group::1.kind::f8f6f4 [%r1072], %rd410, %rd411, %r1073, p; }
+	{ .reg .pred p; setp.ne.u32 p, %r1074, 0; tcgen05.mma.ws.cta_group::1.kind::f8f6f4 [%r1076], %rd405, %rd412, %r1073, p; }
+	{ .reg .pred p; setp.ne.u32 p, %r1075, 0; tcgen05.mma.ws.cta_group::1.kind::f8f6f4 [%r1076], %rd407, %rd413, %r1073, p; }
+	{ .reg .pred p; setp.ne.u32 p, %r1075, 0; tcgen05.mma.ws.cta_group::1.kind::f8f6f4 [%r1076], %rd414, %rd415, %r1073, p; }
+	{ .reg .pred p; setp.ne.u32 p, %r1075, 0; tcgen05.mma.ws.cta_group::1.kind::f8f6f4 [%r1076], %rd410, %rd416, %r1073, p; }
+	tcgen05.commit.cta_group::1.mbarrier::arrive::one.shared::cluster.b64 	[%r3];
+	mbarrier.arrive.expect_tx.shared.b64 %rd9, [%r5], %r99;
+	cp.async.bulk.tensor.2d.shared::cta.global.tile.mbarrier::complete_tx::bytes.cta_group::1 [%r1], [%rd192, {%r93, %r94}], [%r5];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile.mbarrier::complete_tx::bytes.cta_group::1 [%r566], [%rd192, {%r95, %r94}], [%r5];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile.mbarrier::complete_tx::bytes.cta_group::1 [%r568], [%rd192, {%r96, %r94}], [%r5];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile.mbarrier::complete_tx::bytes.cta_group::1 [%r570], [%rd192, {%r97, %r94}], [%r5];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile.mbarrier::complete_tx::bytes.cta_group::1 [%r572], [%rd192, {%r98, %r94}], [%r5];
+	mbarrier.arrive.expect_tx.shared.b64 %rd193, [%r5], %r574;
+	cp.async.bulk.tensor.2d.shared::cta.global.tile.mbarrier::complete_tx::bytes.cta_group::1 [%r1], [%rd192, {%r564, %r565}], [%r5];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile.mbarrier::complete_tx::bytes.cta_group::1 [%r566], [%rd192, {%r567, %r565}], [%r5];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile.mbarrier::complete_tx::bytes.cta_group::1 [%r568], [%rd192, {%r569, %r565}], [%r5];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile.mbarrier::complete_tx::bytes.cta_group::1 [%r570], [%rd192, {%r571, %r565}], [%r5];
+	cp.async.bulk.tensor.2d.shared::cta.global.tile.mbarrier::complete_tx::bytes.cta_group::1 [%r572], [%rd192, {%r573, %r565}], [%r5];

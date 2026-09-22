@@ -1,0 +1,80 @@
+{
+  "v284": {
+    "source": "experiments/glm53_sparse_mla/artifacts/v284/v284_ncu_raw.csv",
+    "source_sha256": "e951c2c44a6fcb158f751953f11452bf85a8f2675c3acdf4d89f0af1a52c7487",
+    "metrics": {
+      "launch__shared_mem_config_size": {
+        "value": "200.704000",
+        "unit": "Kbyte"
+      },
+      "launch__shared_mem_per_block": {
+        "value": "195.944000",
+        "unit": "Kbyte/block"
+      },
+      "launch__shared_mem_per_block_dynamic": {
+        "value": "194.920000",
+        "unit": "Kbyte/block"
+      },
+      "launch__shared_mem_per_block_driver": {
+        "value": "1.024000",
+        "unit": "Kbyte/block"
+      },
+      "device__attribute_max_shared_memory_per_block_optin": {
+        "value": "232,448",
+        "unit": ""
+      },
+      "device__attribute_max_shared_memory_per_multiprocessor": {
+        "value": "233,472",
+        "unit": ""
+      },
+      "lts__t_sector_hit_rate.pct": {
+        "value": "76.481153",
+        "unit": "%"
+      }
+    }
+  },
+  "v287": {
+    "source": "experiments/glm53_sparse_mla/artifacts/v287/v287_ncu_raw.csv",
+    "source_sha256": "9417741fef59d0a5d6cbf64f06bc00f720d95d4a85649daa2207c583f07e11d5",
+    "metrics": {
+      "launch__shared_mem_config_size": {
+        "value": "233.472000",
+        "unit": "Kbyte"
+      },
+      "launch__shared_mem_per_block": {
+        "value": "204.136000",
+        "unit": "Kbyte/block"
+      },
+      "launch__shared_mem_per_block_dynamic": {
+        "value": "203.112000",
+        "unit": "Kbyte/block"
+      },
+      "launch__shared_mem_per_block_driver": {
+        "value": "1.024000",
+        "unit": "Kbyte/block"
+      },
+      "device__attribute_max_shared_memory_per_block_optin": {
+        "value": "232,448",
+        "unit": ""
+      },
+      "device__attribute_max_shared_memory_per_multiprocessor": {
+        "value": "233,472",
+        "unit": ""
+      },
+      "lts__t_sector_hit_rate.pct": {
+        "value": "75.075977",
+        "unit": "%"
+      }
+    }
+  },
+  "inference": {
+    "v296_expected_dynamic_bytes": 215400,
+    "v297_expected_dynamic_bytes": 223592,
+    "v296_exceeds_parent_196_KiB_carveout": true,
+    "v297_parent_already_228_KiB": true,
+    "pending_runtime_confirmation": true,
+    "q_only_padding_expected_dynamic_bytes": 199016,
+    "q_only_plus_driver_bytes": 200040,
+    "q_only_fits_196_KiB": true
+  }
+}
