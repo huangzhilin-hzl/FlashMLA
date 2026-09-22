@@ -1,0 +1,7 @@
+{
+  "purpose": "separate read-only GPU1 NVML metadata query after telemetry runs",
+  "gpu_uuid": "GPU-2dc4b50c-07a5-26d6-f5ce-54ef728d56b2",
+  "power_management_limit_mw": 1100000,
+  "nvmlClocksEventReasonSwPowerCap": 4,
+  "device_settings_changed": false
+}

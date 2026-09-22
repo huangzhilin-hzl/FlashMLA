@@ -5935,3 +5935,112 @@ Installed4.6.2 emits identical native instruction encodings for v190/v203 (2896 
 Based on defaults v190/v197. Retain the final partial-sum store, its256-thread barrier and all TMEM completion/deallocation synchronization. Each output thread then reads the four partial denominators for its own head and computes one reciprocal with the identical parenthesization and division expression. Remove the64-thread reciprocal producer, shared denominator write/read and second256-thread barrier. Keep the shared-memory allocation/layout unchanged to isolate this control.
 
 This exchanges192 extra per-CTA reciprocals and additional shared reads for one barrier and a branch/handoff per query. It is not the earlier per-element division removed by v044: each new reciprocal is reused across all128 output elements owned by that thread. The operation is outside the16-tile attention loop, so any benefit is expected to be small. Compile/resources, bounded guarded smoke/memcheck, synccheck, full bitwise and hole/partial-tile audit precede timing; no numerical equivalence is assumed from expression similarity.
+
+
+### Iterations 205–206 qualification
+
+Both compile with unchanged123/128 registers and STACK0/LOCAL0. Guarded b2 smoke/b512 chunk0 memcheck, b2 synccheck and8192-row seed1234 exact three-repeat comparison pass. The mask fixture matches each parent bitwise; higher-precisionv206 passes the original masked tolerance. Additional full seed/short qualification is pending performance evidence.
+
+v205 completed short paired timing1548.54us versusTRT1691.87us and NCU before an artifact-copy failure: the snapshot glob also matched a new compile-work directory. The original benchmark and NCU results are intact. Fix run_iteration.sh to copy only regular files, preserving existing snapshots and avoiding a redundant v205 rerun. v206's performance step had not started when the driver stopped.
+
+
+## Warm-regime telemetry diagnostic
+
+Add bench_with_telemetry.py, which wraps only the whole source.measure_case invocation and calls its original implementation unchanged. A separate CPU process reads only the authorized GPU1 UUID through NVML, with no CUDA context or setting changes. Cases are bracketed with monotonic host timestamps; those windows include warmup, graph capture, event setup and timed invocations, not individual GPU kernel intervals. Sampling on/off controls are required before interpreting correlations.
+
+NVML documents PowerUsage as a one-second average on newer non-GA100 architectures; utilization likewise has an internal sampling interval. Polling every10ms does not yield10ms instantaneous power/utilization. SM-clock readings do not identify Tensor Core boost state. Retain these limitations and the uninstrumented timing records. Primary references: https://docs.nvidia.com/deploy/nvml-api/api/group__nvmlDeviceQueries.html and https://docs.nvidia.com/deploy/nvml-api/api/structnvmlUtilization__t.html .
+
+
+### Iterations 205–206 result — final reciprocal handoff removal is mixed
+
+v205 short trtllm/native warm 1691.87us.
+
+v205 short cute-v205/native warm 1548.54us.
+
+v205 NCU base/stable: gpu__time_duration.sum=2.638368 ms, launch__registers_per_thread=123 register/thread, launch__shared_mem_per_block_dynamic=194.920000 Kbyte/block, sm__warps_active.avg.pct_of_peak_sustained_active=19.294755 %, sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed=33.542172 %, smsp__warps_eligible.avg.per_cycle_active=0.368444 warp, smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio=6.423142 inst, l1tex__t_sectors_pipe_lsu_mem_local_op_ld.sum=0 sector, l1tex__t_sectors_pipe_lsu_mem_local_op_st.sum=0 sector, l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum=6,474,239 , l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum=3,822,712 .
+
+v206 short trtllm/native warm 1691.94us.
+
+v206 short cute-v206/native warm 1661.12us.
+
+v206 NCU base/stable: gpu__time_duration.sum=2.816064 ms, launch__registers_per_thread=128 register/thread, launch__shared_mem_per_block_dynamic=203.112000 Kbyte/block, sm__warps_active.avg.pct_of_peak_sustained_active=19.406962 %, sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_elapsed=46.179907 %, smsp__warps_eligible.avg.per_cycle_active=0.382516 warp, smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio=6.807788 inst, l1tex__t_sectors_pipe_lsu_mem_local_op_ld.sum=0 sector, l1tex__t_sectors_pipe_lsu_mem_local_op_st.sum=0 sector, l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum=6,939,871 , l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum=2,985,393 .
+
+warm trtllm/native: 1867.81 / 1874.62 / 1878.13 / 1879.97us.
+
+warm cute-v190/native: 1607.90 / 1608.78 / 1611.89 / 1612.00us.
+
+warm cute-v205/native: 1610.91 / 1610.18 / 1611.62 / 1611.82us.
+
+cold trtllm/native: 1857.60 / 1854.10 / 1859.84 / 1863.70us.
+
+cold cute-v190/native: 1616.02 / 1615.90 / 1597.52 / 1597.60us.
+
+cold cute-v205/native: 1595.42 / 1613.95 / 1616.18 / 1615.97us.
+
+warm trtllm/native: 1871.97 / 1882.16 / 1880.91 / 1886.26us.
+
+warm cute-v197/native: 1808.53 / 1812.64 / 1810.53 / 1809.66us.
+
+warm cute-v206/native: 1807.87 / 1810.46 / 1807.71 / 1810.37us.
+
+cold trtllm/native: 1859.39 / 1867.94 / 1865.89 / 1867.71us.
+
+cold cute-v197/native: 1797.12 / 1801.23 / 1798.10 / 1798.43us.
+
+cold cute-v206/native: 1810.13 / 1795.95 / 1808.42 / 1796.22us.
+
+v205 wins two warm and two cold rounds, losing the others; the cold differences change sign and reach about20us. v206 wins three warm and two cold rounds, but its cold regressions10.32/13.01us exceed its observed cold gains2.21/5.28us. Neither establishes a uniform gain. Retain v190/v197. Qualification is limited to the full1234 and mask fixtures already recorded; no additional seed/short audit or standalone long-test promotion is claimed.
+
+
+Static opcode comparison confirms one fewer BAR.SYNC.DEFER_BLOCKING in each reciprocal candidate (8→7 fast,9→8 higher precision), one fewer STS and LDS instruction, and the same four ELECT sites. Static total1448→1440 for fast and1600→1600 for higher precision. Repeating reciprocal/reduction work across more lanes changes dynamic counts; static instruction removal alone does not establish a gain.
+
+### Warm-regime telemetry result at the original20/100 settings
+
+Four independent sampling-on/off pairs alternate order. All512-row checks pass and the original benchmark source hash is unchanged. On/off timing is supplementary; no kernel or device settings changed. GPU1's separately queried power-management limit was1100000mW, and the installed NVML constant for SwPowerCap is4. This metadata query is read-only.
+
+sampling=on warm trtllm/native: 1869.82 / 1874.14 / 1869.41 / 1866.00us.
+
+sampling=on warm cute-v197/native: 1892.34 / 1886.34 / 1884.24 / 1888.29us.
+
+sampling=on cold trtllm/native: 1912.54 / 1914.78 / 1917.25 / 1916.78us.
+
+sampling=on cold cute-v197/native: 1834.70 / 1834.96 / 1832.98 / 1845.22us.
+
+sampling=off warm trtllm/native: 1865.58 / 1867.78 / 1864.75 / 1861.73us.
+
+sampling=off warm cute-v197/native: 1886.26 / 1885.81 / 1886.34 / 1873.98us.
+
+sampling=off cold trtllm/native: 1902.64 / 1914.69 / 1918.80 / 1917.01us.
+
+sampling=off cold cute-v197/native: 1835.02 / 1841.18 / 1835.12 / 1843.30us.
+
+Sampling-on v197 warm1884.24–1892.34us and off1873.98–1886.34us both lose their pairedTRT in all four rounds; cold beatsTRT in every round. Sampling perturbs some numbers, so retain the off controls. During whole warm case windows (including warmup/capture/setup), TRT SM-clock medians are1912–2032MHz versusv1971710–1717MHz. All v197 warm and both cold windows report event reason4; TRT warm includes0 and4. Memory clock stays3996MHz. No thermal reason was observed in these samples. This supports differing operating states during back-to-back cases, not a per-kernel frequency or causal latency correction.
+
+PowerUsage increases across the sequence toward the1100W configured limit; its one-second average includes preceding cases and must not be attributed to the current kernel alone. The meaning of event reason4 is verified against installedpynvml and NVIDIA's SwPowerCap documentation: https://docs.nvidia.com/deploy/nvml-api/api/group__nvmlClocksEventReasons.html .
+
+### Follow-up methodology controls
+
+Run original measure_case with500 warmups and100 measured calls, with alternating NVML sampling on/off, to test whether longer preconditioning changes the warm/cold result. This is a changed warmup diagnostic, not a replacement for20/100 baseline results.
+
+The existing round-robin helper calls nvidia-smi before and after every case. Those subprocesses create inter-case idle gaps outside the GPU event interval, potentially changing subsequent power/clock state. Add an explicit endpoint-telemetry on/off option (default on preserves prior behavior), and allow the separate-process telemetry wrapper to run that helper. Compare otherwise identical rotations before attributing standalone/rotation differences to the kernel or memory placement.
+
+
+### Warmup500 diagnostic result
+
+sampling=on warm trtllm/native: 1952.61 / 1927.38 / 1925.20us.
+
+sampling=on warm cute-v197/native: 1842.19 / 1851.49 / 1851.50us.
+
+sampling=on cold trtllm/native: 1914.70 / 1920.70 / 1919.01us.
+
+sampling=on cold cute-v197/native: 1832.75 / 1837.34 / 1837.28us.
+
+sampling=off warm trtllm/native: 1933.30 / 1925.22 / 1929.28us.
+
+sampling=off warm cute-v197/native: 1849.52 / 1851.44 / 1851.58us.
+
+sampling=off cold trtllm/native: 1918.83 / 1918.80 / 1919.02us.
+
+sampling=off cold cute-v197/native: 1837.18 / 1839.10 / 1836.16us.
+
+The sampling-off warm runs now give v1971849.52–1851.58us versusTRT1925.22–1933.30us, all three wins, and retain cold wins. With sampling on, whole warm-case SM-clock medians areTRT1627–1635MHz andv1971702–1717MHz; both are predominantly power limited. The one-second power readings settle near1.09kW in later windows. This demonstrates warmup-dependent comparisons under unchanged kernel code; it does not replace the original20-warmup results or prove that all differences are clock-caused. Original script and local source copy both still hashd843320fb5147a807135282a1b87bb4c247cdd7a6a16b9107d546c48c8a8fb66.

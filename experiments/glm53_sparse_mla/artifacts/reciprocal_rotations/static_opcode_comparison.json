@@ -1,0 +1,82 @@
+{
+  "v190": {
+    "total_static_instructions": 1448,
+    "selected_opcodes": {
+      "SYNCS.EXCH.64": 8,
+      "ELECT": 4,
+      "STS": 6,
+      "STS.U8": 1,
+      "BAR.SYNC.DEFER_BLOCKING": 8,
+      "SYNCS.ARRIVE.TRANS64": 2,
+      "SYNCS.PHASECHK.TRANS64.TRYWAIT": 16,
+      "LDS.128": 8,
+      "LDS": 14,
+      "BRX": 1,
+      "MUFU.EX2": 33,
+      "STS.128": 2,
+      "SYNCS.ARRIVE.TRANS64.A1T0": 2,
+      "MUFU.RCP": 5,
+      "SYNCS.PHASECHK.TRANS64": 8
+    }
+  },
+  "v205": {
+    "total_static_instructions": 1440,
+    "selected_opcodes": {
+      "SYNCS.EXCH.64": 8,
+      "ELECT": 4,
+      "STS": 5,
+      "STS.U8": 1,
+      "BAR.SYNC.DEFER_BLOCKING": 7,
+      "SYNCS.ARRIVE.TRANS64": 2,
+      "SYNCS.PHASECHK.TRANS64.TRYWAIT": 16,
+      "LDS.128": 8,
+      "LDS": 13,
+      "BRX": 1,
+      "MUFU.EX2": 33,
+      "STS.128": 2,
+      "SYNCS.ARRIVE.TRANS64.A1T0": 2,
+      "MUFU.RCP": 5,
+      "SYNCS.PHASECHK.TRANS64": 8
+    }
+  },
+  "v197": {
+    "total_static_instructions": 1600,
+    "selected_opcodes": {
+      "SYNCS.EXCH.64": 8,
+      "ELECT": 4,
+      "STS": 6,
+      "STS.U8": 1,
+      "BAR.SYNC.DEFER_BLOCKING": 9,
+      "SYNCS.ARRIVE.TRANS64": 2,
+      "SYNCS.PHASECHK.TRANS64.TRYWAIT": 16,
+      "LDS.128": 8,
+      "LDS": 14,
+      "BRX": 1,
+      "MUFU.EX2": 33,
+      "STS.128": 4,
+      "SYNCS.ARRIVE.TRANS64.A1T0": 2,
+      "MUFU.RCP": 5,
+      "SYNCS.PHASECHK.TRANS64": 8
+    }
+  },
+  "v206": {
+    "total_static_instructions": 1600,
+    "selected_opcodes": {
+      "SYNCS.EXCH.64": 8,
+      "ELECT": 4,
+      "STS": 5,
+      "STS.U8": 1,
+      "BAR.SYNC.DEFER_BLOCKING": 8,
+      "SYNCS.ARRIVE.TRANS64": 2,
+      "SYNCS.PHASECHK.TRANS64.TRYWAIT": 16,
+      "LDS.128": 8,
+      "LDS": 13,
+      "BRX": 1,
+      "MUFU.EX2": 33,
+      "STS.128": 4,
+      "SYNCS.ARRIVE.TRANS64.A1T0": 2,
+      "MUFU.RCP": 5,
+      "SYNCS.PHASECHK.TRANS64": 8
+    }
+  }
+}

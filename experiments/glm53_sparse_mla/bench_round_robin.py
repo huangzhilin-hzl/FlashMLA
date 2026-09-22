@@ -22,6 +22,8 @@ parser.add_argument('--rounds', type=int, default=3)
 parser.add_argument('--check-rows', type=int, default=512)
 parser.add_argument('--warmup-iters', type=int, default=20)
 parser.add_argument('--repeat-iters', type=int, default=100)
+parser.add_argument('--endpoint-telemetry', choices=('on', 'off'), default='on',
+                    help='Disable nvidia-smi endpoint queries to test their inter-case idle gaps')
 parser.add_argument('--output-json', required=True)
 args = parser.parse_args()
 source.LOCAL_TOKENS = 8192
@@ -40,6 +42,8 @@ l2_bytes = getattr(properties, 'L2_cache_size', 0) or 128*1024*1024
 flush_bytes = max(2*l2_bytes, 256*1024*1024)
 def gpu_snapshot():
     # Endpoint metadata only; this does not sample frequency inside a kernel.
+    if args.endpoint_telemetry == 'off':
+        return None
     result = subprocess.run(['nvidia-smi', '-i', 'GPU-2dc4b50c-07a5-26d6-f5ce-54ef728d56b2',
                              '--query-gpu=timestamp,clocks.sm,clocks.mem,temperature.gpu,power.draw',
                              '--format=csv,noheader,nounits'], capture_output=True, text=True, check=True)

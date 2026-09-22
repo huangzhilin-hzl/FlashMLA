@@ -1,0 +1,641 @@
+[
+  {
+    "round": 0,
+    "sampling": "on",
+    "case": "trtllm/native",
+    "cache": "warm",
+    "median_us": 1952.608048915863,
+    "sample_count": 212,
+    "telemetry": {
+      "sm_clock_mhz": {
+        "min": 1582,
+        "median": 1627.0,
+        "max": 2032
+      },
+      "memory_clock_mhz": {
+        "min": 3996,
+        "median": 3996.0,
+        "max": 3996
+      },
+      "power_usage_mw": {
+        "min": 244885,
+        "median": 1085428.0,
+        "max": 1098134
+      },
+      "temperature_c": {
+        "min": 34,
+        "median": 51.0,
+        "max": 53
+      },
+      "pstate": {
+        "min": 0,
+        "median": 0.0,
+        "max": 0
+      },
+      "gpu_utilization_pct": {
+        "min": 0,
+        "median": 100.0,
+        "max": 100
+      }
+    },
+    "clock_event_reasons": [
+      0,
+      4
+    ]
+  },
+  {
+    "round": 0,
+    "sampling": "on",
+    "case": "cute-v197/native",
+    "cache": "warm",
+    "median_us": 1842.191994190216,
+    "sample_count": 201,
+    "telemetry": {
+      "sm_clock_mhz": {
+        "min": 1627,
+        "median": 1717,
+        "max": 1725
+      },
+      "memory_clock_mhz": {
+        "min": 3996,
+        "median": 3996,
+        "max": 3996
+      },
+      "power_usage_mw": {
+        "min": 1086163,
+        "median": 1087499,
+        "max": 1092589
+      },
+      "temperature_c": {
+        "min": 53,
+        "median": 54,
+        "max": 55
+      },
+      "pstate": {
+        "min": 0,
+        "median": 0,
+        "max": 0
+      },
+      "gpu_utilization_pct": {
+        "min": 93,
+        "median": 100,
+        "max": 100
+      }
+    },
+    "clock_event_reasons": [
+      4
+    ]
+  },
+  {
+    "round": 0,
+    "sampling": "on",
+    "case": "trtllm/native",
+    "cache": "cold",
+    "median_us": 1914.7040247917175,
+    "sample_count": 213,
+    "telemetry": {
+      "sm_clock_mhz": {
+        "min": 1627,
+        "median": 1627,
+        "max": 1725
+      },
+      "memory_clock_mhz": {
+        "min": 3996,
+        "median": 3996,
+        "max": 3996
+      },
+      "power_usage_mw": {
+        "min": 1086252,
+        "median": 1089506,
+        "max": 1091939
+      },
+      "temperature_c": {
+        "min": 54,
+        "median": 54,
+        "max": 55
+      },
+      "pstate": {
+        "min": 0,
+        "median": 0,
+        "max": 0
+      },
+      "gpu_utilization_pct": {
+        "min": 99,
+        "median": 100,
+        "max": 100
+      }
+    },
+    "clock_event_reasons": [
+      4
+    ]
+  },
+  {
+    "round": 0,
+    "sampling": "on",
+    "case": "cute-v197/native",
+    "cache": "cold",
+    "median_us": 1832.751989364624,
+    "sample_count": 202,
+    "telemetry": {
+      "sm_clock_mhz": {
+        "min": 1672,
+        "median": 1717.0,
+        "max": 1770
+      },
+      "memory_clock_mhz": {
+        "min": 3996,
+        "median": 3996.0,
+        "max": 3996
+      },
+      "power_usage_mw": {
+        "min": 1084231,
+        "median": 1086206.0,
+        "max": 1087130
+      },
+      "temperature_c": {
+        "min": 55,
+        "median": 56.0,
+        "max": 57
+      },
+      "pstate": {
+        "min": 0,
+        "median": 0.0,
+        "max": 0
+      },
+      "gpu_utilization_pct": {
+        "min": 99,
+        "median": 100.0,
+        "max": 100
+      }
+    },
+    "clock_event_reasons": [
+      4
+    ]
+  },
+  {
+    "round": 0,
+    "sampling": "off",
+    "case": "trtllm/native",
+    "cache": "warm",
+    "median_us": 1933.296024799347,
+    "sample_count": 0,
+    "telemetry": {},
+    "clock_event_reasons": []
+  },
+  {
+    "round": 0,
+    "sampling": "off",
+    "case": "cute-v197/native",
+    "cache": "warm",
+    "median_us": 1849.519968032837,
+    "sample_count": 0,
+    "telemetry": {},
+    "clock_event_reasons": []
+  },
+  {
+    "round": 0,
+    "sampling": "off",
+    "case": "trtllm/native",
+    "cache": "cold",
+    "median_us": 1918.832004070282,
+    "sample_count": 0,
+    "telemetry": {},
+    "clock_event_reasons": []
+  },
+  {
+    "round": 0,
+    "sampling": "off",
+    "case": "cute-v197/native",
+    "cache": "cold",
+    "median_us": 1837.1840119361877,
+    "sample_count": 0,
+    "telemetry": {},
+    "clock_event_reasons": []
+  },
+  {
+    "round": 1,
+    "sampling": "off",
+    "case": "trtllm/native",
+    "cache": "warm",
+    "median_us": 1925.2159595489502,
+    "sample_count": 0,
+    "telemetry": {},
+    "clock_event_reasons": []
+  },
+  {
+    "round": 1,
+    "sampling": "off",
+    "case": "cute-v197/native",
+    "cache": "warm",
+    "median_us": 1851.4400124549866,
+    "sample_count": 0,
+    "telemetry": {},
+    "clock_event_reasons": []
+  },
+  {
+    "round": 1,
+    "sampling": "off",
+    "case": "trtllm/native",
+    "cache": "cold",
+    "median_us": 1918.7999963760376,
+    "sample_count": 0,
+    "telemetry": {},
+    "clock_event_reasons": []
+  },
+  {
+    "round": 1,
+    "sampling": "off",
+    "case": "cute-v197/native",
+    "cache": "cold",
+    "median_us": 1839.1039967536926,
+    "sample_count": 0,
+    "telemetry": {},
+    "clock_event_reasons": []
+  },
+  {
+    "round": 1,
+    "sampling": "on",
+    "case": "trtllm/native",
+    "cache": "warm",
+    "median_us": 1927.3760318756104,
+    "sample_count": 209,
+    "telemetry": {
+      "sm_clock_mhz": {
+        "min": 1597,
+        "median": 1627,
+        "max": 2032
+      },
+      "memory_clock_mhz": {
+        "min": 3996,
+        "median": 3996,
+        "max": 3996
+      },
+      "power_usage_mw": {
+        "min": 248666,
+        "median": 1084116,
+        "max": 1118046
+      },
+      "temperature_c": {
+        "min": 38,
+        "median": 54,
+        "max": 56
+      },
+      "pstate": {
+        "min": 0,
+        "median": 0,
+        "max": 0
+      },
+      "gpu_utilization_pct": {
+        "min": 0,
+        "median": 100,
+        "max": 100
+      }
+    },
+    "clock_event_reasons": [
+      0,
+      4
+    ]
+  },
+  {
+    "round": 1,
+    "sampling": "on",
+    "case": "cute-v197/native",
+    "cache": "warm",
+    "median_us": 1851.4879941940308,
+    "sample_count": 201,
+    "telemetry": {
+      "sm_clock_mhz": {
+        "min": 1650,
+        "median": 1702,
+        "max": 1717
+      },
+      "memory_clock_mhz": {
+        "min": 3996,
+        "median": 3996,
+        "max": 3996
+      },
+      "power_usage_mw": {
+        "min": 1086571,
+        "median": 1089174,
+        "max": 1090054
+      },
+      "temperature_c": {
+        "min": 56,
+        "median": 58,
+        "max": 58
+      },
+      "pstate": {
+        "min": 0,
+        "median": 0,
+        "max": 0
+      },
+      "gpu_utilization_pct": {
+        "min": 100,
+        "median": 100,
+        "max": 100
+      }
+    },
+    "clock_event_reasons": [
+      4
+    ]
+  },
+  {
+    "round": 1,
+    "sampling": "on",
+    "case": "trtllm/native",
+    "cache": "cold",
+    "median_us": 1920.7040071487427,
+    "sample_count": 211,
+    "telemetry": {
+      "sm_clock_mhz": {
+        "min": 1627,
+        "median": 1627,
+        "max": 1717
+      },
+      "memory_clock_mhz": {
+        "min": 3996,
+        "median": 3996,
+        "max": 3996
+      },
+      "power_usage_mw": {
+        "min": 1089023,
+        "median": 1091608,
+        "max": 1092684
+      },
+      "temperature_c": {
+        "min": 57,
+        "median": 57,
+        "max": 58
+      },
+      "pstate": {
+        "min": 0,
+        "median": 0,
+        "max": 0
+      },
+      "gpu_utilization_pct": {
+        "min": 100,
+        "median": 100,
+        "max": 100
+      }
+    },
+    "clock_event_reasons": [
+      4
+    ]
+  },
+  {
+    "round": 1,
+    "sampling": "on",
+    "case": "cute-v197/native",
+    "cache": "cold",
+    "median_us": 1837.343990802765,
+    "sample_count": 202,
+    "telemetry": {
+      "sm_clock_mhz": {
+        "min": 1672,
+        "median": 1695.0,
+        "max": 1770
+      },
+      "memory_clock_mhz": {
+        "min": 3996,
+        "median": 3996.0,
+        "max": 3996
+      },
+      "power_usage_mw": {
+        "min": 1087342,
+        "median": 1089093.0,
+        "max": 1091480
+      },
+      "temperature_c": {
+        "min": 57,
+        "median": 59.0,
+        "max": 59
+      },
+      "pstate": {
+        "min": 0,
+        "median": 0.0,
+        "max": 0
+      },
+      "gpu_utilization_pct": {
+        "min": 100,
+        "median": 100.0,
+        "max": 100
+      }
+    },
+    "clock_event_reasons": [
+      4
+    ]
+  },
+  {
+    "round": 2,
+    "sampling": "on",
+    "case": "trtllm/native",
+    "cache": "warm",
+    "median_us": 1925.2000451087952,
+    "sample_count": 210,
+    "telemetry": {
+      "sm_clock_mhz": {
+        "min": 1552,
+        "median": 1635.0,
+        "max": 2032
+      },
+      "memory_clock_mhz": {
+        "min": 3996,
+        "median": 3996.0,
+        "max": 3996
+      },
+      "power_usage_mw": {
+        "min": 249435,
+        "median": 1085386.0,
+        "max": 1121427
+      },
+      "temperature_c": {
+        "min": 38,
+        "median": 55.0,
+        "max": 56
+      },
+      "pstate": {
+        "min": 0,
+        "median": 0.0,
+        "max": 0
+      },
+      "gpu_utilization_pct": {
+        "min": 0,
+        "median": 100.0,
+        "max": 100
+      }
+    },
+    "clock_event_reasons": [
+      0,
+      4
+    ]
+  },
+  {
+    "round": 2,
+    "sampling": "on",
+    "case": "cute-v197/native",
+    "cache": "warm",
+    "median_us": 1851.5039682388306,
+    "sample_count": 202,
+    "telemetry": {
+      "sm_clock_mhz": {
+        "min": 1657,
+        "median": 1702.0,
+        "max": 1740
+      },
+      "memory_clock_mhz": {
+        "min": 3996,
+        "median": 3996.0,
+        "max": 3996
+      },
+      "power_usage_mw": {
+        "min": 1086082,
+        "median": 1089024.0,
+        "max": 1090145
+      },
+      "temperature_c": {
+        "min": 56,
+        "median": 58.0,
+        "max": 58
+      },
+      "pstate": {
+        "min": 0,
+        "median": 0.0,
+        "max": 0
+      },
+      "gpu_utilization_pct": {
+        "min": 100,
+        "median": 100.0,
+        "max": 100
+      }
+    },
+    "clock_event_reasons": [
+      4
+    ]
+  },
+  {
+    "round": 2,
+    "sampling": "on",
+    "case": "trtllm/native",
+    "cache": "cold",
+    "median_us": 1919.007956981659,
+    "sample_count": 213,
+    "telemetry": {
+      "sm_clock_mhz": {
+        "min": 1627,
+        "median": 1627,
+        "max": 1717
+      },
+      "memory_clock_mhz": {
+        "min": 3996,
+        "median": 3996,
+        "max": 3996
+      },
+      "power_usage_mw": {
+        "min": 1089100,
+        "median": 1091114,
+        "max": 1091978
+      },
+      "temperature_c": {
+        "min": 57,
+        "median": 57,
+        "max": 58
+      },
+      "pstate": {
+        "min": 0,
+        "median": 0,
+        "max": 0
+      },
+      "gpu_utilization_pct": {
+        "min": 100,
+        "median": 100,
+        "max": 100
+      }
+    },
+    "clock_event_reasons": [
+      4
+    ]
+  },
+  {
+    "round": 2,
+    "sampling": "on",
+    "case": "cute-v197/native",
+    "cache": "cold",
+    "median_us": 1837.2799754142761,
+    "sample_count": 204,
+    "telemetry": {
+      "sm_clock_mhz": {
+        "min": 1672,
+        "median": 1695.0,
+        "max": 1777
+      },
+      "memory_clock_mhz": {
+        "min": 3996,
+        "median": 3996.0,
+        "max": 3996
+      },
+      "power_usage_mw": {
+        "min": 1087777,
+        "median": 1089391.0,
+        "max": 1091337
+      },
+      "temperature_c": {
+        "min": 57,
+        "median": 59.0,
+        "max": 59
+      },
+      "pstate": {
+        "min": 0,
+        "median": 0.0,
+        "max": 0
+      },
+      "gpu_utilization_pct": {
+        "min": 100,
+        "median": 100.0,
+        "max": 100
+      }
+    },
+    "clock_event_reasons": [
+      4
+    ]
+  },
+  {
+    "round": 2,
+    "sampling": "off",
+    "case": "trtllm/native",
+    "cache": "warm",
+    "median_us": 1929.2799830436707,
+    "sample_count": 0,
+    "telemetry": {},
+    "clock_event_reasons": []
+  },
+  {
+    "round": 2,
+    "sampling": "off",
+    "case": "cute-v197/native",
+    "cache": "warm",
+    "median_us": 1851.5839576721191,
+    "sample_count": 0,
+    "telemetry": {},
+    "clock_event_reasons": []
+  },
+  {
+    "round": 2,
+    "sampling": "off",
+    "case": "trtllm/native",
+    "cache": "cold",
+    "median_us": 1919.0239906311035,
+    "sample_count": 0,
+    "telemetry": {},
+    "clock_event_reasons": []
+  },
+  {
+    "round": 2,
+    "sampling": "off",
+    "case": "cute-v197/native",
+    "cache": "cold",
+    "median_us": 1836.1600041389465,
+    "sample_count": 0,
+    "telemetry": {},
+    "clock_event_reasons": []
+  }
+]

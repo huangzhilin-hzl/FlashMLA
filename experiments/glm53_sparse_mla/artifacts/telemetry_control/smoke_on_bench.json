@@ -1,0 +1,207 @@
+{
+  "configuration": {
+    "gpu": "NVIDIA B300 SXM6 AC",
+    "capability": [
+      10,
+      3
+    ],
+    "versions": {
+      "torch": "2.13.0+cu130",
+      "cuda": "13.0",
+      "flashinfer-python": "0.6.18",
+      "flash-mla": "not installed as a distribution",
+      "flashmla_source_revision": "unreported"
+    },
+    "args": {
+      "mode": "bench",
+      "backends": [
+        "trtllm",
+        "cute"
+      ],
+      "scope": "native",
+      "chunk": 3,
+      "rank": 0,
+      "seed": 1234,
+      "warmup_iters": 1,
+      "repeat_iters": 3,
+      "profile_iters": 20,
+      "timing": "cuda-graph",
+      "cache": "both",
+      "check_rows": 2,
+      "check_atol": 0.01,
+      "check_rtol": 0.05,
+      "trace_path": null,
+      "output_json": "artifacts/telemetry_control/smoke_on_bench.json",
+      "with_stack": false
+    },
+    "workload": {
+      "local_tokens": 2,
+      "cp": 4,
+      "context_len": 131072,
+      "heads": 64,
+      "qk_dim": 576,
+      "v_dim": 512,
+      "topk": 2048,
+      "page_size": 64,
+      "softmax_scale": 0.0625,
+      "bmm2_scale": 1.0,
+      "synthetic": true,
+      "enable_dcp": false
+    },
+    "tensors": {
+      "query": {
+        "shape": [
+          2,
+          1,
+          64,
+          576
+        ],
+        "dtype": "torch.float8_e4m3fn",
+        "stride": [
+          36864,
+          36864,
+          576,
+          1
+        ]
+      },
+      "kv_cache": {
+        "shape": [
+          2048,
+          1,
+          64,
+          576
+        ],
+        "dtype": "torch.float8_e4m3fn",
+        "stride": [
+          36864,
+          36864,
+          576,
+          1
+        ]
+      },
+      "block_tables": {
+        "shape": [
+          2,
+          1,
+          2048
+        ],
+        "dtype": "torch.int32",
+        "stride": [
+          2048,
+          2048,
+          1
+        ]
+      },
+      "seq_lens": {
+        "shape": [
+          2
+        ],
+        "dtype": "torch.int32",
+        "stride": [
+          1
+        ]
+      }
+    },
+    "cases": {
+      "trtllm/native": "Q FP8 [4096,1,64,576]; KV FP8 [pages,1,64,576]; preallocated output",
+      "cute-v197/native": "FP8 Q/KV; preallocated BF16 output; block_k=128"
+    },
+    "candidate": {
+      "version": "v197",
+      "block_k": 128,
+      "file_sha256": "ab5db755204cc204a45fbb7b94c7e9d9a8e5c53d0c50ae183c5a191a4c0dfaa7",
+      "cutlass_dsl": "4.6.2",
+      "original_benchmark_sha256": "d843320fb5147a807135282a1b87bb4c247cdd7a6a16b9107d546c48c8a8fb66"
+    }
+  },
+  "correctness": {
+    "trtllm/native": {
+      "rows": [
+        0,
+        1
+      ],
+      "max_abs": 0.007573306560516357,
+      "rmse": 0.0011798759223893285,
+      "relative_rmse": 0.01283168302401002,
+      "atol": 0.01,
+      "rtol": 0.05
+    },
+    "cute-v197/native": {
+      "rows": [
+        0,
+        1
+      ],
+      "max_abs": 0.0011896789073944092,
+      "rmse": 0.00016030878759920597,
+      "relative_rmse": 0.0017434303975546268,
+      "atol": 0.01,
+      "rtol": 0.05
+    }
+  },
+  "benchmarks": [
+    {
+      "case": "trtllm/native",
+      "cache": "warm",
+      "timing": "cuda-graph",
+      "mean_us": 14.293333205084005,
+      "median_us": 14.62399959564209,
+      "p05_us": 13.443199824541807,
+      "p95_us": 14.912000112235546,
+      "samples_us": [
+        14.944000169634819,
+        14.62399959564209,
+        13.311999849975109
+      ],
+      "l2_flush_bytes": 0,
+      "speedup_vs_trtllm": 1.0
+    },
+    {
+      "case": "cute-v197/native",
+      "cache": "warm",
+      "timing": "cuda-graph",
+      "mean_us": 33.760001262029014,
+      "median_us": 33.88800099492073,
+      "p05_us": 33.45600105822086,
+      "p95_us": 33.97440165281296,
+      "samples_us": [
+        33.40800106525421,
+        33.984001725912094,
+        33.88800099492073
+      ],
+      "l2_flush_bytes": 0,
+      "speedup_vs_trtllm": 0.4315391633113441
+    },
+    {
+      "case": "trtllm/native",
+      "cache": "cold",
+      "timing": "cuda-graph",
+      "mean_us": 16.522666439414024,
+      "median_us": 16.575999557971954,
+      "p05_us": 16.403199918568134,
+      "p95_us": 16.604799777269363,
+      "samples_us": [
+        16.575999557971954,
+        16.383999958634377,
+        16.607999801635742
+      ],
+      "l2_flush_bytes": 268435456,
+      "speedup_vs_trtllm": 1.0
+    },
+    {
+      "case": "cute-v197/native",
+      "cache": "cold",
+      "timing": "cuda-graph",
+      "mean_us": 36.80000081658363,
+      "median_us": 36.83200106024742,
+      "p05_us": 36.716800183057785,
+      "p95_us": 36.86080127954483,
+      "samples_us": [
+        36.83200106024742,
+        36.86400130391121,
+        36.70400008559227
+      ],
+      "l2_flush_bytes": 268435456,
+      "speedup_vs_trtllm": 0.45004341553036986
+    }
+  ]
+}

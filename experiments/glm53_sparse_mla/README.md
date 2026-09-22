@@ -476,3 +476,14 @@ slower than pairedTRT. This materially limits the earlier1811.97 us standalone
 result: the warm advantage is execution-dependent. The same-process rotating
 comparison against v191 remains valid, but does not establish a universal
 standalone lead overTRT. Raw records are in artifacts/compiler_runtime_v197.
+
+
+The original20-warmup standalone warm regime remains mixed for v197: a later
+sampling-off four-round diagnostic records1873.98–1886.34us, all slightly slower
+than pairedTRT. With500 warmups, the separate three-round sampling-off diagnostic
+records1849.52–1851.58us versusTRT1925.22–1933.30us. Keep these parameter regimes
+separate. bench_with_telemetry.py records whole-case NVML samples without changing
+the source timing function or device settings; power/utilization are internally
+averaged and SM clocks are not Tensor Core boost-state measurements. The rotation
+helper now has --endpoint-telemetry off to isolate idle gaps from nvidia-smi calls;
+on remains the default for reproducibility of existing records.

@@ -1,0 +1,107 @@
+{
+  "purpose": "whole-case NVML diagnostic; not per-kernel timing or boost-state proof",
+  "sampling": "off",
+  "interval_ms": 10,
+  "gpu_uuid": "GPU-2dc4b50c-07a5-26d6-f5ce-54ef728d56b2",
+  "benchmark_args": [
+    "--kernel-version",
+    "v197",
+    "--backends",
+    "trtllm",
+    "cute",
+    "--block-k",
+    "128",
+    "--local-tokens",
+    "2",
+    "--scope",
+    "native",
+    "--check-rows",
+    "2",
+    "--warmup-iters",
+    "1",
+    "--repeat-iters",
+    "3",
+    "--cache",
+    "both",
+    "--timing",
+    "cuda-graph",
+    "--output-json",
+    "artifacts/telemetry_control/smoke_off_bench.json"
+  ],
+  "benchmark_sha256": "d843320fb5147a807135282a1b87bb4c247cdd7a6a16b9107d546c48c8a8fb66",
+  "sampler_field_errors": {},
+  "windows": [
+    {
+      "case": "trtllm/native",
+      "cache": "warm",
+      "timing": "cuda-graph",
+      "start_monotonic_ns": 512823781381649,
+      "median_us": 14.303999952971935,
+      "samples_us": [
+        15.584000386297703,
+        13.439999893307686,
+        14.303999952971935
+      ],
+      "end_monotonic_ns": 512823817816068,
+      "telemetry_sample_count": 0,
+      "telemetry": {},
+      "clock_event_reasons_observed": []
+    },
+    {
+      "case": "cute-v197/native",
+      "cache": "warm",
+      "timing": "cuda-graph",
+      "start_monotonic_ns": 512823818181489,
+      "median_us": 33.92000123858452,
+      "samples_us": [
+        33.56799855828285,
+        33.92000123858452,
+        33.952001482248306
+      ],
+      "end_monotonic_ns": 512823818721682,
+      "telemetry_sample_count": 0,
+      "telemetry": {},
+      "clock_event_reasons_observed": []
+    },
+    {
+      "case": "trtllm/native",
+      "cache": "cold",
+      "timing": "cuda-graph",
+      "start_monotonic_ns": 512823819099429,
+      "median_us": 16.383999958634377,
+      "samples_us": [
+        16.383999958634377,
+        16.448000445961952,
+        16.383999958634377
+      ],
+      "end_monotonic_ns": 512823820108558,
+      "telemetry_sample_count": 0,
+      "telemetry": {},
+      "clock_event_reasons_observed": []
+    },
+    {
+      "case": "cute-v197/native",
+      "cache": "cold",
+      "timing": "cuda-graph",
+      "start_monotonic_ns": 512823820303661,
+      "median_us": 36.86400130391121,
+      "samples_us": [
+        36.86400130391121,
+        36.57599911093712,
+        36.86400130391121
+      ],
+      "end_monotonic_ns": 512823821009828,
+      "telemetry_sample_count": 0,
+      "telemetry": {},
+      "clock_event_reasons_observed": []
+    }
+  ],
+  "nvml_reference": "https://docs.nvidia.com/deploy/nvml-api/api/group__nvmlDeviceQueries.html",
+  "limitations": [
+    "Windows include warmup, graph capture, event setup and measured calls.",
+    "PowerUsage is a one-second average on newer non-GA100 architectures.",
+    "Utilization has a device-defined averaging period; polling does not shorten it.",
+    "SM clock samples do not directly report the Tensor Core boost state.",
+    "Compare sampling on/off to detect sampler perturbation; no clocks are changed."
+  ]
+}

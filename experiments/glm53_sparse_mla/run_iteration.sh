@@ -33,5 +33,9 @@ ncu --import "artifacts/${version}_ncu.ncu-rep" --page raw --csv \
 "$python_bin" extract_ncu.py "artifacts/${version}_ncu_raw.csv" \
   > "artifacts/${version}_ncu_summary.json"
 mkdir -p "artifacts/snapshots/${version}"
-cp artifacts/"${version}"_* "artifacts/snapshots/${version}/"
+for artifact in artifacts/"${version}"_*; do
+  if [[ -f "$artifact" ]]; then
+    cp "$artifact" "artifacts/snapshots/${version}/"
+  fi
+done
 cat "artifacts/${version}_ncu_summary.json"
